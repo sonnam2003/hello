@@ -2,6 +2,6 @@ streamlit
 streamlit-autorefresh
 pandas
 plotly
-psycopg2
-st-aggrid
+psycopg2-binary
+streamlit-aggrid
 numpy
