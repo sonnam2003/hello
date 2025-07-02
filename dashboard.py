@@ -1304,8 +1304,8 @@ elif page == "North 1":
         width=1200,
         height=600,
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5),
-        xaxis=dict(tickfont=dict(color='black'), titlefont=dict(color='black')),
-        yaxis=dict(tickfont=dict(color='black'), titlefont=dict(color='black'))
+        xaxis=dict(tickfont=dict(color='black')),
+        yaxis=dict(tickfont=dict(color='black'))
     )
     st.plotly_chart(fig, use_container_width=True)
     st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
@@ -1666,8 +1666,8 @@ elif page == "North 1":
         width=1200,
         height=800,
         legend=dict(orientation="h", yanchor="top", y=1.05, xanchor="center", x=0.5),
-        xaxis=dict(tickfont=dict(color='black'), titlefont=dict(color='black')),
-        yaxis=dict(tickfont=dict(color='black'), titlefont=dict(color='black'))
+        xaxis=dict(tickfont=dict(color='black')),
+        yaxis=dict(tickfont=dict(color='black'))
     )
     st.plotly_chart(fig_stack_priority_north1)
     st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
@@ -1760,12 +1760,10 @@ elif page == "North 1":
             x=0.5
         ),
         xaxis=dict(
-            tickfont=dict(color='black'),
-            titlefont=dict(color='black')
+            tickfont=dict(color='black')
         ),
         yaxis=dict(
-            tickfont=dict(color='black'),
-            titlefont=dict(color='black')
+            tickfont=dict(color='black')
         )
     )
     st.plotly_chart(fig, use_container_width=True)
@@ -1872,12 +1870,10 @@ elif page == "North 1":
             x=0.5
         ),
         xaxis=dict(
-            tickfont=dict(color='black'),
-            titlefont=dict(color='black')
+            tickfont=dict(color='black')
         ),
         yaxis=dict(
-            tickfont=dict(color='black'),
-            titlefont=dict(color='black')
+            tickfont=dict(color='black')
         )
     )
     st.plotly_chart(fig, use_container_width=True)
@@ -2279,8 +2275,8 @@ elif page == "North 1":
         width=1200,
         height=600,
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5),
-        xaxis=dict(tickfont=dict(color='black'), titlefont=dict(color='black')),
-        yaxis=dict(tickfont=dict(color='black'), titlefont=dict(color='black'))
+        xaxis=dict(tickfont=dict(color='black')),
+        yaxis=dict(tickfont=dict(color='black'))
     )
     st.plotly_chart(fig2, use_container_width=True)
     st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
@@ -2622,8 +2618,8 @@ elif page == "North 1":
         width=1200,
         height=800,
         legend=dict(orientation="h", yanchor="top", y=1.05, xanchor="center", x=0.5),
-        xaxis=dict(tickfont=dict(color='black'), titlefont=dict(color='black')),
-        yaxis=dict(tickfont=dict(color='black'), titlefont=dict(color='black'))
+        xaxis=dict(tickfont=dict(color='black')),
+        yaxis=dict(tickfont=dict(color='black'))
     )
     st.plotly_chart(fig_stack_priority_north2)
     st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
@@ -2703,12 +2699,10 @@ elif page == "North 1":
             x=0.5
         ),
         xaxis=dict(
-            tickfont=dict(color='black'),
-            titlefont=dict(color='black')
+            tickfont=dict(color='black')
         ),
         yaxis=dict(
-            tickfont=dict(color='black'),
-            titlefont=dict(color='black')
+            tickfont=dict(color='black')
         )
     )
     st.plotly_chart(fig_high2, use_container_width=True)
@@ -2799,12 +2793,10 @@ elif page == "North 1":
             x=0.5
         ),
         xaxis=dict(
-            tickfont=dict(color='black'),
-            titlefont=dict(color='black')
+            tickfont=dict(color='black')
         ),
         yaxis=dict(
-            tickfont=dict(color='black'),
-            titlefont=dict(color='black')
+            tickfont=dict(color='black')
         )
     )
     st.plotly_chart(fig_lowmed2, use_container_width=True)
@@ -3205,8 +3197,8 @@ elif page == "North 1":
         width=1200,
         height=600,
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5),
-        xaxis=dict(tickfont=dict(color='black'), titlefont=dict(color='black')),
-        yaxis=dict(tickfont=dict(color='black'), titlefont=dict(color='black'))
+        xaxis=dict(tickfont=dict(color='black')),
+        yaxis=dict(tickfont=dict(color='black'))
     )
     st.plotly_chart(fig3, use_container_width=True)
     st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
@@ -3544,8 +3536,8 @@ elif page == "North 1":
         width=1200,
         height=800,
         legend=dict(orientation="h", yanchor="top", y=1.05, xanchor="center", x=0.5),
-        xaxis=dict(tickfont=dict(color='black'), titlefont=dict(color='black')),
-        yaxis=dict(tickfont=dict(color='black'), titlefont=dict(color='black'))
+        xaxis=dict(tickfont=dict(color='black')),
+        yaxis=dict(tickfont=dict(color='black'))
     )
     st.plotly_chart(fig_stack_priority_north3)
     st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
@@ -3625,12 +3617,10 @@ elif page == "North 1":
             x=0.5
         ),
         xaxis=dict(
-            tickfont=dict(color='black'),
-            titlefont=dict(color='black')
+            tickfont=dict(color='black')
         ),
         yaxis=dict(
-            tickfont=dict(color='black'),
-            titlefont=dict(color='black')
+            tickfont=dict(color='black')
         )
     )
     st.plotly_chart(fig_high3, use_container_width=True)
@@ -3721,12 +3711,10 @@ elif page == "North 1":
             x=0.5
         ),
         xaxis=dict(
-            tickfont=dict(color='black'),
-            titlefont=dict(color='black')
+            tickfont=dict(color='black')
         ),
         yaxis=dict(
-            tickfont=dict(color='black'),
-            titlefont=dict(color='black')
+            tickfont=dict(color='black')
         )
     )
     st.plotly_chart(fig_lowmed3, use_container_width=True)
@@ -3950,12 +3938,3 @@ elif page == "North 1":
     row_height3 = 35
     header_height3 = 38
     st.dataframe(styled3, use_container_width=True, height=num_rows3 * row_height3 + header_height3)
-
-
-
-
-
-
-
-
-
