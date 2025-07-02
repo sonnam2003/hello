@@ -1459,21 +1459,16 @@ elif page == "North 1":
 
     fig_stack_north1.update_layout(
         barmode='stack',
-
-        title={
-            'text': "NORTH 1 - OVERALL EVOLUTION OA TICKETS PER CATEGORY",
-            'y': 1,
-            'x': 0.5,
-            'xanchor': 'center',
-            'yanchor': 'top',
-            'font': dict(size=28)
-        },
-
-        xaxis_title="Weeks",
-        yaxis_title="Number of OA Tickets",
+        title=dict(
+            text="NORTH 1 - OVERALL EVOLUTION OA TICKETS PER CATEGORY",
+            y=1,
+            x=0.5,
+            xanchor='center',
+            yanchor='top',
+            font=dict(size=28)
+        ),
         width=1200,
         height=900,
-        legend_title_text="Category",
         legend=dict(
             orientation="h",
             yanchor="bottom",
@@ -1483,14 +1478,14 @@ elif page == "North 1":
         ),
         xaxis=dict(
             tickfont=dict(color='black'),
-            title=dict(font=dict(color='black')),
+            title=dict(text="Weeks", font=dict(color='black')),
             automargin=False
         ),
         yaxis=dict(
             tickfont=dict(color='black'),
-            title=dict(font=dict(color='black'))
+            title=dict(text="Number of OA Tickets", font=dict(color='black'))
         ),
-        margin=dict(r=50, b=5),  # giảm b (b # Tăng margin bên phải để chứa các box
+        margin=dict(r=50, b=5),
     )
     st.plotly_chart(fig_stack_north1)
     st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
@@ -2422,19 +2417,16 @@ elif page == "North 1":
 
     fig_stack_north2.update_layout(
         barmode='stack',
-        title={
-            'text': "NORTH 2 - OVERALL EVOLUTION OA TICKETS PER CATEGORY",
-            'y': 1,
-            'x': 0.5,
-            'xanchor': 'center',
-            'yanchor': 'top',
-            'font': dict(size=28)
-        },
-        xaxis_title="Weeks",
-        yaxis_title="Number of OA Tickets",
+        title=dict(
+            text="NORTH 2 - OVERALL EVOLUTION OA TICKETS PER CATEGORY",
+            y=1,
+            x=0.5,
+            xanchor='center',
+            yanchor='top',
+            font=dict(size=28)
+        ),
         width=1200,
         height=900,
-        legend_title_text="Category",
         legend=dict(
             orientation="h",
             yanchor="bottom",
@@ -2444,12 +2436,12 @@ elif page == "North 1":
         ),
         xaxis=dict(
             tickfont=dict(color='black'),
-            title=dict(font=dict(color='black')),
+            title=dict(text="Weeks", font=dict(color='black')),
             automargin=False
         ),
         yaxis=dict(
             tickfont=dict(color='black'),
-            title=dict(font=dict(color='black'))
+            title=dict(text="Number of OA Tickets", font=dict(color='black'))
         ),
         margin=dict(r=50, b=5),
     )
@@ -3347,19 +3339,16 @@ elif page == "North 1":
 
     fig_stack_north3.update_layout(
         barmode='stack',
-        title={
-            'text': "NORTH 3 - OVERALL EVOLUTION OA TICKETS PER CATEGORY",
-            'y': 1,
-            'x': 0.5,
-            'xanchor': 'center',
-            'yanchor': 'top',
-            'font': dict(size=28)
-        },
-        xaxis_title="Weeks",
-        yaxis_title="Number of OA Tickets",
+        title=dict(
+            text="NORTH 3 - OVERALL EVOLUTION OA TICKETS PER CATEGORY",
+            y=1,
+            x=0.5,
+            xanchor='center',
+            yanchor='top',
+            font=dict(size=28)
+        ),
         width=1200,
         height=900,
-        legend_title_text="Category",
         legend=dict(
             orientation="h",
             yanchor="bottom",
@@ -3369,12 +3358,12 @@ elif page == "North 1":
         ),
         xaxis=dict(
             tickfont=dict(color='black'),
-            title=dict(font=dict(color='black')),
+            title=dict(text="Weeks", font=dict(color='black')),
             automargin=False
         ),
         yaxis=dict(
             tickfont=dict(color='black'),
-            title=dict(font=dict(color='black'))
+            title=dict(text="Number of OA Tickets", font=dict(color='black'))
         ),
         margin=dict(r=50, b=5),
     )
