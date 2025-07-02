@@ -554,15 +554,13 @@ if page == "Dashboard":
         )
     fig_stack_priority.update_layout(
         barmode='stack',
-        title={
-            'text': "OVERALL EVOLUTION OA TICKETS PER PRIORITY",
-            'y': 0.97,
-            'x': 0.5,
-            'xanchor': 'center',
-            'yanchor': 'top'
-        },
-        xaxis_title="Weeks",
-        yaxis_title="Number of OA Tickets",
+        title=dict(
+            text="OVERALL EVOLUTION OA TICKETS PER PRIORITY",
+            y=0.97,
+            x=0.5,
+            xanchor='center',
+            yanchor='top',
+        ),
         width=1200,
         height=800,
         legend=dict(
@@ -574,11 +572,11 @@ if page == "Dashboard":
         ),
         xaxis=dict(
             tickfont=dict(color='black'),
-            title=dict(font=dict(color='black'))
+            title=dict(text="Weeks", font=dict(color='black'))
         ),
         yaxis=dict(
             tickfont=dict(color='black'),
-            title=dict(font=dict(color='black'))
+            title=dict(text="Number of OA Tickets", font=dict(color='black'))
         )
     )
     st.plotly_chart(fig_stack_priority)
@@ -687,17 +685,14 @@ if page == "Dashboard":
         )
     fig_stack.update_layout(
         barmode='stack',
-        title={
-            'text': "OVERALL EVOLUTION OA TICKETS PER CATEGORY",
-            'x': 0.5,
-            'xanchor': 'center',
-            'yanchor': 'top'
-        },
-        xaxis_title="Weeks",
-        yaxis_title="Number of OA Tickets",
+        title=dict(
+            text="OVERALL EVOLUTION OA TICKETS PER CATEGORY",
+            x=0.5,
+            xanchor='center',
+            yanchor='top',
+        ),
         width=1200,
         height=900,
-        legend_title_text="Category",
         legend=dict(
             orientation="h",
             yanchor="bottom",
@@ -707,11 +702,11 @@ if page == "Dashboard":
         ),
         xaxis=dict(
             tickfont=dict(color='black'),
-            title=dict(font=dict(color='black'))
+            title=dict(text="Weeks", font=dict(color='black'))
         ),
         yaxis=dict(
             tickfont=dict(color='black'),
-            title=dict(font=dict(color='black'))
+            title=dict(text="Number of OA Tickets", font=dict(color='black'))
         )
     )
     st.plotly_chart(fig_stack)
@@ -823,17 +818,14 @@ if page == "Dashboard":
         )
     fig_stack_team.update_layout(
         barmode='stack',
-        title={
-            'text': "OVERALL EVOLUTION OA TICKETS PER REGION",
-            'x': 0.5,
-            'xanchor': 'center',
-            'yanchor': 'top'
-        },
-        xaxis_title="Weeks",
-        yaxis_title="Number of OA Tickets",
+        title=dict(
+            text="OVERALL EVOLUTION OA TICKETS PER REGION",
+            x=0.5,
+            xanchor='center',
+            yanchor='top',
+        ),
         width=1200,
         height=900,
-        legend_title_text="Team",
         legend=dict(
             orientation="h",
             yanchor="bottom",
@@ -843,11 +835,11 @@ if page == "Dashboard":
         ),
         xaxis=dict(
             tickfont=dict(color='black'),
-            title=dict(font=dict(color='black'))
+            title=dict(text="Weeks", font=dict(color='black'))
         ),
         yaxis=dict(
             tickfont=dict(color='black'),
-            title=dict(font=dict(color='black'))
+            title=dict(text="Number of OA Tickets", font=dict(color='black'))
         )
     )
     st.plotly_chart(fig_stack_team)
@@ -957,15 +949,13 @@ if page == "Dashboard":
         )
     fig_stack_banner.update_layout(
         barmode='stack',
-        title={
-            'text': "OVERALL EVOLUTION OA TICKETS PER BANNER",
-            'y': 0.97,
-            'x': 0.5,
-            'xanchor': 'center',
-            'yanchor': 'top'
-        },
-        xaxis_title="Weeks",
-        yaxis_title="Number of OA Tickets",
+        title=dict(
+            text="OVERALL EVOLUTION OA TICKETS PER BANNER",
+            y=0.97,
+            x=0.5,
+            xanchor='center',
+            yanchor='top',
+        ),
         width=1200,
         height=800,
         legend=dict(
@@ -977,11 +967,11 @@ if page == "Dashboard":
         ),
         xaxis=dict(
             tickfont=dict(color='black'),
-            title=dict(font=dict(color='black'))
+            title=dict(text="Weeks", font=dict(color='black'))
         ),
         yaxis=dict(
             tickfont=dict(color='black'),
-            title=dict(font=dict(color='black'))
+            title=dict(text="Number of OA Tickets", font=dict(color='black'))
         )
     )
     st.plotly_chart(fig_stack_banner)
@@ -1027,26 +1017,23 @@ if page == "Dashboard":
         connector={"line": {"color": "rgba(0,0,0,0)"}},
     ))
     fig.update_layout(
- 
-        title={
-            'text': "NATIONWIDE ON ASSESSMENT TICKET OVER WEEKS",
-    
-            'x': 0.5,
-            'xanchor': 'center',
-            'yanchor': 'top'
-        },
-
+        title=dict(
+            text="NATIONWIDE ON ASSESSMENT TICKET OVER WEEKS",
+            x=0.5,
+            xanchor='center',
+            yanchor='top',
+        ),
         waterfallgap=0.2,
         barmode='group',
         width=1200,
         height=700,
         xaxis=dict(
             tickfont=dict(color='black'),
-            title=dict(font=dict(color='black'))
+            title=dict(text="Weeks", font=dict(color='black'))
         ),
         yaxis=dict(
             tickfont=dict(color='black'),
-            title=dict(font=dict(color='black'))
+            title=dict(text="Number of OA Tickets", font=dict(color='black'))
         )
     )
     st.plotly_chart(fig, use_container_width=True)
