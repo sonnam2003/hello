@@ -11871,11 +11871,26 @@ elif page == "North 1":
     # Bảng Sites cho South 5
     st.markdown("<h3 style='text-align: center;'>SOUTH 5 - DETAIL VIEW PER SITE</h3>", unsafe_allow_html=True)
     special_display_names = [
-        # Thay đổi danh sách site cho South 5 nếu cần
-        "GO Mall Ben Luc (BLC)", "GO Mall Go Vap (GVP)", "GO Mall Long Xuyen (LXU)", "GO Mall My Tho (MTO)",
-        "GO Mall Phan Thiet (PTT)", "GO Mall Vinh Long (VLG)", "GO Mall Vung Tau (VTU)",
-        "Hyper Ben Luc (BLC)", "Hyper Go Vap (GVP)", "Hyper Long Xuyen (LXU)", "Hyper My Tho (MTO)",
-        "Hyper Phan Thiet (PTT)", "Hyper Vinh Long (VLG)", "Hyper Vung Tau (VTU)"
+        
+        "CBS Crocs 61 Nguyen Trai (276329)", "CBS Crocs Cao Thang (276339)", "CBS Crocs Estella (276366)",
+        "CBS Crocs Giga Mall Thu Duc (2763P2)", "CBS Crocs Go Di An (2763H9)", "CBS Crocs Mac Thi Buoi (2763O9)",
+        "CBS Crocs Phan Van Tri (2763R9)", "CBS Crocs Saigon Centre (2763K1)", "CBS Crocs Thiso Mall (2763U3)",
+        "CBS Crocs Van Hanh Mall (276310)", "CBS Crocs Vincom Grand Park (2763T5)", "CBS Crocs Vincom Landmark 81 (2763Z8)",
+        "CBS Crocs Vincom Thao Dien (276311)", "CBS Crocs Vincom Thu Duc (2763T6)", "CBS Dyson Beauty Box Saigon Center (2763CL)",
+        "CBS Dyson Estella (2763K9)", "CBS Dyson Landmark 81 (2763AV)", "CBS Dyson Maison Online (2763CM)",
+        "CBS Dyson Nguyen Kim Go Vap (2763M2)", "CBS Dyson Nguyen Kim Sai Gon 1 (2763AD)", "CBS Dyson Nguyen Kim Thu Duc (2763M1)",
+        "CBS Dyson Takashimaya (2763AH)", "CBS Dyson Thiso Mall (2763CH)", "CBS Fila Saigon Centre (2763U1)",
+        "CBS Fila Vincom Landmark 81 (2763H2)", "CBS Fitflop Estella (2763Y1)", "CBS Fitflop Takashimaya (2763S5)",
+        "CBS Hoka Saigon Centre (2763X6)", "CBS Supersports Estella (276307)", "CBS Supersports Le Van Sy (2763X7)",
+        "CBS Supersports Takashimaya (2763C6)", "CBS Under Armour Vincom Thao Dien (2763Q5)", "GO Mall Di An (DAN)",
+        "GO Mall SSC (SSC)", "GO Mall Truong Chinh (TCH)", "Hyper Di An (DAN)",
+        "Hyper Go Vap (GVP)", "Hyper Truong Chinh (TCH)", "KUBO NANO Di An (6401)",
+        "KUBO NANO Thang Loi (6431)", "KUBO Premium Lotte Phu Tho (6443)", "Nguyen Kim Binh Thanh (SG27)",
+        "Nguyen Kim Cu Chi (SG29)", "Nguyen Kim Di An (BD02)", "Nguyen Kim Go Vap (SG09)",
+        "Nguyen Kim Le Van Viet (SG30)", "Nguyen Kim Nguyen Duy Trinh (SG17)", "Nguyen Kim Phan Van Hon (SG22)",
+        "Nguyen Kim Phu Nhuan (SG10)", "Nguyen Kim Quang Trung (SG19)", "Nguyen Kim Sai Gon Mall (SGM)",
+        "Nguyen Kim Thu Duc (SG06)", "Nguyen Kim Thuan An (BD03)", "Nguyen Kim Truong Chinh (SG37)",
+        "Tops An Phu (APU)", "Tops Moonlight (MLT)", "Tops Thao Dien (TDN)"
     ]
 
     df_res_partner['display_name'] = df_res_partner['display_name'].astype(str)
@@ -12060,4 +12075,3 @@ elif page == "North 1":
     header_height = 38
     st.dataframe(styled, use_container_width=True, height=num_rows * row_height + header_height)
     st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
-
