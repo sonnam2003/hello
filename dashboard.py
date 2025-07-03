@@ -12974,3 +12974,4 @@ elif page == "North 1":
     header_height = 38
     st.dataframe(styled, use_container_width=True, height=num_rows * row_height + header_height)
     st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+
