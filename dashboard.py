@@ -1112,7 +1112,7 @@ elif page == "Xem dữ liệu":
     df['custom_end_date'] = df['custom_end_date'].fillna("not yet end")
 
 elif page == "North 1":
-    st.markdown("<h2 style='text-align: center;'>North 1 - Nguyen Van Khuong</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align: center;color: #ab3f3f;'>NORTH 1 - Nguyen Van Khuong</h2>", unsafe_allow_html=True)
     df_north1 = df[df['team_id'] == 17]  # team_id = 17 cho North 1
     st.markdown("<div style='height: 6rem'></div>", unsafe_allow_html=True)
 
@@ -1881,7 +1881,7 @@ elif page == "North 1":
 
     # Bảng Sites cho North 1 (cột 2: số ticket chưa end)
 
-    st.markdown("<h3 style='text-align: center;'>Detail View Per Site</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: center;'>NORTH 1 - DETAIL VIEW PER SITE</h3>", unsafe_allow_html=True)
     special_display_names = [
         "CBS Crocs Aeon Hai Phong (2763F6)", "CBS Crocs Nguyen Duc Canh Hai Phong (2763P7)","CBS Crocs Vincom Ha Long (276391)","CBS Dyson Aeon Hai Phong (2763CJ)","CBS Fila Aeon Hai Phong (2763F7)","GO Mall Hai Duong (HDG)",
         "GO Mall Hai Phong (HPG)","GO Mall Ha Long (HLG)","GO Mall Nam Dinh (NDH)","GO Mall Thai Binh (TBH)",
@@ -2096,7 +2096,7 @@ elif page == "North 1":
 
     st.markdown("<div style='height: 3rem'></div>", unsafe_allow_html=True)
 
-    st.markdown("<h2 style='text-align: center;'>NORTH 2 - Vu Ngoc Hieu</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align: center;color: #ab3f3f;'>NORTH 2 - Vu Ngoc Hieu</h2>", unsafe_allow_html=True)
     df_north2 = df[df['team_id'] == 2]  # team_id = 2 cho North 2
     st.markdown("<div style='height: 6rem'></div>", unsafe_allow_html=True)
 
@@ -2806,7 +2806,7 @@ elif page == "North 1":
 
 
     # Bảng Sites cho North 2 (cột 2: số ticket chưa end)
-    st.markdown("<h3 style='text-align: center;'>Detail View Per Site</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: center;'>NORTH 2 - DETAIL VIEW PER SITE</h3>", unsafe_allow_html=True)
     special_display_names2 = [
 
         "GO Mall Hung Yen (HYN)", "GO Mall Lao Cai (LCI)", "GO Mall Thai Nguyen (TNN)",
@@ -3018,7 +3018,7 @@ elif page == "North 1":
 
 
 
-    st.markdown("<h2 style='text-align: center;'>NORTH 3 - Do Van Nam</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align: center;color: #ab3f3f;'>NORTH 3 - Do Van Nam</h2>", unsafe_allow_html=True)
     df_north3 = df[df['team_id'] == 1]  # team_id = 1 cho North 3
     st.markdown("<div style='height: 6rem'></div>", unsafe_allow_html=True)
 
@@ -3721,32 +3721,32 @@ elif page == "North 1":
     st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
 
     # Bảng Sites cho North 3 (cột 2: số ticket chưa end)
-    st.markdown("<h3 style='text-align: center;'>Detail View Per Site</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: center;'>NORTH 3 - DETAIL VIEW PER SITE</h3>", unsafe_allow_html=True)
     special_display_names3 = [
-        "CBS Crocs Aeon Hai Phong (2763F6)",
-        "CBS Crocs Nguyen Duc Canh Hai Phong (2763P7)",
-        "CBS Crocs Vincom Ha Long (276391)",
-        "CBS Dyson Aeon Hai Phong (2763CJ)",
-        "CBS Fila Aeon Hai Phong (2763F7)",
-        "GO Mall Hai Duong (HDG)",
-        "GO Mall Hai Phong (HPG)",
-        "GO Mall Ha Long (HLG)",
-        "GO Mall Nam Dinh (NDH)",
-        "GO Mall Thai Binh (TBH)",
-        "Hyper Hai Duong (HDG)",
-        "Hyper Hai Phong (HPG)",
-        "Hyper Ha Long (HLG)",
-        "Hyper Ha Nam (HNM)",
-        "Hyper Nam Dinh (NDH)",
-        "Hyper Thai Binh (TBH)",
-        "KUBO NANO Hai Duong (6445)",
-        "KUBO NANO Hai Phong (6422)",
-        "KUBO NANO Ha Long (6423)",
-        "KUBO NANO Ha Nam (6451)",
-        "KUBO NANO Nam Dinh (6409)",
-        "KUBO NANO Thai Binh (6438)",
-        "Nguyen Kim Hai Phong (HP01)",
-        "Nguyen Kim Nam Dinh (ND01)"
+
+        "CBS Columbia Lotte Lieu Giai (2763M8)", "CBS Columbia Lotte Mall Ha Noi (2763Q2)", "CBS Crocs Aeon Ha Dong (2763M9)",
+        "CBS Crocs Aeon Long Bien (276342)", "CBS Crocs Big C Thang Long (276348)", "CBS Crocs Chua Boc (2763R3)",
+        "CBS Crocs Hang Bong (276334)", "CBS Crocs Indochina Plaza Ha Noi (2763P8)", "CBS Crocs Lotte Lieu Giai (2763M7)",
+        "CBS Crocs Lotte Mall Ha Noi (2763P9)", "CBS Crocs Savico Long Bien (2763R2)", "CBS Crocs The Garden (2763O3)",
+        "CBS Crocs Vincom Ba Trieu (2763E2)", "CBS Crocs Vincom Bac Giang (2763U4)", "CBS Crocs Vincom Bac Ninh (2763T4)",
+        "CBS Crocs Vincom Long Bien (2763O8)", "CBS Crocs Vincom Metropolis (2763E4)", "CBS Crocs Vincom Ocean Park (2763E8)",
+        "CBS Crocs Vincom Pham Ngoc Thach (2763E1)", "CBS Crocs Vincom Royal City (2763E3)", "CBS Crocs Vincom Smart City (2763G8)",
+        "CBS Crocs Vincom Star City (2763G5)", "CBS Crocs Vincom Times City (276315)", "CBS Dyson Lotte Lieu Giai (2763AN)",
+        "CBS Dyson Lotte Mall Ha Noi (2763BL)", "CBS Dyson Nguyen Kim Trang Thi (2763AU)", "CBS Dyson Vincom Ba Trieu (2763AT)",
+        "CBS Dyson Vincom Star City (2763BF)", "CBS Fila Aeon Ha Dong (2763M6)", "CBS Fila Lotte Lieu Giai (2763H7)",
+        "CBS Fila Lotte Mall Ha Noi (2763Q3)", "CBS Fila Vincom Pham Ngoc Thach (2763D2)", "CBS Fila Vincom Star City (2763G6)",
+        "CBS Fila Vincom Times City (2763G4)", "CBS Fitflop Lotte DS (2763S6)", "CBS Supersports Aeon Long Bien (276341)",
+        "CBS Supersports Big C Thang Long (276305)", "CBS Supersports Lotte Lieu Giai (276319)", "CBS Supersports Lotte Mall Ha Noi (2763Q1)",
+        "CBS Under Armour Lotte Lieu Giai (2763N1)", "GO Mall Bac Giang (BGG)", "GO Mall Ha Dong (HDO)",
+        "GO Mall Le Trong Tan (LTT)", "GO Mall Long Bien (LBN)", "GO Mall Nguyen Xien (NXN)",
+        "GO Mall Thang Long (TLG)", "Hyper Bac Giang (BGG)", "Hyper Long Bien (LBN)",
+        "Hyper Me Linh (MLH)", "Hyper Thang Long (TLG)", "KUBO NANO Bac Giang (6414)",
+        "KUBO NANO Le Trong Tan (6432)", "KUBO NANO Long Bien (6428)", "KUBO NANO Smart City (6440)",
+        "KUBO NANO Thang Long (6421)", "Nguyen Kim Ba Dinh (HN02)", "Nguyen Kim Ba Dinh (Mac Plaza) (Hn16)",
+        "Nguyen Kim Ha Dong (HN04)", "Nguyen Kim Long Bien (HN13)", "Nguyen Kim Thang Long (HN07)",
+        "Nguyen Kim Trang Thi (HN01)", "Tops Ha Dong (HDO)", "Tops Le Trong Tan (LTT)",
+        "Tops Nguyen Xien (NXN)", "Tops Park City (PCY)", "Tops The Garden (TGN)"
+
     ]
 
     df_res_partner['display_name'] = df_res_partner['display_name'].astype(str)
