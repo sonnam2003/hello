@@ -26,7 +26,7 @@ password = "p0w3rb!"
 #1 giờ = 60 phút = 3.600.000 ms
 #24 giờ = 24 × 3.600.000 = 86.400.000 ms
 
-st_autorefresh(interval=86400000, key="datarefresh")
+st_autorefresh(interval=10800000, key="datarefresh")
 
 st.markdown(
     '''
@@ -132,7 +132,7 @@ def load_helpdesk_ticket():
     connection = psycopg2.connect(
         host=host, database=database, user=user, password=password
     )
-    query = "SELECT * FROM helpdesk_ticket LIMIT 50"
+    query = "SELECT * FROM helpdesk_ticket"
     df = pd.read_sql(query, connection)
     connection.close()
     return df
@@ -430,7 +430,7 @@ df['Under this month report'] = df.apply(calculate_condition, axis=1)
 df['Carry over ticket'] = df.apply(calculate_carry_over, axis=1)
 
 # 9. Giao diện
-page = st.sidebar.radio("Chọn trang", ["Dashboard", "Xem dữ liệu", "North 1", "North 2", "Others"])
+page = st.sidebar.radio("Chọn trang", ["Dashboard", "Xem dữ liệu"])
 
 if page == "Dashboard":
     # Căn giữa title ở top center
@@ -1039,79 +1039,923 @@ if page == "Dashboard":
     st.plotly_chart(fig, use_container_width=True)
     st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
 
+
+
+    st.markdown("<h2 style='text-align: center;'>Others</h2>", unsafe_allow_html=True)
     
 
-elif page == "Xem dữ liệu":
-    st.title("Xem dữ liệu và cột tính mới")
+    # Lấy danh sách category id và tên (chỉ lấy tên tiếng Anh ngắn gọn)
+    def extract_short_en_name(val):
+        try:
+            if isinstance(val, dict):
+                return val.get('en_US', str(val))
+            if isinstance(val, str) and val.startswith("{'en_US':"):
+                import ast
+                d = ast.literal_eval(val)
+                return d.get('en_US', val)
+            return val
+        except Exception:
+            return val
     
-    # Hiển thị thông tin thời gian
-    st.markdown("""
-    <style>
-    .date-info {
-        padding: 20px;
-        border-radius: 5px;
-        background-color: #f0f2f6;
-        margin-bottom: 20px;
-    }
-    </style>
-    """, unsafe_allow_html=True)
+    category_map = df_category.set_index('id')['name'].apply(extract_short_en_name).to_dict()
+    category_ids = [cid for cid in df['category_id'].unique() if cid in category_map]
     
-    st.markdown(f"""
-    <div class='date-info'>
-        <h3>Thông tin thời gian:</h3>
-        <p><strong>Start date:</strong> {start_date.strftime('%d-%m-%y %H:%M:%S')}</p>
-        <p><strong>End date:</strong> {end_date.strftime('%d-%m-%y %H:%M:%S')}</p>
-    </div>
-    """, unsafe_allow_html=True)
+    teams = df['team_name'].unique()
+    teams_df = pd.DataFrame({'Team': teams}).sort_values('Team').reset_index(drop=True)
 
-    st.write("Ngày create_date mới nhất trong dữ liệu:", df['create_date'].max())
+    for cid in category_ids:
+        cat_name = category_map[cid]
+        # Rút gọn tên nếu cần (chỉ lấy phần đầu, loại bỏ phần trong ngoặc)
+        short_name = cat_name.split('(')[0].strip() if isinstance(cat_name, str) else cat_name
+        # Created
+        mask_created = (df['Under this month report'] == 1) & (df['Carry over ticket'] == 0) & (df['category_id'] == cid)
+        created = df[mask_created].groupby('team_name').size()
+        teams_df[f'{short_name} Newly Created'] = teams_df['Team'].map(created).fillna(0).astype(int)
+        # Emergency created
+        mask_emergency = mask_created & (df['helpdesk_ticket_tag_id'] == 3)
+        emergency_created = df[mask_emergency].groupby('team_name').size()
+        teams_df[f'{short_name} Emergency created'] = teams_df['Team'].map(emergency_created).fillna(0).astype(int)
+        # Solved
+        mask_solved = (df['custom_end_date'] != 'not yet end') & (df['category_id'] == cid)
+        df_solved = df[mask_solved].copy()
+        df_solved['custom_end_date_dt'] = pd.to_datetime(df_solved['custom_end_date'], errors='coerce')
+        mask_time = (df_solved['custom_end_date_dt'] >= start_date) & (df_solved['custom_end_date_dt'] < end_date)
+        solved = df_solved[mask_time].groupby('team_name').size()
+        teams_df[f'{short_name} Solved'] = teams_df['Team'].map(solved).fillna(0).astype(int)
 
-    st.write("Dữ liệu với cột tính mới:")
-    AgGrid(df[['id','number','stage_id','approved_date','last_stage_update','custom_end_date','category_id','category_name','team_id','team_name','priority','helpdesk_ticket_tag_id','mall_id','mall_display_name','processing_time','Under this month report','Carry over ticket']].head(100), key="main_table")
-    
-    with st.expander("Bảng dữ liệu mẫu helpdesk_ticket_category"):
-        st.dataframe(df_category.head(20))
-    with st.expander("Bảng dữ liệu mẫu helpdesk_ticket_team"):
-        st.dataframe(df_team.head(20))
-    with st.expander("Bảng dữ liệu mẫu res_partner"):
-        st.dataframe(df_res_partner)
+    # Thêm 3 cột tổng: Newly created, Emergency created, Solved
+    newly_cols = [col for col in teams_df.columns if col.endswith('Newly Created') and not col.endswith('Emergency created')]
+    emergency_cols = [col for col in teams_df.columns if col.endswith('Emergency created')]
+    solved_cols = [col for col in teams_df.columns if col.endswith('Solved')]
 
-    with st.expander("Bảng dữ liệu mẫu helpdesk_ticket"):
-        df_helpdesk_ticket = load_helpdesk_ticket()
-        st.dataframe(df_helpdesk_ticket)
-    
-    st.write("Bảng kiểm tra số lượng ticket tồn theo Category và Tuần:")
-    AgGrid(df_table.head(50), key="table_category")
-    
-    st.write("Bảng kiểm tra số lượng ticket tồn theo TEAM và Tuần:")
-    AgGrid(df_table_team.head(50), key="table_team")
+    teams_df['Total Newly created'] = teams_df[newly_cols].sum(axis=1)
+    teams_df['Total Emergency created'] = teams_df[emergency_cols].sum(axis=1)
+    teams_df['Total Solved'] = teams_df[solved_cols].sum(axis=1)
 
-    st.write("Bảng kiểm tra số lượng ticket tồn theo PRIORITY và Tuần:")
-    AgGrid(df_table_priority.head(50), key="table_priority")
+    # Đưa 3 cột tổng lên đầu bảng
+    total_cols = ['Total Newly created', 'Total Emergency created', 'Total Solved']
+    other_cols = [col for col in teams_df.columns if col not in total_cols and col != 'Team']
+    teams_df = teams_df[['Team'] + total_cols + other_cols]
 
-    st.write("Bảng kiểm tra số lượng ticket tồn theo BANNER và Tuần:")
-    AgGrid(df_table_banner.head(50), key="table_banner")
+    # Thêm một hàng Total vào cuối bảng
+    total_row = {}
+    for col in teams_df.columns:
+        if col == 'Team':
+            total_row[col] = 'Total'
+        else:
+            try:
+                total_row[col] = teams_df[col].sum()
+            except Exception:
+                total_row[col] = ''
+    teams_df = pd.concat([teams_df, pd.DataFrame([total_row])], ignore_index=True)
 
-    st.write("### Bảng kiểm tra số lượng Created và Solved ticket theo tuần:")
-    st.dataframe(result_df)
+    # Highlight các cột Emergency created nếu value > 0, riêng Total Emergency created: nền vàng, nhưng nếu >0 thì nền đỏ
+    def highlight_emergency(val):
+        try:
+            if pd.notnull(val) and float(val) > 0:
+                return 'background-color: red; color: black;'
+        except Exception:
+            pass
+        return ''
+    def highlight_total(val):
+        try:
+            if pd.notnull(val) and float(val) > 0:
+                return 'background-color: red; color: black;'
+        except Exception:
+            pass
+        return 'background-color: #fff9b1; color: black;'
+    def highlight_total_row(row):
+        if row.name == len(teams_df) - 1:
+            styles = []
+            for col, val in zip(row.index, row):
+                if col.endswith('Emergency created') and pd.notnull(val) and float(val) > 0:
+                    styles.append('background-color: red; color: black;')
+                else:
+                    styles.append('background-color: #fff9b1; color: black;')
+            return styles
+        return ['' for _ in row]
 
-    with st.expander("Danh sách các bảng trong database"):
-        connection = psycopg2.connect(
-            host=host, database=database, user=user, password=password
+    emergency_cols = [col for col in teams_df.columns if col.endswith('Emergency created') and col != 'Total Emergency created']
+    total_cols = ['Total Newly created', 'Total Emergency created', 'Total Solved']
+
+    styled_df = teams_df.style
+    styled_df = styled_df.applymap(highlight_emergency, subset=emergency_cols)
+    styled_df = styled_df.applymap(highlight_total, subset=['Total Emergency created'])
+    styled_df = styled_df.applymap(lambda v: 'background-color: #fff9b1; color: black;', subset=['Total Newly created', 'Total Solved'])
+    styled_df = styled_df.apply(highlight_total_row, axis=1)
+
+
+    st.markdown(
+        '<h3 style="text-align: center; color: #ab3f3f;">Helpdesk ticket D-1 (Last weekend in case today is Monday) report <br>(including solved carry over tickets)</h3>',
+        unsafe_allow_html=True
+    )
+
+    num_rows = teams_df.shape[0]
+    row_height = 35
+    total_height = (num_rows + 1) * row_height
+    st.dataframe(styled_df, use_container_width=True, height=total_height)
+    st.markdown("<div style='height: 5rem'></div>", unsafe_allow_html=True)
+
+
+    # Bảng mới bên dưới
+    teams_df2 = pd.DataFrame({'Team': teams})
+
+
+    # Thêm cột "ACMV Total ticket" (category_id = 1)
+    teams_df2['ACMV Total ticket'] = teams_df2['Team'].apply(
+        lambda team: df[(df['team_name'] == team) & (df['category_id'] == 1)].shape[0]
+    )
+
+    # Thêm cột "D-1 ticket (or wkn)" lấy từ cột "ACMV Newly Created" của bảng teams_df
+    if 'ACMV Newly Created' in teams_df.columns:
+        teams_df2['ACMV D-1 ticket (or wkn)'] = teams_df2['Team'].map(teams_df.set_index('Team')['ACMV Newly Created']).fillna(0).astype(int)
+    else:
+        # Nếu tên cột là "ACMV Newly Created" chưa đúng, dò tìm cột đúng theo category_id=1
+        acmv_col = None
+        for col in teams_df.columns:
+            if col.lower().startswith('acmv') and 'newly' in col.lower():
+                acmv_col = col
+                break
+        if acmv_col:
+            teams_df2['ACMV D-1 ticket (or wkn)'] = teams_df2['Team'].map(teams_df.set_index('Team')[acmv_col]).fillna(0).astype(int)
+        else:
+            teams_df2['ACMV D-1 ticket (or wkn)'] = 0
+
+    # Thêm cột "ACMV OA" (category_id = 1, custom_end_date = 'not yet end')
+    teams_df2['ACMV OA'] = teams_df2['Team'].apply(
+        lambda team: df[(df['team_name'] == team) & (df['category_id'] == 1) & (df['custom_end_date'] == 'not yet end')].shape[0]
+    )
+
+    # Thêm cột "ACMV OA%" (tỷ lệ ACMV OA trên tổng ACMV Total ticket, làm tròn lên số nguyên)
+    def calc_oa_percent(row):
+        total = row['ACMV Total ticket']
+        oa = row['ACMV OA']
+        if total == 0:
+            return 'NA'
+        else:
+            percent = oa / total * 100
+            return f"{math.ceil(percent):.0f}%"
+    teams_df2['ACMV OA%'] = teams_df2.apply(calc_oa_percent, axis=1)
+
+    def render_data_bar(val):
+        if val == 'NA':
+            return 'NA'
+        try:
+            percent = int(val.replace('%', ''))
+            bar = f'''
+                <div style="background: linear-gradient(90deg, #ffe082 {percent}%, #fff {percent}%); 
+                            border-radius: 4px; 
+                            width: 100%; 
+                            height: 22px; 
+                            display: flex; 
+                            align-items: center; 
+                            padding-left: 6px;
+                            font-weight: bold;">
+                    {val}
+                </div>
+            '''
+            return bar
+        except:
+            return val
+
+   
+    # Thêm cột "ACMV Emerg OA" (category_id = 1, custom_end_date = 'not yet end', helpdesk_ticket_tag_id = 3)
+    teams_df2['ACMV Emerg OA'] = teams_df2['Team'].apply(
+        lambda team: df[(df['team_name'] == team) & (df['category_id'] == 1) & (df['custom_end_date'] == 'not yet end') & (df['helpdesk_ticket_tag_id'] == 3)].shape[0]
+    )
+
+    # Thêm cột "ACMV SLA Late OA" (category_id = 1, custom_end_date = 'not yet end', sla_reached_late = True)
+    teams_df2['ACMV SLA Late OA'] = teams_df2['Team'].apply(
+        lambda team: df[(df['team_name'] == team) & (df['category_id'] == 1) & (df['custom_end_date'] == 'not yet end') & (df['sla_reached_late'] == True)].shape[0]
+    )
+
+    # --- TỰ ĐỘNG TẠO 6 CỘT CHO TẤT CẢ CATEGORY (trừ 3,7,9) ---
+    category_ids_exclude = [3, 7, 9]
+    teams = df['team_name'].unique()
+    teams_df2 = pd.DataFrame({'Team': teams})
+    for cid, cat_name in category_map.items():
+        if cid in category_ids_exclude:
+            continue
+        short_name = cat_name.split('(')[0].strip() if isinstance(cat_name, str) else str(cat_name)
+        # 1. Total ticket
+        col_total = f'{short_name} Total ticket'
+        teams_df2[col_total] = teams_df2['Team'].apply(
+            lambda team: df[(df['team_name'] == team) & (df['category_id'] == cid)].shape[0]
         )
-        query = '''
-        SELECT table_name
-        FROM information_schema.tables
-        WHERE table_schema = 'public'
-        ORDER BY table_name;
-        '''
-        df_tables = pd.read_sql(query, connection)
-        connection.close()
-        st.dataframe(df_tables)
+        # 2. D-1 ticket (or wkn)
+        col_d1 = f'{short_name} D-1 ticket (or wkn)'
+        mask_created = (df['Under this month report'] == 1) & (df['Carry over ticket'] == 0) & (df['category_id'] == cid)
+        created = df[mask_created].groupby('team_name').size()
+        teams_df2[col_d1] = teams_df2['Team'].map(created).fillna(0).astype(int)
+        # 3. OA
+        col_oa = f'{short_name} OA'
+        teams_df2[col_oa] = teams_df2['Team'].apply(
+            lambda team: df[(df['team_name'] == team) & (df['category_id'] == cid) & (df['custom_end_date'] == 'not yet end')].shape[0]
+        )
+        # 4. OA%
+        col_oa_percent = f'{short_name} OA%'
+        def calc_oa_percent_cat(row):
+            total = row[col_total]
+            oa = row[col_oa]
+            if total == 0:
+                return 'NA'
+            else:
+                percent = oa / total * 100
+                return f"{round(percent):.0f}%"
+        teams_df2[col_oa_percent] = teams_df2.apply(calc_oa_percent_cat, axis=1)
+        # 5. Emerg OA
+        col_emerg = f'{short_name} Emerg OA'
+        teams_df2[col_emerg] = teams_df2['Team'].apply(
+            lambda team: df[(df['team_name'] == team) & (df['category_id'] == cid) & (df['custom_end_date'] == 'not yet end') & (df['helpdesk_ticket_tag_id'] == 3)].shape[0]
+        )
+        # 6. SLA Late OA
+        col_sla = f'{short_name} SLA Late OA'
+        teams_df2[col_sla] = teams_df2['Team'].apply(
+            lambda team: df[(df['team_name'] == team) & (df['category_id'] == cid) & (df['custom_end_date'] == 'not yet end') & (df['sla_reached_late'] == True)].shape[0]
+        )
 
-    df['custom_end_date'] = df['custom_end_date'].fillna("not yet end")
 
-elif page == "North 1":
+
+    # Thêm cột 'Total Ticket' là tổng tất cả các cột '[category] Total ticket' trên từng dòng
+    total_ticket_cols = [col for col in teams_df2.columns if col.endswith('Total ticket')]
+    teams_df2['Total Ticket'] = teams_df2[total_ticket_cols].sum(axis=1)
+    # Đưa cột 'Total Ticket' lên đầu (sau cột Team)
+    cols = list(teams_df2.columns)
+    cols.insert(1, cols.pop(cols.index('Total Ticket')))
+    teams_df2 = teams_df2[cols]
+
+ 
+    # Thêm cột 'Total D-1 ticket (or wkn)' là tổng tất cả các cột '[category] D-1 ticket (or wkn)' trên từng dòng
+    d1_ticket_cols = [col for col in teams_df2.columns if col.endswith('D-1 ticket (or wkn)')]
+    teams_df2['Total D-1 ticket (or wkn)'] = teams_df2[d1_ticket_cols].sum(axis=1)
+    # Đưa cột này lên vị trí thứ 2 (sau 'Total Ticket')
+    cols = list(teams_df2.columns)
+    cols.insert(2, cols.pop(cols.index('Total D-1 ticket (or wkn)')))
+    teams_df2 = teams_df2[cols]
+
+    # Thêm cột 'Total OA' là tổng tất cả các cột '[category] OA' trên từng dòng
+    oa_cols = [col for col in teams_df2.columns if col.endswith(' OA')]
+    teams_df2['Total OA'] = teams_df2[oa_cols].sum(axis=1)
+    # Đưa cột này lên vị trí thứ 3 (sau 'Total D-1 ticket (or wkn)')
+    cols = list(teams_df2.columns)
+    cols.insert(3, cols.pop(cols.index('Total OA')))
+    teams_df2 = teams_df2[cols]
+
+    # Thêm cột 'Total OA%' = Total OA / Total Ticket, làm tròn số nguyên gần nhất (round), nếu mẫu số = 0 thì trả về 'NA'
+    def calc_total_oa_percent(row):
+        total = row['Total Ticket']
+        oa = row['Total OA']
+        if total == 0:
+            return 'NA'
+        else:
+            percent = oa / total * 100
+            return f"{round(percent):.0f}%"
+    teams_df2['Total OA%'] = teams_df2.apply(calc_total_oa_percent, axis=1)
+    # Đưa cột này lên vị trí thứ 4 (sau 'Total OA')
+    cols = list(teams_df2.columns)
+    cols.insert(4, cols.pop(cols.index('Total OA%')))
+    teams_df2 = teams_df2[cols]
+
+    # Thêm cột 'Total Emerg OA' là tổng tất cả các cột '[category] Emerg OA' trên từng dòng
+    emerg_oa_cols = [col for col in teams_df2.columns if col.endswith('Emerg OA')]
+    teams_df2['Total Emerg OA'] = teams_df2[emerg_oa_cols].sum(axis=1)
+    # Đưa cột này lên vị trí thứ 5 (sau 'Total OA%')
+    cols = list(teams_df2.columns)
+    cols.insert(5, cols.pop(cols.index('Total Emerg OA')))
+    teams_df2 = teams_df2[cols]
+
+    # Thêm cột 'Total SLA Late OA' là tổng tất cả các cột '[category] SLA Late OA' trên từng dòng
+    sla_late_oa_cols = [col for col in teams_df2.columns if col.endswith('SLA Late OA')]
+    teams_df2['Total SLA Late OA'] = teams_df2[sla_late_oa_cols].sum(axis=1)
+    # Đưa cột này lên vị trí thứ 6 (sau 'Total Emerg OA')
+    cols = list(teams_df2.columns)
+    cols.insert(6, cols.pop(cols.index('Total SLA Late OA')))
+    teams_df2 = teams_df2[cols]
+
+    # Tô màu vàng nhạt cho 6 cột tổng đầu bảng khi hiển thị
+    def highlight_total_cols(s):
+        if s.name in ['Total Ticket', 'Total D-1 ticket (or wkn)', 'Total OA', 'Total OA%', 'Total Emerg OA', 'Total SLA Late OA']:
+            return ['background-color: #fff9b1'] * len(s)
+        return [''] * len(s)
+
+    # Đảm bảo không có hàng Grand Total cũ bị lặp lại
+    teams_df2 = teams_df2[teams_df2['Team'] != 'Grand Total']
+
+    # Thêm một hàng Grand Total cuối bảng
+    grand_total = {}
+    for col in teams_df2.columns:
+        if col == 'Team':
+            grand_total[col] = 'Grand Total'
+        elif teams_df2[col].dtype.kind in 'biufc':  # chỉ cộng các cột số
+            grand_total[col] = teams_df2[col].sum()
+        else:
+            grand_total[col] = ''
+    # Tính lại Total OA% cho Grand Total
+    try:
+        total_oa = grand_total.get('Total OA', 0)
+        total_ticket = grand_total.get('Total Ticket', 0)
+        if total_ticket == 0:
+            grand_total['Total OA%'] = 'NA'
+        else:
+            percent = total_oa / total_ticket * 100
+            grand_total['Total OA%'] = f"{round(percent):.0f}%"
+    except Exception:
+        grand_total['Total OA%'] = 'NA'
+    teams_df2 = pd.concat([teams_df2, pd.DataFrame([grand_total])], ignore_index=True)
+
+    # Tô màu vàng nhạt cho 6 cột tổng đầu bảng và toàn bộ hàng Grand Total
+    def highlight_grand_total(row):
+        if row.name == len(teams_df2) - 1:
+            return ['background-color: #fff9b1'] * len(row)
+        return [''] * len(row)
+
+    # Sort lại bảng theo tên team trước khi thêm Grand Total
+    teams_df2 = teams_df2.sort_values('Team').reset_index(drop=True)
+    # Đảm bảo không có hàng Grand Total cũ bị lặp lại
+    teams_df2 = teams_df2[teams_df2['Team'] != 'Grand Total']
+
+    # Thêm cột phụ is_grand_total
+    teams_df2['is_grand_total'] = 0
+
+    # Thêm một hàng Grand Total cuối bảng
+    grand_total = {}
+    for col in teams_df2.columns:
+        if col == 'Team':
+            grand_total[col] = 'Grand Total'
+        elif col == 'is_grand_total':
+            grand_total[col] = 1
+        elif teams_df2[col].dtype.kind in 'biufc':  # chỉ cộng các cột số
+            grand_total[col] = teams_df2[col].sum()
+        else:
+            grand_total[col] = ''
+    # Tính lại Total OA% cho Grand Total
+    try:
+        total_oa = grand_total.get('Total OA', 0)
+        total_ticket = grand_total.get('Total Ticket', 0)
+        if total_ticket == 0:
+            grand_total['Total OA%'] = 'NA'
+        else:
+            percent = total_oa / total_ticket * 100
+            grand_total['Total OA%'] = f"{round(percent):.0f}%"
+    except Exception:
+        grand_total['Total OA%'] = 'NA'
+    teams_df2 = pd.concat([teams_df2, pd.DataFrame([grand_total])], ignore_index=True)
+
+    # Luôn sort lại theo is_grand_total để Grand Total ở cuối
+    teams_df2 = teams_df2.sort_values('is_grand_total').reset_index(drop=True)
+
+    # Khi hiển thị, ẩn cột is_grand_total và mở rộng bảng ra toàn bộ chiều rộng, loại bỏ thanh cuộn
+    num_rows = teams_df2.shape[0]
+    row_height = 38  # hoặc 35 tuỳ font, có thể chỉnh lại nếu cần
+
+    st.markdown(
+        '<h3 style="text-align: center; color: #ab3f3f;">HELPDESK TICKETS ALL TIME</h3>',
+        unsafe_allow_html=True
+    )
+
+    st.dataframe(
+        teams_df2.drop(columns=['is_grand_total']).style.apply(highlight_total_cols, axis=0).apply(highlight_grand_total, axis=1),
+        use_container_width=True,
+        height=num_rows * row_height + 38  # +38 cho header
+    )
+    st.markdown("<div style='height: 7rem'></div>", unsafe_allow_html=True)
+
+
+    # --- Bảng trung bình processing_time theo team và category ---
+    st.markdown(
+        '<h3 style="text-align: center; color: #ab3f3f;">AVERAGE TICKET PROCESSING SPEED OF ALL TIME<br>(DAYS UP UNTIL "APPROVED" STAGE OF TICKET)</h3>',
+        
+        unsafe_allow_html=True
+    )
+    pivot = pd.pivot_table(
+        df,
+        values='processing_time',
+        index='team_name',
+        columns='category_name',
+        aggfunc='mean',
+        fill_value=0
+    )
+    # Thêm cột Across all category
+    across_all = df.groupby('team_name')['processing_time'].mean().round(0).astype(int)
+    pivot.insert(0, 'Across all category', across_all)
+    # Làm tròn cho đẹp
+    pivot = pivot.round(0).astype(int)
+    # Conditional formatting: xanh nhạt (min), trắng (giữa), đỏ đậm (#ff4d4d)
+    import matplotlib
+    def color_scale(val, vmin, vmax):
+        norm = (val - vmin) / (vmax - vmin) if vmax > vmin else 0.5
+        if norm <= 0.5:
+            r = int(183 + (255-183)*norm*2)
+            g = int(247 + (255-247)*norm*2)
+            b = int(183 + (255-183)*norm*2)
+        else:
+            r = int(255)
+            g = int(255 - (255-77)*(norm-0.5)*2)
+            b = int(255 - (255-77)*(norm-0.5)*2)
+        return f'background-color: rgb({r},{g},{b})'
+    vmin = pivot.min().min()
+    vmax = pivot.max().max()
+    styled = pivot.style.applymap(lambda v: color_scale(v, vmin, vmax)).set_properties(**{'text-align': 'center', 'color': 'black'})
+    num_rows = len(pivot.index)
+    row_height = 35
+    total_height = (num_rows + 1) * row_height
+
+
+    # --- Thêm hàng 'Avg. across all' vào bảng pivot ---
+    # Lấy lại bảng teams_df2 (bảng tổng hợp ticket theo team/category)
+    teams_df2_no_total = teams_df2[teams_df2['Team'] != 'Grand Total'].drop_duplicates(subset=['Team']).set_index('Team')
+    team_order = list(pivot.index)
+    # Cột 'Across all category'
+    total_ticket_team = teams_df2_no_total.loc[team_order, 'Total Ticket'] if 'Total Ticket' in teams_df2_no_total.columns else pd.Series(1, index=team_order)
+    total_ticket_all = total_ticket_team.sum()
+    avg_across_all = (pivot['Across all category'] * total_ticket_team).sum() / total_ticket_all if total_ticket_all > 0 else 0
+    avg_row = {'Across all category': round(avg_across_all)}
+    # Các cột category
+    for cat in pivot.columns:
+        if cat == 'Across all category':
+            continue
+        # Lấy phần tên trước dấu '(' nếu có
+        cat_short = cat.split('(')[0].strip()
+        cat_total_col = None
+        for c in teams_df2_no_total.columns:
+            if c.endswith('Total ticket'):
+                c_short = c.replace('Total ticket', '').strip()
+                if c_short == cat_short:
+                    cat_total_col = c
+                    break
+        if not cat_total_col:
+            # Nếu không tìm thấy, thử match gần đúng
+            for c in teams_df2_no_total.columns:
+                if c.endswith('Total ticket') and cat_short.lower() in c.lower():
+                    cat_total_col = c
+                    break
+        if cat_total_col:
+            cat_ticket_team = teams_df2_no_total.loc[team_order, cat_total_col]
+            cat_ticket_all = cat_ticket_team.sum()
+            if cat_ticket_all > 0:
+                avg_val = (pivot[cat] * cat_ticket_team).sum() / cat_ticket_all
+                avg_row[cat] = round(avg_val)
+            else:
+                avg_row[cat] = 0
+        else:
+            avg_row[cat] = 0
+    # Thêm hàng vào pivot
+    pivot.loc['Avg. across all'] = avg_row
+    num_rows = len(pivot.index)
+    total_height = (num_rows + 1) * row_height
+    styled = pivot.style.applymap(lambda v: color_scale(v, vmin, vmax)).set_properties(**{'text-align': 'center', 'color': 'black'})
+    st.dataframe(styled, use_container_width=True, height=total_height)
+    st.markdown("<div style='height: 7rem'></div>", unsafe_allow_html=True)
+
+
+    import plotly.graph_objects as go
+    # 1. Lấy các cột Newly Created (không lấy Emergency)
+    newly_cols = [col for col in teams_df.columns if col.endswith('Newly Created') and 'Emergency' not in col]
+    category_names = [col.replace(' Newly Created', '') for col in newly_cols]
+
+    # 2. Loại bỏ hàng Total
+    df_bar = teams_df[teams_df['Team'] != 'Total']
+
+    # 3. Tạo clustered (grouped) bar chart
+    fig = go.Figure()
+    team_labels = list(df_bar['Team'])
+    team_indices = list(range(len(team_labels)))
+
+    # Định nghĩa màu cho các category, tránh trùng màu đỏ
+    category_colors = [
+        '#1f77b4',  # xanh dương
+        '#ff7f0e',  # cam
+        '#2ca02c',  # xanh lá
+        '#9467bd',  # tím
+        '#8c564b',  # nâu
+        '#e377c2',  # hồng
+        '#7f7f7f',  # xám
+        '#bcbd22',  # vàng xanh
+        '#17becf',  # xanh ngọc
+    ]
+
+    # Vẽ bar Emergency màu đỏ đứng đầu tiên
+    if 'Total Emergency created' in teams_df.columns:
+        emergency_vals = df_bar['Total Emergency created'] if 'Total Emergency created' in df_bar.columns else [0]*len(team_indices)
+        text_emergency = [str(v) if v != 0 else '' for v in emergency_vals]
+        # Tạo custom texttemplate với background vàng nhạt và chữ đỏ
+        custom_text = [
+            f'<span style="background-color:#fff9b1; color:#d62728; padding:2px 6px; border-radius:4px; font-weight:bold;">{v}</span>' if v != '' else ''
+            for v in text_emergency
+        ]
+        fig.add_trace(go.Bar(
+            x=team_indices,
+            y=emergency_vals,
+            name='Total Emergency created',
+            text=custom_text,
+            textposition='outside',
+            offsetgroup='emergency',
+            marker_color='#d62728',  # đỏ
+            textfont=dict(size=12),
+            # Sử dụng texttemplate để giữ HTML style
+            texttemplate='%{text}'
+        ))
+
+    # Vẽ các bar cho từng category (trừ Emergency)
+    category_colors = [c for c in category_colors if c != '#d62728']
+    for i, (cat, col) in enumerate(zip(category_names, newly_cols)):
+        text_vals = [str(v) if v != 0 else '' for v in df_bar[col]]
+        color = category_colors[i % len(category_colors)]
+        fig.add_trace(go.Bar(
+            x=team_indices,
+            y=df_bar[col],
+            name=cat,
+            text=text_vals,
+            textposition='outside',
+            offsetgroup=cat,
+            marker_color=color,
+            textfont=dict(size=12, color='black')
+        ))
+
+    # Thêm các đường kẻ thẳng để phân chia các team
+    team_count = len(team_indices)
+    shapes = []
+    for i in range(1, team_count):
+        shapes.append(dict(
+            type='line',
+            xref='x', yref='paper',
+            x0=i-0.5, x1=i-0.5,
+            y0=0, y1=1,
+            line=dict(color='gray', width=1, dash='dot')
+        ))
+
+    fig.update_layout(
+        barmode='group',
+        bargap=0.25,
+        bargroupgap=0.3,
+        title={
+            'text': "TOTAL CREATED TICKETS PAST 1 DAY BY REGIONS",
+            'y': 1,
+            'x': 0.5,
+            'xanchor': 'center',
+            'yanchor': 'top',
+            'font': dict(size=28, color='#ab3f3f')
+        },
+        width=1200,
+        height=800,
+        xaxis_tickangle=-70,
+        xaxis=dict(
+            tickmode='array',
+            tickvals=team_indices,
+            ticktext=team_labels,
+            tickfont=dict(size=12, color='black'),
+            showgrid=False
+        ),
+        yaxis=dict(
+            tickfont=dict(size=12, color='black')
+        ),
+        legend=dict(
+            orientation='h',
+            yanchor='top',
+            y=9,
+            xanchor='center',
+            x=0.5
+        ),
+        shapes=shapes
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+    # --- BAR CHART OA CỦA TỪNG CATEGORY VÀ TEAM ---
+    # Lấy các cột OA (chỉ lấy đúng '[category] OA', không lấy SLA Late OA, Emerg OA...)
+    oa_cols = [col for col in teams_df2.columns if col.endswith(' OA') and not any(x in col for x in ['Emerg', 'SLA Late']) and col != 'Total OA']
+    oa_category_names = [col.replace(' OA', '') for col in oa_cols]
+    df_oa = teams_df2[teams_df2['Team'] != 'Grand Total']
+    teams_oa = list(df_oa['Team'])
+    teams_oa_indices = list(range(len(teams_oa)))
+
+    # Định nghĩa màu cho các category OA, tránh trùng màu đỏ
+    category_colors_oa = [
+        '#1f77b4',  # xanh dương
+        '#ff7f0e',  # cam
+        '#2ca02c',  # xanh lá
+        '#9467bd',  # tím
+        '#8c564b',  # nâu
+        '#e377c2',  # hồng
+        '#7f7f7f',  # xám
+        '#bcbd22',  # vàng xanh
+        '#17becf',  # xanh ngọc
+    ]
+
+    fig_oa = go.Figure()
+    # Thêm bar Total Emerg OA màu đỏ đứng đầu
+    if 'Total Emerg OA' in df_oa.columns:
+        emerg_oa_vals = df_oa['Total Emerg OA']
+        text_emerg_oa = [str(v) if v != 0 else '' for v in emerg_oa_vals]
+        fig_oa.add_trace(go.Bar(
+            x=teams_oa_indices,
+            y=emerg_oa_vals,
+            name='Total Emerg OA',
+            text=text_emerg_oa,
+            textposition='outside',
+            offsetgroup='emerg_oa',
+            marker_color='#d62728',
+            textfont=dict(size=14, color='#d62728'),  # màu đỏ, size lớn hơn
+            texttemplate='%{text}'
+        ))
+    st.markdown("<div style='height: 7rem'></div>", unsafe_allow_html=True)
+    
+
+    # Vẽ các bar OA cho từng category (trừ Total Emerg OA)
+    category_colors_oa = [c for c in category_colors_oa if c != '#d62728']
+    for i, (cat, col) in enumerate(zip(oa_category_names, oa_cols)):
+        text_vals = [str(v) if v != 0 else '' for v in df_oa[col]]
+        color = category_colors_oa[i % len(category_colors_oa)]
+        fig_oa.add_trace(go.Bar(
+            x=teams_oa_indices,
+            y=df_oa[col],
+            name=cat + ' OA',
+            text=text_vals,
+            textposition='outside',
+            offsetgroup=cat,
+            marker_color=color,
+            textfont=dict(size=12, color='black')
+        ))
+
+    # Thêm các đường kẻ thẳng để phân chia các team
+    team_count_oa = len(teams_oa_indices)
+    shapes_oa = []
+    for i in range(1, team_count_oa):
+        shapes_oa.append(dict(
+            type='line',
+            xref='x', yref='paper',
+            x0=i-0.5, x1=i-0.5,
+            y0=0, y1=1,
+            line=dict(color='gray', width=1, dash='dot')
+        ))
+
+    fig_oa.update_layout(
+        barmode='group',
+        bargap=0.25,
+        bargroupgap=0.3,
+        title={
+            'text': "TOTAL ACCUMULATIVE OA TICKETS UP TO DATE BY REGIONS",
+            'y': 1.0,
+            'x': 0.5,
+            'xanchor': 'center',
+            'yanchor': 'top',
+            'font': dict(size=28, color='#ab3f3f')
+        },
+        width=1200,
+        height=800,
+        xaxis_tickangle=-70,
+        xaxis=dict(
+            tickmode='array',
+            tickvals=teams_oa_indices,
+            ticktext=teams_oa,
+            tickfont=dict(size=13, color='black'),
+            showgrid=False
+        ),
+        yaxis=dict(
+            tickfont=dict(size=13, color='black')
+        ),
+        legend=dict(
+            orientation='h',
+            yanchor='top',
+            y=9,
+            xanchor='center',
+            x=0.5
+        ),
+        shapes=shapes_oa
+    )
+    st.plotly_chart(fig_oa, use_container_width=True)
+    st.markdown("<div style='height: 7rem'></div>", unsafe_allow_html=True)
+
+
+    # --- LINE CHART DAILY OA TICKETS BY CATEGORY ---
+    from datetime import timedelta
+
+    # Xác định ngày bắt đầu và ngày kết thúc
+    start_line_date = pd.Timestamp('2025-04-10')
+    today = pd.Timestamp.now().normalize()
+    if today.dayofweek == 0:  # Thứ 2
+        end_line_date = today - pd.Timedelta(days=3)
+    else:
+        end_line_date = today - pd.Timedelta(days=1)
+
+    # Tạo list ngày
+    date_range = pd.date_range(start=start_line_date, end=end_line_date, freq='D')
+
+    # Lấy danh sách category thực tế từ dữ liệu, loại bỏ rỗng
+    category_names = [c for c in sorted(df['category_name'].unique()) if c and c != 'nan']
+
+    def count_ton_tung_ngay(cat, day):
+        cat = str(cat)
+        mask1 = (df['category_name'] == cat) & (df['custom_end_date'] == 'not yet end')
+        count1 = df[mask1].shape[0]
+        mask2 = (
+            (df['category_name'] == cat) &
+            (df['custom_end_date'] != 'not yet end') &
+            (pd.to_datetime(df['custom_end_date'], errors='coerce') > day) &
+            (df['create_date'] <= day)
+        )
+        count2 = df[mask2].shape[0]
+        return count1 + count2
+
+    # Tạo dataframe kết quả
+    line_data = {'date': date_range}
+    for cat in category_names:
+        line_data[cat] = [count_ton_tung_ngay(cat, d) for d in date_range]
+    df_line = pd.DataFrame(line_data)
+
+    # Vẽ line chart
+    import plotly.graph_objects as go
+    fig_line = go.Figure()
+    color_map = [
+        '#00cfff', '#2ca02c', '#222', '#bcbd22', '#9467bd', '#ff7f0e', '#8c564b', '#e377c2', '#17becf', '#d62728', '#7f7f7f', '#ffd700', '#00bfff'
+    ]
+    for i, cat in enumerate(category_names):
+        fig_line.add_trace(go.Scatter(
+            x=df_line['date'],
+            y=df_line[cat],
+            mode='lines',
+            name=cat,
+            line=dict(width=3, color=color_map[i % len(color_map)])
+        ))
+    fig_line.update_layout(
+        title={
+            'text': 'DAILY ON ASSESSMENT TICKETS BY CATEGORY',
+            'x': 0.5,
+            'xanchor': 'center',
+            'yanchor': 'top',
+            'font': dict(size=28, color='#ab3f3f')
+        },
+        width=1300,
+        height=800,
+        legend=dict(
+            orientation='h',
+            yanchor='top',
+            y=-0.25,  # Đặt legend xuống dưới chart
+            xanchor='center',
+            x=0.5,
+            font=dict(size=16)
+        ),
+        xaxis=dict(
+            tickangle=0,
+            tickfont=dict(size=13, color='black', family='Arial', weight='bold'),
+            tickformat='%d/%m/%Y',
+            showgrid=False
+        ),
+        yaxis=dict(
+            tickfont=dict(size=14, color='black', family='Arial', weight='bold'),
+            showgrid=True
+        ),
+        margin=dict(l=40, r=40, t=80, b=120)
+    )
+    st.plotly_chart(fig_line, use_container_width=True)
+    st.markdown("<div style='height: 7rem'></div>", unsafe_allow_html=True)
+
+
+        # --- LINE CHART DAILY OA TICKETS BY PRIORITY ---
+
+    # Xác định ngày bắt đầu và kết thúc
+    start_line_date = pd.Timestamp('2025-04-10')
+    today = pd.Timestamp.now().normalize()
+    if today.dayofweek == 0:  # Thứ 2
+        end_line_date = today - pd.Timedelta(days=3)
+    else:
+        end_line_date = today - pd.Timedelta(days=1)
+    date_range = pd.date_range(start=start_line_date, end=end_line_date, freq='D')
+
+    priority_names = ['Low priority', 'Medium priority', 'High priority', 'Emergency']
+
+    def count_ton_tung_ngay_priority(priority, day):
+        if priority == 'Low priority':
+            mask1 = (
+                (df['helpdesk_ticket_tag_id'] != 3) &
+                (
+                    df['priority'].isna() |
+                    (df['priority'].astype(str).str.strip() == '0') |
+                    (df['priority'].fillna(0).astype(int) == 1)
+                ) &
+                (df['custom_end_date'] == 'not yet end')
+            )
+            count1 = df[mask1].shape[0]
+            mask2 = (
+                (df['helpdesk_ticket_tag_id'] != 3) &
+                (
+                    df['priority'].isna() |
+                    (df['priority'].astype(str).str.strip() == '0') |
+                    (df['priority'].fillna(0).astype(int) == 1)
+                ) &
+                (df['custom_end_date'] != 'not yet end') &
+                (pd.to_datetime(df['custom_end_date'], errors='coerce') > day) &
+                (df['create_date'] <= day)
+            )
+            count2 = df[mask2].shape[0]
+            return count1 + count2
+
+        elif priority == 'Medium priority':
+            mask1 = (
+                (df['helpdesk_ticket_tag_id'] != 3) &
+                (df['priority'].fillna(0).astype(int) == 2) &
+                (df['custom_end_date'] == 'not yet end')
+            )
+            count1 = df[mask1].shape[0]
+            mask2 = (
+                (df['helpdesk_ticket_tag_id'] != 3) &
+                (df['priority'].fillna(0).astype(int) == 2) &
+                (df['custom_end_date'] != 'not yet end') &
+                (pd.to_datetime(df['custom_end_date'], errors='coerce') > day) &
+                (df['create_date'] <= day)
+            )
+            count2 = df[mask2].shape[0]
+            return count1 + count2
+
+        elif priority == 'High priority':
+            mask1 = (
+                (df['helpdesk_ticket_tag_id'] != 3) &
+                (df['priority'].fillna(0).astype(int) == 3) &
+                (df['custom_end_date'] == 'not yet end')
+            )
+            count1 = df[mask1].shape[0]
+            mask2 = (
+                (df['helpdesk_ticket_tag_id'] != 3) &
+                (df['priority'].fillna(0).astype(int) == 3) &
+                (df['custom_end_date'] != 'not yet end') &
+                (pd.to_datetime(df['custom_end_date'], errors='coerce') > day) &
+                (df['create_date'] <= day)
+            )
+            count2 = df[mask2].shape[0]
+            return count1 + count2
+
+        elif priority == 'Emergency':
+            mask1 = (
+                (df['helpdesk_ticket_tag_id'] == 3) &
+                (df['custom_end_date'] == 'not yet end')
+            )
+            count1 = df[mask1].shape[0]
+            mask2 = (
+                (df['helpdesk_ticket_tag_id'] == 3) &
+                (df['custom_end_date'] != 'not yet end') &
+                (pd.to_datetime(df['custom_end_date'], errors='coerce') > day) &
+                (df['create_date'] <= day)
+            )
+            count2 = df[mask2].shape[0]
+            return count1 + count2
+
+    # Tạo dataframe kết quả
+    line_data_priority = {'date': date_range}
+    for pri in priority_names:
+        line_data_priority[pri] = [count_ton_tung_ngay_priority(pri, d) for d in date_range]
+    df_line_priority = pd.DataFrame(line_data_priority)
+
+    # Vẽ line chart
+    fig_line_priority = go.Figure()
+    priority_colors = {
+        'Low priority': '#61ee9c',
+        'Medium priority': '#f5f541',
+        'High priority': '#f7a31b',
+        'Emergency': '#e54125'
+    }
+    for pri in priority_names:
+        fig_line_priority.add_trace(go.Scatter(
+            x=df_line_priority['date'],
+            y=df_line_priority[pri],
+            mode='lines',
+            name=pri,
+            line=dict(width=3, color=priority_colors[pri])
+        ))
+    fig_line_priority.update_layout(
+        title={
+            'text': 'DAILY ON ASSESSMENT TICKETS BY PRIORITY',
+            'y': 1.0,
+            'x': 0.5,
+            'xanchor': 'center',
+            'yanchor': 'top',
+            'font': dict(size=28, color='#ab3f3f')
+        },
+        width=1300,
+        height=800,
+        legend=dict(
+            orientation='h',
+            yanchor='top',
+            y=7,
+            xanchor='center',
+            x=0.5,
+            font=dict(size=16)
+        ),
+        xaxis=dict(
+            tickangle=0,
+            tickfont=dict(size=13, color='black', family='Arial', weight='bold'),
+            tickformat='%d/%m/%Y',
+            showgrid=False
+        ),
+        yaxis=dict(
+            tickfont=dict(size=14, color='black', family='Arial', weight='bold'),
+            showgrid=True
+        ),
+        margin=dict(l=40, r=40, t=80, b=120)
+    )
+    st.plotly_chart(fig_line_priority, use_container_width=True)
+    st.markdown("<div style='height: 7rem'></div>", unsafe_allow_html=True)
+
+
     st.markdown("<h2 style='text-align: center;color: #ab3f3f;'>NORTH 1 - Nguyen Van Khuong</h2>", unsafe_allow_html=True)
     df_north1 = df[df['team_id'] == 17]  # team_id = 17 cho North 1
     st.markdown("<div style='height: 6rem'></div>", unsafe_allow_html=True)
@@ -11871,6 +12715,905 @@ elif page == "North 1":
     # Bảng Sites cho South 5
     st.markdown("<h3 style='text-align: center;'>SOUTH 5 - DETAIL VIEW PER SITE</h3>", unsafe_allow_html=True)
     special_display_names = [
+        # Thay đổi danh sách site cho South 5 nếu cần
+        "GO Mall Ben Luc (BLC)", "GO Mall Go Vap (GVP)", "GO Mall Long Xuyen (LXU)", "GO Mall My Tho (MTO)",
+        "GO Mall Phan Thiet (PTT)", "GO Mall Vinh Long (VLG)", "GO Mall Vung Tau (VTU)",
+        "Hyper Ben Luc (BLC)", "Hyper Go Vap (GVP)", "Hyper Long Xuyen (LXU)", "Hyper My Tho (MTO)",
+        "Hyper Phan Thiet (PTT)", "Hyper Vinh Long (VLG)", "Hyper Vung Tau (VTU)"
+    ]
+
+    df_res_partner['display_name'] = df_res_partner['display_name'].astype(str)
+    if 'is_company' in df_res_partner.columns:
+        mask_company = (df_res_partner['is_company'] == True) | (df_res_partner['is_company'] == 1)
+    else:
+        mask_company = True
+
+    df_special_sites = df_res_partner[
+        df_res_partner['display_name'].isin(special_display_names)
+        & mask_company
+        & (df_res_partner['helpdesk_team_id'] != 12)
+        & (df_res_partner['helpdesk_team_id'] != 25)
+        & (df_res_partner['active'] == True)
+    ][['display_name', 'mall_code']].drop_duplicates().sort_values('display_name')
+
+    df_special_sites = df_special_sites.rename(columns={'display_name': 'Sites', 'mall_code': 'Mall Code'})
+
+    today = pd.Timestamp.now().normalize()
+    seven_days_ago = today - pd.Timedelta(days=7)
+    seventy_days_ago = today - pd.Timedelta(days=70)
+
+    site_ticket_not_end = []
+    site_ticket_7days = []
+    site_ticket_70days = []
+    site_ticket_emergency = []
+    site_ticket_high_priority = []
+    site_ticket_medium_priority = []
+    site_ticket_low_priority = []
+
+    category_list = df_south5['category_name'].dropna().unique()[:11]
+    site_ticket_by_category = {cat: [] for cat in category_list}
+
+    sites_south5 = df_special_sites['Sites'].tolist()
+
+    for site in sites_south5:
+        count_not_end = df_south5[
+            (df_south5['mall_display_name'] == site) &
+            (df_south5['custom_end_date'] == "not yet end")
+        ].shape[0]
+        site_ticket_not_end.append(count_not_end)
+
+        count_old_not_end_7 = df_south5[
+            (df_south5['mall_display_name'] == site) &
+            (df_south5['create_date'] <= seven_days_ago) &
+            (df_south5['custom_end_date'] == "not yet end")
+        ].shape[0]
+        count_old_end_late_7 = df_south5[
+            (df_south5['mall_display_name'] == site) &
+            (df_south5['create_date'] <= seven_days_ago) &
+            (df_south5['custom_end_date'] != "not yet end") &
+            (pd.to_datetime(df_south5['custom_end_date'], errors='coerce') > seven_days_ago)
+        ].shape[0]
+        site_ticket_7days.append(count_not_end - (count_old_not_end_7 + count_old_end_late_7))
+
+        count_old_not_end_70 = df_south5[
+            (df_south5['mall_display_name'] == site) &
+            (df_south5['create_date'] <= seventy_days_ago) &
+            (df_south5['custom_end_date'] == "not yet end")
+        ].shape[0]
+        count_old_end_late_70 = df_south5[
+            (df_south5['mall_display_name'] == site) &
+            (df_south5['create_date'] <= seventy_days_ago) &
+            (df_south5['custom_end_date'] != "not yet end") &
+            (pd.to_datetime(df_south5['custom_end_date'], errors='coerce') > seventy_days_ago)
+        ].shape[0]
+        site_ticket_70days.append(count_not_end - (count_old_not_end_70 + count_old_end_late_70))
+
+        site_ticket_emergency.append(df_south5[
+            (df_south5['mall_display_name'] == site) &
+            (df_south5['custom_end_date'] == "not yet end") &
+            (df_south5['helpdesk_ticket_tag_id'] == 3)
+        ].shape[0])
+
+        site_ticket_high_priority.append(df_south5[
+            (df_south5['mall_display_name'] == site) &
+            (df_south5['custom_end_date'] == "not yet end") &
+            (df_south5['helpdesk_ticket_tag_id'] != 3) &
+            (df_south5['priority'].fillna(0).astype(int) == 3)
+        ].shape[0])
+
+        site_ticket_medium_priority.append(df_south5[
+            (df_south5['mall_display_name'] == site) &
+            (df_south5['custom_end_date'] == "not yet end") &
+            (df_south5['helpdesk_ticket_tag_id'] != 3) &
+            (df_south5['priority'].fillna(0).astype(int) == 2)
+        ].shape[0])
+
+        site_ticket_low_priority.append(df_south5[
+            (df_south5['mall_display_name'] == site) &
+            (df_south5['custom_end_date'] == "not yet end") &
+            (df_south5['helpdesk_ticket_tag_id'] != 3) &
+            (
+                df_south5['priority'].isna() |
+                (df_south5['priority'].astype(str).str.strip() == '0') |
+                (df_south5['priority'].fillna(0).astype(int) == 0) |
+                (df_south5['priority'].fillna(0).astype(int) == 1)
+            )
+        ].shape[0])
+
+        for cat in category_list:
+            site_ticket_by_category[cat].append(df_south5[
+                (df_south5['mall_display_name'] == site) &
+                (df_south5['custom_end_date'] == "not yet end") &
+                (df_south5['category_name'] == cat)
+            ].shape[0])
+
+    data = {
+        'Sites': sites_south5,
+        'Total OA tickets': site_ticket_not_end,
+        'Vs last 7 days': site_ticket_7days,
+        'Vs last 70 days': site_ticket_70days,
+        'Emergency OA': site_ticket_emergency,
+        'High priority OA': site_ticket_high_priority,
+        'Medium priority OA': site_ticket_medium_priority,
+        'Low priority OA': site_ticket_low_priority,
+    }
+    for cat in category_list:
+        data[cat] = site_ticket_by_category[cat]
+
+    df_sites_south5 = pd.DataFrame(data)
+
+    # Thêm hàng Total (sum các cột số)
+    total_row = {col: df_sites_south5[col].sum() if df_sites_south5[col].dtype != 'O' else 'TOTAL' for col in df_sites_south5.columns}
+    df_sites_south5 = pd.concat([df_sites_south5, pd.DataFrame([total_row])], ignore_index=True)
+
+    # Conditional formatting 3-Color Scale (chỉ áp dụng cho các hàng, không áp dụng cho hàng Total)
+    num_cols = [col for col in df_sites_south5.columns if col != 'Sites']
+    df_no_total = df_sites_south5.iloc[:-1][num_cols]
+    vmin = df_no_total.min().min()
+    vmax = df_no_total.max().max()
+    vmid = df_no_total.stack().quantile(0.5)  # 50th percentile
+
+    def color_scale(val):
+        try:
+            val = float(val)
+        except:
+            return ""
+        if vmax == vmin:
+            norm = 0.5
+        elif val <= vmid:
+            norm = (val - vmin) / (vmid - vmin) / 2 if vmid > vmin else 0
+        else:
+            norm = 0.5 + (val - vmid) / (vmax - vmid) / 2 if vmax > vmid else 1
+        # Xanh lá nhạt (#b7f7b7) -> trắng (#ffffff) -> đỏ nhạt (#ffb3b3)
+        if norm <= 0.5:
+            r = int(183 + (255-183)*norm*2)
+            g = int(247 + (255-247)*norm*2)
+            b = int(183 + (255-183)*norm*2)
+        else:
+            r = int(255)
+            g = int(255 - (255-179)*(norm-0.5)*2)
+            b = int(255 - (255-179)*(norm-0.5)*2)
+        return f'background-color: rgb({r},{g},{b})'
+
+    def style_func(val, row_idx):
+        # Không tô màu cho hàng Total (hàng cuối)
+        if row_idx == len(df_sites_south5) - 1:
+            return ""
+        return color_scale(val)
+
+    def apply_color_scale(df):
+        styled = pd.DataFrame('', index=df.index, columns=df.columns)
+        for row_idx in range(len(df)):
+            if row_idx == len(df) - 1:
+                continue
+            for col in num_cols:
+                styled.at[row_idx, col] = color_scale(df.at[row_idx, col])
+        return styled
+
+    styled = df_sites_south5.style.apply(lambda s: apply_color_scale(df_sites_south5), axis=None)
+
+    # Format hàng Total: màu đỏ, in đậm
+    def highlight_total(s):
+        is_total = s.name == len(df_sites_south5) - 1
+        return ['font-weight: bold; color: red;' if is_total else '' for _ in s]
+
+    styled = styled.apply(highlight_total, axis=1)
+
+    num_rows = df_sites_south5.shape[0]
+    row_height = 35
+    header_height = 38
+    st.dataframe(styled, use_container_width=True, height=num_rows * row_height + header_height)
+    st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+
+    st.markdown(
+    "<hr style='border: 1.5px solid #222; margin: 30px 0;'>",
+    unsafe_allow_html=True
+    )
+
+    st.markdown("<div style='height: 3rem'></div>", unsafe_allow_html=True)
+
+    st.markdown("<h2 style='text-align: center;color: #ab3f3f;'>SOUTH 5 - Nguyen Ngoc Ho</h2>", unsafe_allow_html=True)
+    df_south5 = df[df['team_id'] == 23]
+    st.markdown("<div style='height: 6rem'></div>", unsafe_allow_html=True)
+
+    # Pivot cho gauge
+    pivot = pd.pivot_table(
+        df,
+        values='processing_time',
+        index='team_name',
+        columns='category_name',
+        aggfunc='mean',
+        fill_value=0
+    )
+    across_all = df.groupby('team_name')['processing_time'].mean().round(0).astype(int)
+    pivot.insert(0, 'Across all category', across_all)
+    pivot = pivot.round(0).astype(int)
+
+    # Lấy giá trị cho South 5
+    value = pivot.loc['SOUTH 5 - Nguyen Ngoc Ho', 'Across all category']
+
+    gauge_max = 100
+    gauge_min = 0
+    level1 = 33
+    level2 = 66
+
+    steps = []
+    if value > 0:
+        steps.append({'range': [0, min(value, level1)], 'color': '#b7f7b7'})
+    if value > level1:
+        steps.append({'range': [level1, min(value, level2)], 'color': '#ffe082'})
+    if value > level2:
+        steps.append({'range': [level2, min(value, gauge_max)], 'color': '#ffb3b3'})
+    if value < gauge_max:
+        steps.append({'range': [value, gauge_max], 'color': '#eeeeee'})
+
+    fig_gauge = go.Figure(go.Indicator(
+        mode="gauge+number",
+        value=value,
+        gauge={
+            'axis': {'range': [gauge_min, gauge_max]},
+            'bar': {'color': 'rgba(0,0,0,0)'},
+            'steps': steps,
+        },
+        domain={'x': [0, 1], 'y': [0, 1]}
+    ))
+
+    fig_gauge.update_layout(
+        annotations=[
+            dict(
+                x=0.5, y=0.01,
+                text="(days)",
+                showarrow=False,
+                font=dict(size=22, color="gray"),
+                xanchor="center"
+            )
+        ],
+        width=350, height=250,
+        margin=dict(l=10, r=10, t=40, b=10),
+    )
+
+    # Tính số lượng ticket tồn tuần trước (W-1) và tuần hiện tại (W)
+    idx_w = len(week_ends) - 1
+    idx_w1 = idx_w - 1
+    end_w = week_ends[idx_w]
+    end_w1 = week_ends[idx_w1]
+
+    mask_w1 = (
+        (df_south5['create_date'] <= end_w1) &
+        (
+            (df_south5['custom_end_date'] == "not yet end") |
+            (pd.to_datetime(df_south5['custom_end_date'], errors='coerce') > end_w1)
+        )
+    )
+    count_w1 = df_south5[mask_w1].shape[0]
+
+    mask_w = (
+        (df_south5['create_date'] <= end_w) &
+        (
+            (df_south5['custom_end_date'] == "not yet end") |
+            (pd.to_datetime(df_south5['custom_end_date'], errors='coerce') > end_w)
+        )
+    )
+    count_w = df_south5[mask_w].shape[0]
+
+    if count_w1 == 0:
+        percent = 100 if count_w > 0 else 0
+    else:
+        percent = ((count_w - count_w1) / count_w1) * 100
+
+    if percent > 0:
+        percent_text = f"W vs W-1: +{percent:.1f}%"
+        bgcolor = "#f2c795"
+    elif percent < 0:
+        percent_text = f"W vs W-1: -{abs(percent):.1f}%"
+        bgcolor = "#abf3ab"
+    else:
+        percent_text = "W vs W-1: 0.0%"
+        bgcolor = "#f2c795"
+
+    percent_value = f"{percent:+.1f}%" if percent != 0 else "0.0%"
+
+    col1, col2 = st.columns([1, 0.9])
+    with col1:
+        st.markdown("<div style='height: 10rem'></div>", unsafe_allow_html=True)
+        st.markdown(
+            f"""
+            <div style='display: flex; justify-content: center; margin-bottom: 2rem;'>
+                <div style='padding: 0.5rem 1.2rem; background: {bgcolor}; border: 2px solid #888; border-radius: 10px; font-size: 1.1rem; font-weight: bold; color: #222; min-width: 180px; text-align: center;'>
+                    <div style='font-size:1.7rem; font-weight: bold;'>W vs W-1</div>
+                    <div style='font-size:1.3rem; font-weight: bold; margin-top: 0.2rem;'>{percent_value}</div>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+    with col2:
+        st.markdown(
+            """
+            <div style='text-align:left; font-size:1.5rem; font-weight:bold; margin-bottom: 1.5rem; margin-left: 35px;'>
+                Avg. Processing Time<br>Across All Category
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+        st.markdown("<div style='margin-left: 40px;'>", unsafe_allow_html=True)
+        st.plotly_chart(fig_gauge)
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    st.markdown("<div style='height: 7rem'></div>", unsafe_allow_html=True)
+
+    # Clustered column chart: Created vs Solved ticket per week
+    created_counts = []
+    solved_counts = []
+    for start, end in zip(week_starts, week_ends):
+        created = df_south5[(df_south5['create_date'] >= start) & (df_south5['create_date'] <= end)].shape[0]
+        solved = -df_south5[(pd.to_datetime(df_south5['custom_end_date'], errors='coerce') >= start) & (pd.to_datetime(df_south5['custom_end_date'], errors='coerce') <= end)].shape[0]
+        created_counts.append(created)
+        solved_counts.append(solved)
+
+    fig = go.Figure(data=[
+        go.Bar(
+            name='Created ticket',
+            x=week_labels,
+            y=created_counts,
+            marker_color='#ffb3b3',
+            text=[str(v) if v != 0 else "" for v in created_counts],
+            textposition="outside",
+            textfont=dict(size=14, color="black")
+        ),
+        go.Bar(
+            name='Solved ticket',
+            x=week_labels,
+            y=solved_counts,
+            marker_color='#b7f7b7',
+            text=[str(v) if v != 0 else "" for v in solved_counts],
+            textposition="outside",
+            textfont=dict(size=14, color="black")
+        )
+    ])
+    fig.update_layout(
+        barmode='group',
+        title={
+            'text': "SOUTH 5 - ON ASSESSMENT TICKET OVER WEEKS",
+            'y': 1,
+            'x': 0.5,
+            'xanchor': 'center',
+            'yanchor': 'top',
+            'font': dict(size=28)
+        },
+        xaxis_title="Weeks",
+        yaxis_title="Number of Tickets",
+        width=1200,
+        height=600,
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5),
+        xaxis=dict(tickfont=dict(color='black')),
+        yaxis=dict(tickfont=dict(color='black'))
+    )
+    st.plotly_chart(fig, use_container_width=True)
+    st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+
+    # Stacked Bar Chart theo Category cho South 5
+    category_names_south5 = df_south5['category_name'].dropna().unique()
+    table_data_south5 = []
+    for i, end in enumerate(week_ends):
+        row = {"Tuần": week_labels[i]}
+        for cat in category_names_south5:
+            mask = (
+                (df_south5['category_name'] == cat) &
+                (df_south5['create_date'] <= end) &
+                (
+                    (df_south5['custom_end_date'] == "not yet end") |
+                    (
+                        (df_south5['custom_end_date'] != "not yet end") &
+                        (pd.to_datetime(df_south5['custom_end_date'], errors='coerce') > end)
+                    )
+                )
+            )
+            count = df_south5[mask].shape[0]
+            row[cat] = count
+        table_data_south5.append(row)
+    df_table_south5 = pd.DataFrame(table_data_south5)
+
+    fig_stack_south5 = go.Figure()
+    for cat in category_names_south5:
+        y_values = df_table_south5[cat].tolist()
+        text_labels = [str(v) if v != 0 else "" for v in y_values]
+        fig_stack_south5.add_trace(go.Bar(
+            name=cat,
+            x=df_table_south5["Tuần"],
+            y=y_values,
+            text=text_labels,
+            textposition="inside",
+            texttemplate="%{text}",
+            textangle=0,
+            textfont=dict(size=9),
+        ))
+    totals = df_table_south5[category_names_south5].sum(axis=1)
+    totals_offset = totals + totals * 0.04
+    fig_stack_south5.add_trace(go.Scatter(
+        x=df_table_south5["Tuần"],
+        y=totals_offset,
+        textposition="top center",
+        textfont=dict(size=16),
+        showlegend=False,
+        hoverinfo="skip",
+        texttemplate="%{text}"
+    ))
+    for i, (x, y, t) in enumerate(zip(df_table_south5["Tuần"], totals_offset, totals)):
+        fig_stack_south5.add_annotation(
+            x=x,
+            y=y,
+            text=f"<span style='color:#e74c3c; font-weight:bold'>{t}</span>",
+            showarrow=False,
+            font=dict(size=10, color="#e74c3c"),
+            align="center",
+            xanchor="center",
+            yanchor="bottom",
+            bgcolor="rgba(255,255,0,0.77)",
+            borderpad=4,
+            bordercolor="#e74c3c",
+            borderwidth=0
+        )
+
+    # % thay đổi giữa tuần hiện tại và tuần trước cho từng category
+    idx_w = len(week_ends) - 1
+    idx_w1 = idx_w - 1
+    w_label = df_table_south5["Tuần"].iloc[idx_w]
+
+    active_categories = []
+    percent_changes = {}
+    category_positions = {}
+    cumulative_height = 0
+    for cat in category_names_south5:
+        count_w = float(df_table_south5[cat].iloc[idx_w])
+        if count_w <= 0:
+            continue
+        count_w1 = float(df_table_south5[cat].iloc[idx_w1])
+        if count_w1 == 0:
+            percent = 100 if count_w > 0 else 0
+        else:
+            percent = ((count_w - count_w1) / count_w1) * 100
+        active_categories.append(cat)
+        percent_changes[cat] = percent
+        category_positions[cat] = cumulative_height + count_w / 2
+        cumulative_height += count_w
+
+    if active_categories:
+        total_height = cumulative_height
+        x_vals = list(df_table_south5["Tuần"])
+        x_idx = x_vals.index(w_label)
+        x_offset = x_idx + 2
+        sorted_categories = sorted(active_categories, key=lambda x: category_positions[x])
+        for i, cat in enumerate(sorted_categories):
+            percent = percent_changes[cat]
+            if percent > 0:
+                percent_text = f"W vs W-1: +{percent:.1f}%"
+                bgcolor = "#f2c795"
+            elif percent < 0:
+                percent_text = f"W vs W-1: -{abs(percent):.1f}%"
+                bgcolor = "#abf3ab"
+            else:
+                percent_text = "W vs W-1: 0.0%"
+                bgcolor = "#f2c795"
+            y_col = category_positions[cat]
+            spacing_factor = 0.35
+            y_box = y_col + (total_height * spacing_factor * (i - len(sorted_categories)/2))
+            fig_stack_south5.add_annotation(
+                x=w_label, y=y_col,
+                ax=x_offset, ay=y_box,
+                xref="x", yref="y", axref="x", ayref="y",
+                text="", showarrow=True, arrowhead=0, arrowwidth=1, arrowcolor="black"
+            )
+            fig_stack_south5.add_annotation(
+                x=x_offset, y=y_box,
+                text=f"<b>{percent_text}</b>",
+                showarrow=False,
+                font=dict(size=11, color="black"),
+                align="left",
+                xanchor="left",
+                yanchor="middle",
+                bgcolor=bgcolor,
+                borderpad=3,
+                bordercolor="black",
+                borderwidth=1
+            )
+
+    fig_stack_south5.update_layout(
+        barmode='stack',
+        title=dict(
+            text="SOUTH 5 - OVERALL EVOLUTION OA TICKETS PER CATEGORY",
+            y=1,
+            x=0.5,
+            xanchor='center',
+            yanchor='top',
+            font=dict(size=28)
+        ),
+        width=1200,
+        height=900,
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=-0.45,
+            xanchor="left",
+            x=0
+        ),
+        xaxis=dict(
+            tickfont=dict(color='black'),
+            title=dict(text="Weeks", font=dict(color='black')),
+            automargin=False
+        ),
+        yaxis=dict(
+            tickfont=dict(color='black'),
+            title=dict(text="Number of OA Tickets", font=dict(color='black'))
+        ),
+        margin=dict(r=50, b=5),
+    )
+    st.plotly_chart(fig_stack_south5)
+    st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+
+    # Stacked Bar Chart theo Priority cho South 5
+    priority_cols = ['Low priority', 'Medium priority', 'High priority', 'Emergency']
+    priority_colors = {
+        'Low priority': '#b7f7b7',
+        'Medium priority': '#fff9b1',
+        'High priority': '#ffd6a0',
+        'Emergency': '#ff2222'
+    }
+    table_data_priority_south5 = []
+    for i, end in enumerate(week_ends):
+        row = {"Tuần": week_labels[i]}
+        mask_low = (
+            (df_south5['helpdesk_ticket_tag_id'] != 3) &
+            (
+                (df_south5['priority'].isna()) |
+                (df_south5['priority'].astype(str).str.strip() == '0') |
+                (df_south5['priority'].fillna(0).astype(int) == 1)
+            ) &
+            (df_south5['create_date'] <= end) &
+            (
+                (df_south5['custom_end_date'] == "not yet end") |
+                (pd.to_datetime(df_south5['custom_end_date'], errors='coerce') > end)
+            )
+        )
+        row['Low priority'] = df_south5[mask_low].shape[0]
+        mask_medium = (
+            (df_south5['helpdesk_ticket_tag_id'] != 3) &
+            (df_south5['priority'].fillna(0).astype(int) == 2) &
+            (df_south5['create_date'] <= end) &
+            (
+                (df_south5['custom_end_date'] == "not yet end") |
+                (pd.to_datetime(df_south5['custom_end_date'], errors='coerce') > end)
+            )
+        )
+        row['Medium priority'] = df_south5[mask_medium].shape[0]
+        mask_high = (
+            (df_south5['helpdesk_ticket_tag_id'] != 3) &
+            (df_south5['priority'].fillna(0).astype(int) == 3) &
+            (df_south5['create_date'] <= end) &
+            (
+                (df_south5['custom_end_date'] == "not yet end") |
+                (pd.to_datetime(df_south5['custom_end_date'], errors='coerce') > end)
+            )
+        )
+        row['High priority'] = df_south5[mask_high].shape[0]
+        mask_emergency = (
+            (df_south5['helpdesk_ticket_tag_id'] == 3) &
+            (df_south5['create_date'] <= end) &
+            (
+                (df_south5['custom_end_date'] == "not yet end") |
+                (pd.to_datetime(df_south5['custom_end_date'], errors='coerce') > end)
+            )
+        )
+        row['Emergency'] = df_south5[mask_emergency].shape[0]
+        table_data_priority_south5.append(row)
+    df_table_priority_south5 = pd.DataFrame(table_data_priority_south5)
+
+    # % thay đổi giữa tuần hiện tại và tuần trước cho từng priority
+    idx_w = len(week_ends) - 1
+    idx_w1 = idx_w - 1
+    w_label = df_table_priority_south5["Tuần"].iloc[idx_w]
+    active_priorities = []
+    percent_changes = {}
+    priority_positions = {}
+    cumulative_height = 0
+    for pri in priority_cols:
+        count_w = float(df_table_priority_south5[pri].iloc[idx_w])
+        if count_w <= 0:
+            continue
+        count_w1 = float(df_table_priority_south5[pri].iloc[idx_w1])
+        if count_w1 == 0:
+            percent = 100 if count_w > 0 else 0
+        else:
+            percent = ((count_w - count_w1) / count_w1) * 100
+        active_priorities.append(pri)
+        percent_changes[pri] = percent
+        priority_positions[pri] = cumulative_height + count_w / 2
+        cumulative_height += count_w
+
+    fig_stack_priority_south5 = go.Figure()
+    for priority in priority_cols:
+        y_values = df_table_priority_south5[priority].tolist()
+        text_labels = [str(v) if v != 0 else "" for v in y_values]
+        fig_stack_priority_south5.add_trace(go.Bar(
+            name=priority,
+            x=df_table_priority_south5["Tuần"],
+            y=y_values,
+            text=text_labels,
+            textposition="inside",
+            texttemplate="%{text}",
+            textangle=0,
+            textfont=dict(size=9),
+            marker_color=priority_colors[priority]
+        ))
+    if active_priorities:
+        total_height = cumulative_height
+        x_vals = list(df_table_priority_south5["Tuần"])
+        x_idx = x_vals.index(w_label)
+        x_offset = x_idx + 2
+        sorted_priorities = sorted(active_priorities, key=lambda x: priority_positions[x])
+        for i, pri in enumerate(sorted_priorities):
+            percent = percent_changes[pri]
+            if percent > 0:
+                percent_text = f"W vs W-1: +{percent:.1f}%"
+                bgcolor = "#f2c795"
+            elif percent < 0:
+                percent_text = f"W vs W-1: -{abs(percent):.1f}%"
+                bgcolor = "#abf3ab"
+            else:
+                percent_text = "W vs W-1: 0.0%"
+                bgcolor = "#f2c795"
+            y_col = priority_positions[pri]
+            spacing_factor = 0.35
+            y_box = y_col + (total_height * spacing_factor * (i - len(sorted_priorities)/2))
+            fig_stack_priority_south5.add_annotation(
+                x=w_label, y=y_col,
+                ax=x_offset, ay=y_box,
+                xref="x", yref="y", axref="x", ayref="y",
+                text="", showarrow=True, arrowhead=0, arrowwidth=1, arrowcolor="black"
+            )
+            fig_stack_priority_south5.add_annotation(
+                x=x_offset, y=y_box,
+                text=f"<b>{percent_text}</b>",
+                showarrow=False,
+                font=dict(size=11, color="black"),
+                align="left",
+                xanchor="left",
+                yanchor="middle",
+                bgcolor=bgcolor,
+                borderpad=3,
+                bordercolor="black",
+                borderwidth=1
+            )
+    totals = df_table_priority_south5[priority_cols].sum(axis=1)
+    totals_offset = totals + totals * 0.04
+    fig_stack_priority_south5.add_trace(go.Scatter(
+        x=df_table_priority_south5["Tuần"],
+        y=totals_offset,
+        textposition="top center",
+        textfont=dict(size=16),
+        showlegend=False,
+        hoverinfo="skip",
+        texttemplate="%{text}"
+    ))
+    for i, (x, y, t) in enumerate(zip(df_table_priority_south5["Tuần"], totals_offset, totals)):
+        fig_stack_priority_south5.add_annotation(
+            x=x,
+            y=y,
+            text=f"<span style='color:#e74c3c; font-weight:bold'>{t}</span>",
+            showarrow=False,
+            font=dict(size=10, color="#e74c3c"),
+            align="center",
+            xanchor="center",
+            yanchor="bottom",
+            bgcolor="rgba(255,255,0,0.77)",
+            borderpad=4,
+            bordercolor="#e74c3c",
+            borderwidth=0
+        )
+    fig_stack_priority_south5.update_layout(
+        barmode='stack',
+        title={
+            'text': "SOUTH 5 - OVERALL EVOLUTION OA TICKETS PER PRIORITY",
+            'y': 1,
+            'x': 0.5,
+            'xanchor': 'center',
+            'yanchor': 'top',
+            'font': dict(size=28)
+        },
+        xaxis_title="Weeks",
+        yaxis_title="Number of OA Tickets",
+        width=1200,
+        height=800,
+        legend=dict(orientation="h", yanchor="top", y=1.05, xanchor="center", x=0.5),
+        xaxis=dict(tickfont=dict(color='black')),
+        yaxis=dict(tickfont=dict(color='black'))
+    )
+    st.plotly_chart(fig_stack_priority_south5)
+    st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+
+    # Clustered Chart: Created/Solved ticket High Priority (Emergency & Non-Emergency)
+    created_counts = []
+    solved_counts = []
+    for start, end in zip(week_starts, week_ends):
+        created_high_non_emergency = df_south5[
+            (df_south5['create_date'] >= start) &
+            (df_south5['create_date'] <= end) &
+            (df_south5['priority'].fillna(0).astype(int) == 3) &
+            (df_south5['helpdesk_ticket_tag_id'] != 3)
+        ].shape[0]
+        created_high_emergency = df_south5[
+            (df_south5['create_date'] >= start) &
+            (df_south5['create_date'] <= end) &
+            (df_south5['helpdesk_ticket_tag_id'] == 3)
+        ].shape[0]
+        created = created_high_non_emergency + created_high_emergency
+
+        solved_high_non_emergency = df_south5[
+            (pd.to_datetime(df_south5['custom_end_date'], errors='coerce') >= start) &
+            (pd.to_datetime(df_south5['custom_end_date'], errors='coerce') <= end) &
+            (df_south5['priority'].fillna(0).astype(int) == 3) &
+            (df_south5['helpdesk_ticket_tag_id'] != 3)
+        ].shape[0]
+        solved_high_emergency = df_south5[
+            (pd.to_datetime(df_south5['custom_end_date'], errors='coerce') >= start) &
+            (pd.to_datetime(df_south5['custom_end_date'], errors='coerce') <= end) &
+            (df_south5['helpdesk_ticket_tag_id'] == 3)
+        ].shape[0]
+        solved = -(solved_high_non_emergency + solved_high_emergency)
+
+        created_counts.append(created)
+        solved_counts.append(solved)
+
+    fig = go.Figure(data=[
+        go.Bar(
+            name='Created ticket',
+            x=week_labels,
+            y=created_counts,
+            marker_color='#ffb3b3',
+            text=[str(v) if v != 0 else "" for v in created_counts],
+            textposition="outside",
+            textfont=dict(size=14, color="black")
+        ),
+        go.Bar(
+            name='Solved ticket',
+            x=week_labels,
+            y=solved_counts,
+            marker_color='#b7f7b7',
+            text=[str(v) if v != 0 else "" for v in solved_counts],
+            textposition="outside",
+            textfont=dict(size=14, color="black")
+        )
+    ])
+    fig.update_layout(
+        barmode='group',
+        title={
+            'text': "SOUTH 5 - OVERALL EVOLUTION EMERGENCY & HIGH PRIORITY TICKETS",
+            'y': 1,
+            'x': 0.5,
+            'xanchor': 'center',
+            'yanchor': 'top',
+            'font': dict(size=28)
+        },
+        xaxis_title="Weeks",
+        yaxis_title="Number of Tickets",
+        width=1200,
+        height=750,
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.05,
+            xanchor="center",
+            x=0.5
+        ),
+        xaxis=dict(
+            tickfont=dict(color='black')
+        ),
+        yaxis=dict(
+            tickfont=dict(color='black')
+        )
+    )
+    st.plotly_chart(fig, use_container_width=True)
+    st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+
+    # Clustered Chart: Created/Solved ticket Low & Medium Priority 
+    created_counts = []
+    solved_counts = []
+    for start, end in zip(week_starts, week_ends):
+        created_low = df_south5[
+            (df_south5['create_date'] >= start) &
+            (df_south5['create_date'] <= end) &
+            (
+                df_south5['priority'].isna() |
+                (df_south5['priority'].astype(str).str.strip() == '0') |
+                (df_south5['priority'].fillna(0).astype(int) == 1)
+            ) &
+            (df_south5['helpdesk_ticket_tag_id'] != 3)
+        ].shape[0]
+        created_medium = df_south5[
+            (df_south5['create_date'] >= start) &
+            (df_south5['create_date'] <= end) &
+            (df_south5['priority'].fillna(0).astype(int) == 2)
+            &
+            (df_south5['helpdesk_ticket_tag_id'] != 3)
+        ].shape[0]
+        created = created_low + created_medium
+
+        solved_low = df_south5[
+            (pd.to_datetime(df_south5['custom_end_date'], errors='coerce') >= start) &
+            (pd.to_datetime(df_south5['custom_end_date'], errors='coerce') <= end) &
+            (
+                df_south5['priority'].isna() |
+                (df_south5['priority'].astype(str).str.strip() == '0') |
+                (df_south5['priority'].fillna(0).astype(int) == 1)
+            ) &
+            (df_south5['helpdesk_ticket_tag_id'] != 3)
+        ].shape[0]
+        solved_medium = df_south5[
+            (pd.to_datetime(df_south5['custom_end_date'], errors='coerce') >= start) &
+            (pd.to_datetime(df_south5['custom_end_date'], errors='coerce') <= end) &
+            (df_south5['priority'].fillna(0).astype(int) == 2)
+            &
+            (df_south5['helpdesk_ticket_tag_id'] != 3)
+        ].shape[0]
+        solved = -(solved_low + solved_medium)
+
+        created_counts.append(created)
+        solved_counts.append(solved)
+
+    fig = go.Figure(data=[
+        go.Bar(
+            name='Created ticket',
+            x=week_labels,
+            y=created_counts,
+            marker_color='#ffb3b3',
+            text=[str(v) if v != 0 else "" for v in created_counts],
+            textposition="outside",
+            textfont=dict(size=14, color="black")
+        ),
+        go.Bar(
+            name='Solved ticket',
+            x=week_labels,
+            y=solved_counts,
+            marker_color='#b7f7b7',
+            text=[str(v) if v != 0 else "" for v in solved_counts],
+            textposition="outside",
+            textfont=dict(size=14, color="black")
+        )
+    ])
+    fig.update_layout(
+        barmode='group',
+        title={
+            'text': "SOUTH 5 - OVERALL EVOLUTION MEDIUM & LOW PRIORITY TICKETS",
+            'y': 1,
+            'x': 0.5,
+            'xanchor': 'center',
+            'yanchor': 'top',
+            'font': dict(size=28)
+        },
+        xaxis_title="Weeks",
+        yaxis_title="Number of Tickets",
+        width=1200,
+        height=750,
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.05,
+            xanchor="center",
+            x=0.5
+        ),
+        xaxis=dict(
+            tickfont=dict(color='black')
+        ),
+        yaxis=dict(
+            tickfont=dict(color='black')
+        )
+    )
+    st.plotly_chart(fig, use_container_width=True)
+    st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+
+    # Bảng Sites cho South 5
+    st.markdown("<h3 style='text-align: center;'>SOUTH 5 - DETAIL VIEW PER SITE</h3>", unsafe_allow_html=True)
+    special_display_names = [
         
         "CBS Crocs 61 Nguyen Trai (276329)", "CBS Crocs Cao Thang (276339)", "CBS Crocs Estella (276366)",
         "CBS Crocs Giga Mall Thu Duc (2763P2)", "CBS Crocs Go Di An (2763H9)", "CBS Crocs Mac Thi Buoi (2763O9)",
@@ -12075,3 +13818,78 @@ elif page == "North 1":
     header_height = 38
     st.dataframe(styled, use_container_width=True, height=num_rows * row_height + header_height)
     st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+
+
+
+
+elif page == "Xem dữ liệu":
+    st.title("Xem dữ liệu và cột tính mới")
+    
+    # Hiển thị thông tin thời gian
+    st.markdown("""
+    <style>
+    .date-info {
+        padding: 20px;
+        border-radius: 5px;
+        background-color: #f0f2f6;
+        margin-bottom: 20px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    st.markdown(f"""
+    <div class='date-info'>
+        <h3>Thông tin thời gian:</h3>
+        <p><strong>Start date:</strong> {start_date.strftime('%d-%m-%y %H:%M:%S')}</p>
+        <p><strong>End date:</strong> {end_date.strftime('%d-%m-%y %H:%M:%S')}</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.write("Ngày create_date mới nhất trong dữ liệu:", df['create_date'].max())
+
+    st.write("Dữ liệu với cột tính mới:")
+    AgGrid(df[['id','number','stage_id','approved_date','last_stage_update','custom_end_date','category_id','category_name','team_id','team_name','priority','helpdesk_ticket_tag_id','mall_id','mall_display_name','processing_time','Under this month report','Carry over ticket']], key="main_table")
+    
+    with st.expander("Bảng dữ liệu mẫu helpdesk_ticket_category"):
+        st.dataframe(df_category.head(20))
+    with st.expander("Bảng dữ liệu mẫu helpdesk_ticket_team"):
+        st.dataframe(df_team.head(20))
+    with st.expander("Bảng dữ liệu mẫu res_partner"):
+        st.dataframe(df_res_partner)
+
+    with st.expander("Bảng dữ liệu mẫu helpdesk_ticket"):
+        df_helpdesk_ticket = load_helpdesk_ticket()
+        st.dataframe(df_helpdesk_ticket)
+    
+    st.write("Bảng kiểm tra số lượng ticket tồn theo Category và Tuần:")
+    AgGrid(df_table.head(50), key="table_category")
+    
+    st.write("Bảng kiểm tra số lượng ticket tồn theo TEAM và Tuần:")
+    AgGrid(df_table_team.head(50), key="table_team")
+
+    st.write("Bảng kiểm tra số lượng ticket tồn theo PRIORITY và Tuần:")
+    AgGrid(df_table_priority.head(50), key="table_priority")
+
+    st.write("Bảng kiểm tra số lượng ticket tồn theo BANNER và Tuần:")
+    AgGrid(df_table_banner.head(50), key="table_banner")
+
+    st.write("### Bảng kiểm tra số lượng Created và Solved ticket theo tuần:")
+    st.dataframe(result_df)
+
+    with st.expander("Danh sách các bảng trong database"):
+        connection = psycopg2.connect(
+            host=host, database=database, user=user, password=password
+        )
+        query = '''
+        SELECT table_name
+        FROM information_schema.tables
+        WHERE table_schema = 'public'
+        ORDER BY table_name;
+        '''
+        df_tables = pd.read_sql(query, connection)
+        connection.close()
+        st.dataframe(df_tables)
+
+    df['custom_end_date'] = df['custom_end_date'].fillna("not yet end")
+
+
