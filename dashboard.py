@@ -579,6 +579,70 @@ fig_stack_priority.update_layout(
     )
 )
 st.plotly_chart(fig_stack_priority)
+st.markdown("<div style='height: 2rem'></div>", unsafe_allow_html=True)
+
+# --- Tính X%, Z%, Y% và sinh câu mô tả tự động mới ---
+# Lấy lại các giá trị đã tính ở trên
+idx_w = len(df_table_priority["Tuần"]) - 1
+idx_w1 = idx_w - 1
+
+# Tính phần trăm thay đổi cho từng priority
+percent_changes = {}
+for pri in priority_cols:
+    count_w = float(df_table_priority[pri].iloc[idx_w])
+    count_w1 = float(df_table_priority[pri].iloc[idx_w1])
+    if count_w1 == 0:
+        percent = 100 if count_w > 0 else 0
+    else:
+        percent = ((count_w - count_w1) / count_w1) * 100
+    percent_changes[pri] = percent
+
+# X% là số âm lớn nhất (giảm nhiều nhất), A là tên priority đó
+neg_percents = {k: v for k, v in percent_changes.items() if v < 0}
+if neg_percents:
+    A = min(neg_percents, key=neg_percents.get)
+    X = neg_percents[A]
+else:
+    A = min(percent_changes, key=percent_changes.get)
+    X = percent_changes[A]
+
+# Z% là số dương lớn nhất (tăng nhiều nhất), B là tên priority đó
+pos_percents = {k: v for k, v in percent_changes.items() if v > 0}
+if pos_percents:
+    B = max(pos_percents, key=pos_percents.get)
+    Z = pos_percents[B]
+else:
+    B = max(percent_changes, key=percent_changes.get)
+    Z = percent_changes[B]
+
+# Y% là phần trăm thay đổi tổng số ticket của tất cả priority
+sum_w = sum([df_table_priority[pri].iloc[idx_w] for pri in priority_cols])
+sum_w1 = sum([df_table_priority[pri].iloc[idx_w1] for pri in priority_cols])
+if sum_w1 == 0:
+    Y = 100 if sum_w > 0 else 0
+else:
+    Y = ((sum_w - sum_w1) / sum_w1) * 100
+
+# C là 'increased' nếu Y > 0, ngược lại 'decreased'
+C = 'increased' if Y > 0 else 'decreased'
+
+# Hiển thị câu mô tả tự động
+A_html = f"<span style='color:#d62728; font-weight:bold'>{A}</span>"
+B_html = f"<span style='color:#d62728; font-weight:bold'>{B}</span>"
+C_html = f"<span style='color:#111; font-weight:bold'>{C}</span>"
+
+decrease_html = "<span style='font-weight:bold; color:#111'>decrease</span>"
+increase_html = "<span style='font-weight:bold; color:#111'>increase</span>"
+total_html = "<span style='font-weight:bold; color:#d62728'>Total</span>"
+
+st.markdown(
+    f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>"
+    f"{A_html} recorded the largest {decrease_html} at {X:.1f}%, while {B_html} show the highest {increase_html} with {Z:.1f}%, compared to the previous week. "
+    f"Overall, the {total_html} change is {C_html} by {Y:.1f}%"
+    f"</div>",
+    unsafe_allow_html=True
+)
+
 st.markdown("<div style='height: 5rem'></div>", unsafe_allow_html=True)
 
 # Stacked Column Chart theo Category
@@ -710,15 +774,108 @@ fig_stack.update_layout(
     )
 )
 st.plotly_chart(fig_stack)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 1rem'></div>", unsafe_allow_html=True)
+
+# Sau khi st.plotly_chart(fig_stack)
+# --- Tính top 2 giảm/tăng mạnh nhất và sinh câu mô tả tự động cho Category ---
+idx_w = len(df_table["Tuần"]) - 1
+idx_w1 = idx_w - 1
+
+# Tính phần trăm thay đổi cho từng category
+percent_changes_cat = {}
+for cat in category_names:
+    count_w = float(df_table[cat].iloc[idx_w])
+    count_w1 = float(df_table[cat].iloc[idx_w1])
+    if count_w1 == 0:
+        percent = 100 if count_w > 0 else 0
+    else:
+        percent = ((count_w - count_w1) / count_w1) * 100
+    percent_changes_cat[cat] = percent
+
+# Top 2 giảm mạnh nhất (min), A, X% và O, K%
+neg_percents = sorted([(k, v) for k, v in percent_changes_cat.items() if v < 0], key=lambda x: x[1])
+if len(neg_percents) >= 2:
+    (A, X), (O, K) = neg_percents[0], neg_percents[1]
+elif len(neg_percents) == 1:
+    (A, X), (O, K) = neg_percents[0], (neg_percents[0][0], neg_percents[0][1])
+else:
+    min2 = sorted(percent_changes_cat.items(), key=lambda x: x[1])[:2]
+    (A, X), (O, K) = min2[0], min2[1]
+
+# Top 2 tăng mạnh nhất (max), B, Z% và P, H%
+pos_percents = sorted([(k, v) for k, v in percent_changes_cat.items() if v > 0], key=lambda x: x[1], reverse=True)
+if len(pos_percents) >= 2:
+    (B, Z), (P, H) = pos_percents[0], pos_percents[1]
+elif len(pos_percents) == 1:
+    (B, Z), (P, H) = pos_percents[0], (pos_percents[0][0], pos_percents[0][1])
+else:
+    max2 = sorted(percent_changes_cat.items(), key=lambda x: x[1], reverse=True)[:2]
+    (B, Z), (P, H) = max2[0], max2[1]
+
+# Y% là phần trăm thay đổi tổng số ticket của tất cả category
+sum_w = sum([df_table[cat].iloc[idx_w] for cat in category_names])
+sum_w1 = sum([df_table[cat].iloc[idx_w1] for cat in category_names])
+if sum_w1 == 0:
+    Y = 100 if sum_w > 0 else 0
+else:
+    Y = ((sum_w - sum_w1) / sum_w1) * 100
+
+# C là 'increased' nếu Y > 0, ngược lại 'decreased'
+C = 'increased' if Y > 0 else 'decreased'
+
+# Hiển thị câu mô tả tự động
+A_html = f"<span style='color:#d62728; font-weight:bold'>{A}</span>"
+O_html = f"<span style='color:#d62728; font-weight:bold'>{O}</span>"
+B_html = f"<span style='color:#d62728; font-weight:bold'>{B}</span>"
+P_html = f"<span style='color:#d62728; font-weight:bold'>{P}</span>"
+C_html = f"<span style='color:#111; font-weight:bold'>{C}</span>"
+
+decrease_html = "<span style='font-weight:bold; color:#111'>decrease</span>"
+increase_html = "<span style='font-weight:bold; color:#111'>increase</span>"
+total_html = "<span style='font-weight:bold; color:#d62728'>Total</span>"
+
+st.markdown(
+    f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>"
+    f"{A_html} and {O_html} recorded the largest {decrease_html} at {X:.1f}% and {K:.1f}%, respectively, "
+    f"while {B_html} and {P_html} showed highest {increase_html} with {Z:.1f}% and {H:.1f}%, respectively, compared to the previous week. "
+    f"Overall, the {total_html} change is {C_html} by {Y:.1f}%"
+    f"</div>",
+    unsafe_allow_html=True
+)
+
+st.markdown("<div style='height: 5rem'></div>", unsafe_allow_html=True)
 
 # Stacked Column Chart theo Team
 fig_stack_team = go.Figure()
-for team in df_table_team.columns:
+# Định nghĩa bảng màu đủ dài, không trùng, dễ phân biệt
+team_colors = [
+    '#1f77b4',  # xanh dương
+    '#2d5cf4',  # xanh lá
+    '#ff7f0e',  # cam
+    '#d62728',  # đỏ
+    '#9467bd',  # tím
+    '#8c564b',  # nâu
+    '#e377c2',  # hồng
+    '#7f7f7f',  # xám
+    '#bcbd22',  # vàng xanh
+    '#17becf',  # xanh ngọc
+    '#f5b041',  # vàng cam
+    '#229954',  # xanh lá đậm
+    '#0bf4a3',  # xanh biển nhạt
+    '#e74c3c',  # đỏ tươi
+    '#f7dc6f',  # vàng nhạt
+    '#a569bd',  # tím nhạt
+    '#45b39d',  # xanh ngọc nhạt
+    '#f1948a',  # hồng nhạt
+    '#34495e',  # xanh đen
+    '#f39c12',  # cam đậm
+]
+for i, team in enumerate(df_table_team.columns):
     if team == "Tuần":
         continue
     y_values = df_table_team[team].tolist()
     text_labels = [str(v) if v != 0 else "" for v in y_values]
+    color = team_colors[i % len(team_colors)]
     fig_stack_team.add_trace(go.Bar(
         name=team,
         x=df_table_team["Tuần"],
@@ -728,6 +885,7 @@ for team in df_table_team.columns:
         texttemplate="%{text}",
         textangle=0,
         textfont=dict(size=9),
+        marker_color=color
     ))
 # --- Thêm box so sánh % giữa tuần hiện tại và tuần trước cho từng team ---
 team_cols = [col for col in df_table_team.columns if col != "Tuần"]
@@ -845,6 +1003,76 @@ fig_stack_team.update_layout(
 )
 st.plotly_chart(fig_stack_team)
 st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+
+# Sau khi st.plotly_chart(fig_stack_team)
+# --- Tính top 2 giảm/tăng mạnh nhất và sinh câu mô tả tự động cho Region (Team) ---
+team_cols = [col for col in df_table_team.columns if col != "Tuần"]
+idx_w = len(df_table_team["Tuần"]) - 1
+idx_w1 = idx_w - 1
+
+# Tính phần trăm thay đổi cho từng team
+percent_changes_team = {}
+for team in team_cols:
+    count_w = float(df_table_team[team].iloc[idx_w])
+    count_w1 = float(df_table_team[team].iloc[idx_w1])
+    if count_w1 == 0:
+        percent = 100 if count_w > 0 else 0
+    else:
+        percent = ((count_w - count_w1) / count_w1) * 100
+    percent_changes_team[team] = percent
+
+# Top 2 giảm mạnh nhất (min), A, X% và O, K%
+neg_percents = sorted([(k, v) for k, v in percent_changes_team.items() if v < 0], key=lambda x: x[1])
+if len(neg_percents) >= 2:
+    (A, X), (O, K) = neg_percents[0], neg_percents[1]
+elif len(neg_percents) == 1:
+    (A, X), (O, K) = neg_percents[0], (neg_percents[0][0], neg_percents[0][1])
+else:
+    min2 = sorted(percent_changes_team.items(), key=lambda x: x[1])[:2]
+    (A, X), (O, K) = min2[0], min2[1]
+
+# Top 2 tăng mạnh nhất (max), B, Z% và P, H%
+pos_percents = sorted([(k, v) for k, v in percent_changes_team.items() if v > 0], key=lambda x: x[1], reverse=True)
+if len(pos_percents) >= 2:
+    (B, Z), (P, H) = pos_percents[0], pos_percents[1]
+elif len(pos_percents) == 1:
+    (B, Z), (P, H) = pos_percents[0], (pos_percents[0][0], pos_percents[0][1])
+else:
+    max2 = sorted(percent_changes_team.items(), key=lambda x: x[1], reverse=True)[:2]
+    (B, Z), (P, H) = max2[0], max2[1]
+
+# Y% là phần trăm thay đổi tổng số ticket của tất cả team
+sum_w = sum([df_table_team[team].iloc[idx_w] for team in team_cols])
+sum_w1 = sum([df_table_team[team].iloc[idx_w1] for team in team_cols])
+if sum_w1 == 0:
+    Y = 100 if sum_w > 0 else 0
+else:
+    Y = ((sum_w - sum_w1) / sum_w1) * 100
+
+# C là 'increased' nếu Y > 0, ngược lại 'decreased'
+C = 'increased' if Y > 0 else 'decreased'
+
+# Hiển thị câu mô tả tự động
+A_html = f"<span style='color:#d62728; font-weight:bold'>{A}</span>"
+O_html = f"<span style='color:#d62728; font-weight:bold'>{O}</span>"
+B_html = f"<span style='color:#d62728; font-weight:bold'>{B}</span>"
+P_html = f"<span style='color:#d62728; font-weight:bold'>{P}</span>"
+C_html = f"<span style='color:#111; font-weight:bold'>{C}</span>"
+
+decrease_html = "<span style='font-weight:bold; color:#111'>decrease</span>"
+increase_html = "<span style='font-weight:bold; color:#111'>increase</span>"
+total_html = "<span style='font-weight:bold; color:#d62728'>Total</span>"
+
+st.markdown(
+    f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>"
+    f"{A_html} and {O_html} recorded the largest {decrease_html} at {X:.1f}% and {K:.1f}%, respectively, "
+    f"while {B_html} and {P_html} showed highest {increase_html} with {Z:.1f}% and {H:.1f}%, respectively, compared to the previous week. "
+    f"Overall, the {total_html} change is {C_html} by {Y:.1f}%"
+    f"</div>",
+    unsafe_allow_html=True
+)
+
+st.markdown("<div style='height: 5rem'></div>", unsafe_allow_html=True)
 
 # Stacked Column Chart theo Banner
 fig_stack_banner = go.Figure()
@@ -977,7 +1205,71 @@ fig_stack_banner.update_layout(
     )
 )
 st.plotly_chart(fig_stack_banner)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 1rem'></div>", unsafe_allow_html=True)
+
+# Sau khi st.plotly_chart(fig_stack_banner)
+# --- Tính X%, Z%, Y% và sinh câu mô tả tự động cho Banner ---
+idx_w = len(df_table_banner["Tuần"]) - 1
+idx_w1 = idx_w - 1
+
+# Tính phần trăm thay đổi cho từng banner
+percent_changes_banner = {}
+for banner in banner_cols:
+    count_w = float(df_table_banner[banner].iloc[idx_w])
+    count_w1 = float(df_table_banner[banner].iloc[idx_w1])
+    if count_w1 == 0:
+        percent = 100 if count_w > 0 else 0
+    else:
+        percent = ((count_w - count_w1) / count_w1) * 100
+    percent_changes_banner[banner] = percent
+
+# X% là số âm lớn nhất (giảm nhiều nhất), A là tên banner đó
+neg_percents = {k: v for k, v in percent_changes_banner.items() if v < 0}
+if neg_percents:
+    A = min(neg_percents, key=neg_percents.get)
+    X = neg_percents[A]
+else:
+    A = min(percent_changes_banner, key=percent_changes_banner.get)
+    X = percent_changes_banner[A]
+
+# Z% là số dương lớn nhất (tăng nhiều nhất), B là tên banner đó
+pos_percents = {k: v for k, v in percent_changes_banner.items() if v > 0}
+if pos_percents:
+    B = max(pos_percents, key=pos_percents.get)
+    Z = pos_percents[B]
+else:
+    B = max(percent_changes_banner, key=percent_changes_banner.get)
+    Z = percent_changes_banner[B]
+
+# Y% là phần trăm thay đổi tổng số ticket của tất cả banner
+sum_w = sum([df_table_banner[banner].iloc[idx_w] for banner in banner_cols])
+sum_w1 = sum([df_table_banner[banner].iloc[idx_w1] for banner in banner_cols])
+if sum_w1 == 0:
+    Y = 100 if sum_w > 0 else 0
+else:
+    Y = ((sum_w - sum_w1) / sum_w1) * 100
+
+# C là 'increased' nếu Y > 0, ngược lại 'decreased'
+C = 'increased' if Y > 0 else 'decreased'
+
+# Hiển thị câu mô tả tự động
+A_html = f"<span style='color:#d62728; font-weight:bold'>{A}</span>"
+B_html = f"<span style='color:#d62728; font-weight:bold'>{B}</span>"
+C_html = f"<span style='color:#111; font-weight:bold'>{C}</span>"
+
+decrease_html = "<span style='font-weight:bold; color:#111'>decrease</span>"
+increase_html = "<span style='font-weight:bold; color:#111'>increase</span>"
+total_html = "<span style='font-weight:bold; color:#d62728'>Total</span>"
+
+st.markdown(
+    f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>"
+    f"{A_html} recorded the largest {decrease_html} at {X:.1f}%, while {B_html} show the highest {increase_html} with {Z:.1f}%, compared to the previous week. "
+    f"Overall, the {total_html} change is {C_html} by {Y:.1f}%"
+    f"</div>",
+    unsafe_allow_html=True
+)
+
+st.markdown("<div style='height: 5rem'></div>", unsafe_allow_html=True)
 
 # Waterfall Chart
 week_start = datetime(2025, 3, 3)
@@ -1461,7 +1753,6 @@ st.markdown("<div style='height: 7rem'></div>", unsafe_allow_html=True)
 # --- Bảng trung bình processing_time theo team và category ---
 st.markdown(
     '<h3 style="text-align: center;">AVERAGE TICKET PROCESSING SPEED OF ALL TIME<br>(DAYS UP UNTIL "APPROVED" STAGE OF TICKET)</h3>',
-    
     unsafe_allow_html=True
 )
 pivot = pd.pivot_table(
@@ -1477,8 +1768,29 @@ across_all = df.groupby('team_name')['processing_time'].mean().round(0).astype(i
 pivot.insert(0, 'Across all category', across_all)
 # Làm tròn cho đẹp
 pivot = pivot.round(0).astype(int)
-# Conditional formatting: xanh nhạt (min), trắng (giữa), đỏ đậm (#ff4d4d)
-import matplotlib
+
+# --- Tạo hàng "Avg. across all" ---
+avg_row = {}
+for col in pivot.columns:
+    avg_row[col] = int(round(df['processing_time'].mean())) if col == 'Across all category' else int(round(df[df['category_name'] == col]['processing_time'].mean()))
+avg_row = pd.DataFrame([avg_row], index=['Avg. across all'])
+
+# --- Sort theo 'Across all category' tăng dần, rồi nối hàng "Avg. across all" vào cuối ---
+pivot = pivot.sort_values('Across all category', ascending=True)
+pivot = pd.concat([pivot, avg_row])
+
+# Đổi tên index thành cột 'Regions' (và đặt heading rõ ràng)
+pivot = pivot.reset_index()
+pivot.rename(columns={pivot.columns[0]: 'Regions'}, inplace=True)
+
+# Chỉ lấy các cột số để tính min/max
+num_cols = pivot.select_dtypes(include=[np.number]).columns
+vmin = pivot[num_cols].min().min()
+vmax = pivot[num_cols].max().max()
+
+def style_regions(val):
+    return 'color: black;'
+
 def color_scale(val, vmin, vmax):
     norm = (val - vmin) / (vmax - vmin) if vmax > vmin else 0.5
     if norm <= 0.5:
@@ -1490,57 +1802,13 @@ def color_scale(val, vmin, vmax):
         g = int(255 - (255-77)*(norm-0.5)*2)
         b = int(255 - (255-77)*(norm-0.5)*2)
     return f'background-color: rgb({r},{g},{b})'
-vmin = pivot.min().min()
-vmax = pivot.max().max()
-styled = pivot.style.applymap(lambda v: color_scale(v, vmin, vmax)).set_properties(**{'text-align': 'center', 'color': 'black'})
+
+styled = pivot.style.applymap(lambda v: color_scale(v, vmin, vmax), subset=pivot.columns.difference(['Regions'])) \
+                   .applymap(style_regions, subset=['Regions']) \
+                   .set_properties(**{'text-align': 'center', 'color': 'black'})
 num_rows = len(pivot.index)
 row_height = 35
 total_height = (num_rows + 1) * row_height
-
-
-# --- Thêm hàng 'Avg. across all' vào bảng pivot ---
-# Lấy lại bảng teams_df2 (bảng tổng hợp ticket theo team/category)
-teams_df2_no_total = teams_df2[teams_df2['Team'] != 'Grand Total'].drop_duplicates(subset=['Team']).set_index('Team')
-team_order = list(pivot.index)
-# Cột 'Across all category'
-total_ticket_team = teams_df2_no_total.loc[team_order, 'Total Ticket'] if 'Total Ticket' in teams_df2_no_total.columns else pd.Series(1, index=team_order)
-total_ticket_all = total_ticket_team.sum()
-avg_across_all = (pivot['Across all category'] * total_ticket_team).sum() / total_ticket_all if total_ticket_all > 0 else 0
-avg_row = {'Across all category': round(avg_across_all)}
-# Các cột category
-for cat in pivot.columns:
-    if cat == 'Across all category':
-        continue
-    # Lấy phần tên trước dấu '(' nếu có
-    cat_short = cat.split('(')[0].strip()
-    cat_total_col = None
-    for c in teams_df2_no_total.columns:
-        if c.endswith('Total ticket'):
-            c_short = c.replace('Total ticket', '').strip()
-            if c_short == cat_short:
-                cat_total_col = c
-                break
-    if not cat_total_col:
-        # Nếu không tìm thấy, thử match gần đúng
-        for c in teams_df2_no_total.columns:
-            if c.endswith('Total ticket') and cat_short.lower() in c.lower():
-                cat_total_col = c
-                break
-    if cat_total_col:
-        cat_ticket_team = teams_df2_no_total.loc[team_order, cat_total_col]
-        cat_ticket_all = cat_ticket_team.sum()
-        if cat_ticket_all > 0:
-            avg_val = (pivot[cat] * cat_ticket_team).sum() / cat_ticket_all
-            avg_row[cat] = round(avg_val)
-        else:
-            avg_row[cat] = 0
-    else:
-        avg_row[cat] = 0
-# Thêm hàng vào pivot
-pivot.loc['Avg. across all'] = avg_row
-num_rows = len(pivot.index)
-total_height = (num_rows + 1) * row_height
-styled = pivot.style.applymap(lambda v: color_scale(v, vmin, vmax)).set_properties(**{'text-align': 'center', 'color': 'black'})
 st.dataframe(styled, use_container_width=True, height=total_height)
 st.markdown("<div style='height: 7rem'></div>", unsafe_allow_html=True)
 
@@ -1991,6 +2259,8 @@ fig_line_priority.update_layout(
 )
 st.plotly_chart(fig_line_priority, use_container_width=True)
 st.markdown("<div style='height: 7rem'></div>", unsafe_allow_html=True)
+
+# -------------------------------NORTH 1------------------------------------------------------
 
 # -------------------------------NORTH 1------------------------------------------------------
 
