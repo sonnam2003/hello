@@ -430,7 +430,6 @@ df['Under this month report'] = df.apply(calculate_condition, axis=1)
 df['Carry over ticket'] = df.apply(calculate_carry_over, axis=1)
 
 
-
     # Căn giữa title ở top center
 st.markdown(
     """
@@ -635,10 +634,20 @@ decrease_html = "<span style='font-weight:bold; color:#111'>decrease</span>"
 increase_html = "<span style='font-weight:bold; color:#111'>increase</span>"
 total_html = "<span style='font-weight:bold; color:#d62728'>Total</span>"
 
+# Hiển thị câu mô tả tự động
+if abs(X) < 1e-6:  # X gần 0
+    decrease_text = f"{A_html} remains unchanged"
+else:
+    decrease_text = f"{A_html} recorded the largest {decrease_html} at {abs(X):.1f}%"
+if abs(Z) < 1e-6:  # Z gần 0
+    increase_text = f"{B_html} remains unchanged"
+else:
+    increase_text = f"{B_html} show the highest {increase_html} with {abs(Z):.1f}%"
+
 st.markdown(
     f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>"
-    f"{A_html} recorded the largest {decrease_html} at {X:.1f}%, while {B_html} show the highest {increase_html} with {Z:.1f}%, compared to the previous week. "
-    f"Overall, the {total_html} change is {C_html} by {Y:.1f}%"
+    f"{decrease_text}, while {increase_text}, compared to the previous week. "
+    f"Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
     f"</div>",
     unsafe_allow_html=True
 )
@@ -834,11 +843,34 @@ decrease_html = "<span style='font-weight:bold; color:#111'>decrease</span>"
 increase_html = "<span style='font-weight:bold; color:#111'>increase</span>"
 total_html = "<span style='font-weight:bold; color:#d62728'>Total</span>"
 
+# Xử lý logic remain unchanged và số dương cho 2 min (category)
+min1_unchanged = abs(X) < 1e-6
+min2_unchanged = abs(K) < 1e-6
+if min1_unchanged and min2_unchanged:
+    decrease_text = f"{A_html} and {O_html} remain unchanged"
+elif min1_unchanged:
+    decrease_text = f"{A_html} remains unchanged and {O_html} recorded the largest {decrease_html} at {abs(K):.1f}%"
+elif min2_unchanged:
+    decrease_text = f"{A_html} recorded the largest {decrease_html} at {abs(X):.1f}% and {O_html} remains unchanged"
+else:
+    decrease_text = f"{A_html} and {O_html} recorded the largest {decrease_html} at {abs(X):.1f}% and {abs(K):.1f}%, respectively"
+
+# Xử lý logic remain unchanged và số dương cho 2 max (category)
+max1_unchanged = abs(Z) < 1e-6
+max2_unchanged = abs(H) < 1e-6
+if max1_unchanged and max2_unchanged:
+    increase_text = f"{B_html} and {P_html} remain unchanged"
+elif max1_unchanged:
+    increase_text = f"{B_html} remains unchanged and {P_html} showed highest {increase_html} with {abs(H):.1f}%"
+elif max2_unchanged:
+    increase_text = f"{B_html} showed highest {increase_html} with {abs(Z):.1f}% and {P_html} remains unchanged"
+else:
+    increase_text = f"{B_html} and {P_html} showed highest {increase_html} with {abs(Z):.1f}% and {abs(H):.1f}%, respectively"
+
 st.markdown(
     f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>"
-    f"{A_html} and {O_html} recorded the largest {decrease_html} at {X:.1f}% and {K:.1f}%, respectively, "
-    f"while {B_html} and {P_html} showed highest {increase_html} with {Z:.1f}% and {H:.1f}%, respectively, compared to the previous week. "
-    f"Overall, the {total_html} change is {C_html} by {Y:.1f}%"
+    f"{decrease_text}, while {increase_text}, compared to the previous week. "
+    f"Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
     f"</div>",
     unsafe_allow_html=True
 )
@@ -1002,7 +1034,7 @@ fig_stack_team.update_layout(
     )
 )
 st.plotly_chart(fig_stack_team)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 1rem'></div>", unsafe_allow_html=True)
 
 # Sau khi st.plotly_chart(fig_stack_team)
 # --- Tính top 2 giảm/tăng mạnh nhất và sinh câu mô tả tự động cho Region (Team) ---
@@ -1053,21 +1085,52 @@ else:
 C = 'increased' if Y > 0 else 'decreased'
 
 # Hiển thị câu mô tả tự động
-A_html = f"<span style='color:#d62728; font-weight:bold'>{A}</span>"
-O_html = f"<span style='color:#d62728; font-weight:bold'>{O}</span>"
-B_html = f"<span style='color:#d62728; font-weight:bold'>{B}</span>"
-P_html = f"<span style='color:#d62728; font-weight:bold'>{P}</span>"
+def short_team_name(name):
+    return str(name).split('-')[0].strip() if '-' in str(name) else str(name).strip()
+
+A_short = short_team_name(A)
+O_short = short_team_name(O)
+B_short = short_team_name(B)
+P_short = short_team_name(P)
+
+A_html = f"<span style='color:#d62728; font-weight:bold'>{A_short}</span>"
+O_html = f"<span style='color:#d62728; font-weight:bold'>{O_short}</span>"
+B_html = f"<span style='color:#d62728; font-weight:bold'>{B_short}</span>"
+P_html = f"<span style='color:#d62728; font-weight:bold'>{P_short}</span>"
 C_html = f"<span style='color:#111; font-weight:bold'>{C}</span>"
 
 decrease_html = "<span style='font-weight:bold; color:#111'>decrease</span>"
 increase_html = "<span style='font-weight:bold; color:#111'>increase</span>"
 total_html = "<span style='font-weight:bold; color:#d62728'>Total</span>"
 
+# Xử lý logic remain unchanged và số dương cho 2 min
+min1_unchanged = abs(X) < 1e-6
+min2_unchanged = abs(K) < 1e-6
+if min1_unchanged and min2_unchanged:
+    decrease_text = f"{A_html} and {O_html} remain unchanged"
+elif min1_unchanged:
+    decrease_text = f"{A_html} remains unchanged and {O_html} recorded the largest {decrease_html} at {abs(K):.1f}%"
+elif min2_unchanged:
+    decrease_text = f"{A_html} recorded the largest {decrease_html} at {abs(X):.1f}% and {O_html} remains unchanged"
+else:
+    decrease_text = f"{A_html} and {O_html} recorded the largest {decrease_html} at {abs(X):.1f}% and {abs(K):.1f}%, respectively"
+
+# Xử lý logic remain unchanged và số dương cho 2 max
+max1_unchanged = abs(Z) < 1e-6
+max2_unchanged = abs(H) < 1e-6
+if max1_unchanged and max2_unchanged:
+    increase_text = f"{B_html} and {P_html} remain unchanged"
+elif max1_unchanged:
+    increase_text = f"{B_html} remains unchanged and {P_html} showed highest {increase_html} with {abs(H):.1f}%"
+elif max2_unchanged:
+    increase_text = f"{B_html} showed highest {increase_html} with {abs(Z):.1f}% and {P_html} remains unchanged"
+else:
+    increase_text = f"{B_html} and {P_html} showed highest {increase_html} with {abs(Z):.1f}% and {abs(H):.1f}%, respectively"
+
 st.markdown(
     f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>"
-    f"{A_html} and {O_html} recorded the largest {decrease_html} at {X:.1f}% and {K:.1f}%, respectively, "
-    f"while {B_html} and {P_html} showed highest {increase_html} with {Z:.1f}% and {H:.1f}%, respectively, compared to the previous week. "
-    f"Overall, the {total_html} change is {C_html} by {Y:.1f}%"
+    f"{decrease_text}, while {increase_text}, compared to the previous week. "
+    f"Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
     f"</div>",
     unsafe_allow_html=True
 )
@@ -1261,10 +1324,20 @@ decrease_html = "<span style='font-weight:bold; color:#111'>decrease</span>"
 increase_html = "<span style='font-weight:bold; color:#111'>increase</span>"
 total_html = "<span style='font-weight:bold; color:#d62728'>Total</span>"
 
+# Hiển thị câu mô tả tự động cho chart per banner
+if abs(X) < 1e-6:
+    decrease_text = f"{A_html} remains unchanged"
+else:
+    decrease_text = f"{A_html} recorded the largest {decrease_html} at {abs(X):.1f}%"
+if abs(Z) < 1e-6:
+    increase_text = f"{B_html} remains unchanged"
+else:
+    increase_text = f"{B_html} show the highest {increase_html} with {abs(Z):.1f}%"
+
 st.markdown(
     f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>"
-    f"{A_html} recorded the largest {decrease_html} at {X:.1f}%, while {B_html} show the highest {increase_html} with {Z:.1f}%, compared to the previous week. "
-    f"Overall, the {total_html} change is {C_html} by {Y:.1f}%"
+    f"{decrease_text}, while {increase_text}, compared to the previous week. "
+    f"Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
     f"</div>",
     unsafe_allow_html=True
 )
@@ -1804,8 +1877,8 @@ def color_scale(val, vmin, vmax):
     return f'background-color: rgb({r},{g},{b})'
 
 styled = pivot.style.applymap(lambda v: color_scale(v, vmin, vmax), subset=pivot.columns.difference(['Regions'])) \
-                   .applymap(style_regions, subset=['Regions']) \
-                   .set_properties(**{'text-align': 'center', 'color': 'black'})
+                .applymap(style_regions, subset=['Regions']) \
+                .set_properties(**{'text-align': 'center', 'color': 'black'})
 num_rows = len(pivot.index)
 row_height = 35
 total_height = (num_rows + 1) * row_height
