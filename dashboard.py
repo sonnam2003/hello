@@ -210,7 +210,7 @@ df['custom_end_date'] = df['custom_end_date'].apply(
 )
 
 # 6. Tạo tuần
-week_starts = [datetime(2025, 3, 3) + timedelta(weeks=i) for i in range(18)]
+week_starts = [datetime(2025, 3, 3) + timedelta(weeks=i) for i in range(19)]
 week_ends = [start + timedelta(days=6, hours=23, minutes=59, seconds=59) for start in week_starts]
 week_labels = [f"W{10+i} ({start.strftime('%d/%m')} - {end.strftime('%d/%m')})" for i, (start, end) in enumerate(zip(week_starts, week_ends))]
 
