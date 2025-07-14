@@ -12,6 +12,9 @@ from st_aggrid import GridOptionsBuilder
 import math
 from pandas.api.types import is_numeric_dtype
 import numpy as np
+import requests
+from io import BytesIO
+import matplotlib.colors as mcolors
 
 warnings.filterwarnings("ignore")
 os.environ["PYARROW_IGNORE_TIMEZONE"] = "1"
@@ -21,12 +24,11 @@ database = "pbreport"
 user = "pbuser"
 password = "p0w3rb!"
 
-#Auto refresh mỗi 24h
+#Auto refresh mỗi 1h để làm mới cache data
 #1 phút = 60 giây = 60.000 ms
 #1 giờ = 60 phút = 3.600.000 ms
-#24 giờ = 24 × 3.600.000 = 86.400.000 ms
 
-st_autorefresh(interval=10800000, key="datarefresh")
+st_autorefresh(interval=10800000, key="datarefresh")  # 1 tiếng = 3.600.000 ms
 
 st.markdown(
     '''
@@ -61,7 +63,7 @@ def execute_query(query):
         return pd.read_sql(query, connection)
 
 # 1. Tách hàm load từng bảng và cache riêng biệt
-@st.cache_data
+@st.cache_data  # Cache trong 1 tiếng (3600 giây)
 def load_ticket():
     connection = psycopg2.connect(
         host=host, database=database, user=user, password=password
@@ -74,7 +76,7 @@ def load_ticket():
     connection.close()
     return df
 
-@st.cache_data
+@st.cache_data  # Cache trong 1 tiếng (3600 giây)
 def load_category():
     connection = psycopg2.connect(
         host=host, database=database, user=user, password=password
@@ -84,7 +86,7 @@ def load_category():
     connection.close()
     return df
 
-@st.cache_data
+@st.cache_data  # Cache trong 1 tiếng (3600 giây)
 def load_team():
     connection = psycopg2.connect(
         host=host, database=database, user=user, password=password
@@ -94,7 +96,7 @@ def load_team():
     connection.close()
     return df
 
-@st.cache_data
+@st.cache_data  # Cache trong 1 tiếng (3600 giây)
 def load_tag():
     connection = psycopg2.connect(
         host=host, database=database, user=user, password=password
@@ -107,7 +109,7 @@ def load_tag():
     connection.close()
     return df
 
-@st.cache_data
+@st.cache_data  # Cache trong 1 tiếng (3600 giây)
 def load_res_partner():
     connection = psycopg2.connect(
         host=host, database=database, user=user, password=password
@@ -117,7 +119,7 @@ def load_res_partner():
     connection.close()
     return df
 
-@st.cache_data
+@st.cache_data  # Cache trong 1 tiếng (3600 giây)
 def load_res_partner_display_name():
     connection = psycopg2.connect(
         host=host, database=database, user=user, password=password
@@ -127,7 +129,7 @@ def load_res_partner_display_name():
     connection.close()
     return df
 
-@st.cache_data
+@st.cache_data  # Cache trong 1 tiếng (3600 giây)
 def load_helpdesk_ticket():
     connection = psycopg2.connect(
         host=host, database=database, user=user, password=password
@@ -210,7 +212,7 @@ df['custom_end_date'] = df['custom_end_date'].apply(
 )
 
 # 6. Tạo tuần
-week_starts = [datetime(2025, 3, 3) + timedelta(weeks=i) for i in range(19)]
+week_starts = [datetime(2025, 3, 3) + timedelta(weeks=i) for i in range(20)]
 week_ends = [start + timedelta(days=6, hours=23, minutes=59, seconds=59) for start in week_starts]
 week_labels = [f"W{10+i} ({start.strftime('%d/%m')} - {end.strftime('%d/%m')})" for i, (start, end) in enumerate(zip(week_starts, week_ends))]
 
@@ -428,6 +430,214 @@ def calculate_carry_over(row):
 
 df['Under this month report'] = df.apply(calculate_condition, axis=1)
 df['Carry over ticket'] = df.apply(calculate_carry_over, axis=1)
+
+
+# --- Đọc dữ liệu từ file Excel online (OneDrive/SharePoint link chia sẻ) ---
+@st.cache_data(show_spinner=True)  # Cache vĩnh viễn - update khi reboot
+def load_excel_online(excel_url, sheet_name, usecols, skiprows, nrows):
+    response = requests.get(excel_url)
+    excel_data = BytesIO(response.content)
+    df_excel = pd.read_excel(excel_data, sheet_name=sheet_name, usecols=usecols, skiprows=skiprows, nrows=nrows)
+    return df_excel
+
+excel_url = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=YCBOfu&download=1"
+sheet_name = "VISUALIZE (fin) by weeks"
+usecols = "BF:BQ"
+skiprows = 7
+nrows = 19
+try:
+    df_excel = load_excel_online(excel_url, sheet_name, usecols, skiprows, nrows)
+except Exception as e:
+    st.warning(f"Không thể đọc dữ liệu từ file Excel online: {e}")
+
+
+
+# --- Đọc dữ liệu từ file Excel online thứ 2 (OneDrive/SharePoint link chia sẻ) ---
+@st.cache_data(show_spinner=True)  # Cache vĩnh viễn - update khi reboot
+def load_excel_online2(excel_url2, sheet_name2, usecols2, skiprows2, nrows2):
+    response2 = requests.get(excel_url2)
+    excel_data2 = BytesIO(response2.content)
+    df_excel2 = pd.read_excel(excel_data2, sheet_name=sheet_name2, usecols=usecols2, skiprows=skiprows2, nrows=nrows2)
+    return df_excel2
+
+excel_url2 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=YCBOfu&download=1"
+sheet_name2 = "VISUALIZE (fin) by weeks"
+usecols2 = "BW:CI"
+skiprows2 = 7
+nrows2 = 19
+try:
+    df_excel2 = load_excel_online2(excel_url2, sheet_name2, usecols2, skiprows2, nrows2)
+except Exception as e:
+    st.warning(f"Không thể đọc dữ liệu từ file Excel online thứ 2: {e}")
+
+
+
+# --- Đọc dữ liệu từ file Excel online thứ 3 (OneDrive/SharePoint link chia sẻ) ---
+@st.cache_data(show_spinner=True)  # Cache vĩnh viễn - update khi reboot
+def load_excel_online3(excel_url3, sheet_name3, usecols3, skiprows3, nrows3):
+    response3 = requests.get(excel_url3)
+    excel_data3 = BytesIO(response3.content)
+    df_excel3 = pd.read_excel(excel_data3, sheet_name=sheet_name3, usecols=usecols3, skiprows=skiprows3, nrows=nrows3)
+    return df_excel3
+
+excel_url3 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=YCBOfu&download=1"
+sheet_name3 = "VISUALIZE (fin) by weeks"
+usecols3 = "DD:DK"
+skiprows3 = 10
+nrows3 = 19
+try:
+    df_excel3 = load_excel_online3(excel_url3, sheet_name3, usecols3, skiprows3, nrows3)
+except Exception as e:
+    st.warning(f"Không thể đọc dữ liệu từ file Excel online thứ 3: {e}")
+
+# --- Đọc dữ liệu từ file Excel online thứ 4 (OneDrive/SharePoint link chia sẻ) ---
+@st.cache_data(show_spinner=True)  # Cache vĩnh viễn - update khi reboot
+def load_excel_online4(excel_url4, sheet_name4, usecols4, skiprows4, nrows4):
+    response4 = requests.get(excel_url4)
+    excel_data4 = BytesIO(response4.content)
+    df_excel4 = pd.read_excel(excel_data4, sheet_name=sheet_name4, usecols=usecols4, skiprows=skiprows4, nrows=nrows4)
+    return df_excel4
+
+excel_url4 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=YCBOfu&download=1"
+sheet_name4 = "VISUALIZE (fin) by weeks"
+usecols4 = "EF:EN"
+skiprows4 = 28
+nrows4 = 26
+try:
+    df_excel4 = load_excel_online4(excel_url4, sheet_name4, usecols4, skiprows4, nrows4)
+except Exception as e:
+    st.warning(f"Không thể đọc dữ liệu từ file Excel online thứ 4: {e}")
+
+
+# --- Đọc dữ liệu từ file Excel online thứ 5 (OneDrive/SharePoint link chia sẻ) ---
+@st.cache_data(show_spinner=True)  # Cache vĩnh viễn - update khi reboot
+def load_excel_online5(excel_url5, sheet_name5, usecols5, skiprows5, nrows5):
+    response5 = requests.get(excel_url5)
+    excel_data5 = BytesIO(response5.content)
+    df_excel5 = pd.read_excel(excel_data5, sheet_name=sheet_name5, usecols=usecols5, skiprows=skiprows5, nrows=nrows5)
+    return df_excel5
+
+excel_url5 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=YCBOfu&download=1"
+sheet_name5 = "VISUALIZE (fin) by months"
+usecols5 = "BF:BQ"
+skiprows5 = 7
+nrows5 = 5
+try:
+    df_excel5 = load_excel_online5(excel_url5, sheet_name5, usecols5, skiprows5, nrows5)
+except Exception as e:
+    st.warning(f"Không thể đọc dữ liệu từ file Excel online thứ 5: {e}")
+
+
+# --- Đọc dữ liệu từ file Excel online thứ 6 (OneDrive/SharePoint link chia sẻ) ---
+@st.cache_data(show_spinner=True)  # Cache vĩnh viễn - update khi reboot
+def load_excel_online6(excel_url6, sheet_name6, usecols6, skiprows6, nrows6):
+    response6 = requests.get(excel_url6)
+    excel_data6 = BytesIO(response6.content)
+    df_excel6 = pd.read_excel(excel_data6, sheet_name=sheet_name6, usecols=usecols6, skiprows=skiprows6, nrows=nrows6)
+    return df_excel6
+
+excel_url6 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=YCBOfu&download=1"
+sheet_name6 = "VISUALIZE (fin) by months"
+usecols6 = "BY:CK"
+skiprows6 = 7
+nrows6 = 5
+try:
+    df_excel6 = load_excel_online6(excel_url6, sheet_name6, usecols6, skiprows6, nrows6)
+except Exception as e:
+    st.warning(f"Không thể đọc dữ liệu từ file Excel online thứ 6: {e}")
+
+# --- Đọc dữ liệu từ file Excel online thứ 7 (OneDrive/SharePoint link chia sẻ) ---
+@st.cache_data(show_spinner=True)  # Cache vĩnh viễn - update khi reboot
+def load_excel_online7(excel_url7, sheet_name7, usecols7, skiprows7, nrows7):
+    response7 = requests.get(excel_url7)
+    excel_data7 = BytesIO(response7.content)
+    df_excel7 = pd.read_excel(excel_data7, sheet_name=sheet_name7, usecols=usecols7, skiprows=skiprows7, nrows=nrows7)
+    return df_excel7
+
+excel_url7 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=YCBOfu&download=1"
+sheet_name7 = "VISUALIZE (fin) by months"
+usecols7 = "DF:DM"
+skiprows7 = 10
+nrows7 = 5
+try:
+    df_excel7 = load_excel_online7(excel_url7, sheet_name7, usecols7, skiprows7, nrows7)
+except Exception as e:
+    st.warning(f"Không thể đọc dữ liệu từ file Excel online thứ 7: {e}")
+
+# --- Đọc dữ liệu từ file Excel online thứ 8 (OneDrive/SharePoint link chia sẻ) ---
+@st.cache_data(show_spinner=True)  # Cache vĩnh viễn - update khi reboot
+def load_excel_online8(excel_url8, sheet_name8, usecols8, skiprows8, nrows8):
+    response8 = requests.get(excel_url8)
+    excel_data8 = BytesIO(response8.content)
+    df_excel8 = pd.read_excel(excel_data8, sheet_name=sheet_name8, usecols=usecols8, skiprows=skiprows8, nrows=nrows8)
+    return df_excel8
+
+excel_url8 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=YCBOfu&download=1"
+sheet_name8 = "Actual cost per cat"
+usecols8 = "Y:AK"
+skiprows8 = 3
+nrows8 = 12
+try:
+    df_excel8 = load_excel_online8(excel_url8, sheet_name8, usecols8, skiprows8, nrows8)
+except Exception as e:
+    st.warning(f"Không thể đọc dữ liệu từ file Excel online thứ 8: {e}")
+
+
+# --- Đọc dữ liệu từ file Excel online thứ 9 (OneDrive/SharePoint link chia sẻ) ---
+@st.cache_data(show_spinner=True)  # Cache vĩnh viễn - update khi reboot
+def load_excel_online9(excel_url9, sheet_name9, usecols9, skiprows9, nrows9):
+    response9 = requests.get(excel_url9)
+    excel_data9 = BytesIO(response9.content)
+    df_excel9 = pd.read_excel(excel_data9, sheet_name=sheet_name9, usecols=usecols9, skiprows=skiprows9, nrows=nrows9)
+    return df_excel9
+
+excel_url9 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=YCBOfu&download=1"
+sheet_name9 = "Actual cost per cat"
+usecols9 = "Y:AK"
+skiprows9 = 44
+nrows9 = 12
+try:
+    df_excel9 = load_excel_online9(excel_url9, sheet_name9, usecols9, skiprows9, nrows9)
+except Exception as e:
+    st.warning(f"Không thể đọc dữ liệu từ file Excel online thứ 9: {e}")
+
+
+# --- Đọc dữ liệu từ file Excel online thứ 10 (OneDrive/SharePoint link chia sẻ) ---
+@st.cache_data(show_spinner=True)  # Cache vĩnh viễn - update khi reboot
+def load_excel_online10(excel_url10, sheet_name10, usecols10, skiprows10, nrows10):
+    response10 = requests.get(excel_url10)
+    excel_data10 = BytesIO(response10.content)
+    df_excel10 = pd.read_excel(excel_data10, sheet_name=sheet_name10, usecols=usecols10, skiprows=skiprows10, nrows=nrows10)
+    return df_excel10
+
+excel_url10 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=YCBOfu&download=1"
+sheet_name10 = "Actual cost per sub region"
+usecols10 = "AA:AM"
+skiprows10 = 3
+nrows10 = 13
+try:
+    df_excel10 = load_excel_online10(excel_url10, sheet_name10, usecols10, skiprows10, nrows10)
+except Exception as e:
+    st.warning(f"Không thể đọc dữ liệu từ file Excel online thứ 10: {e}")
+
+
+# --- Đọc dữ liệu từ file Excel online thứ 11 (OneDrive/SharePoint link chia sẻ) ---
+@st.cache_data(show_spinner=True)  # Cache vĩnh viễn - update khi reboot
+def load_excel_online11(excel_url11, sheet_name11, usecols11, skiprows11, nrows11):
+    response11 = requests.get(excel_url11)
+    excel_data11 = BytesIO(response11.content)
+    df_excel11 = pd.read_excel(excel_data11, sheet_name=sheet_name11, usecols=usecols11, skiprows=skiprows11, nrows=nrows11)
+    return df_excel11
+
+excel_url11 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=YCBOfu&download=1"
+sheet_name11 = "Actual cost per sub region"
+usecols11 = "AA:AM"
+skiprows11 = 45
+nrows11 = 13
+try:
+    df_excel11 = load_excel_online11(excel_url11, sheet_name11, usecols11, skiprows11, nrows11)
+except Exception as e:
+    st.warning(f"Không thể đọc dữ liệu từ file Excel online thứ 11: {e}")
 
 
     # Căn giữa title ở top center
@@ -1349,7 +1559,7 @@ week_start = datetime(2025, 3, 3)
 week_labels = []
 created_counts = []
 solved_counts = []
-for i in range(18):
+for i in range(20):
     start = week_start + timedelta(weeks=i)
     end = start + timedelta(days=6)
     week_label = f"W{10+i} ({start.strftime('%d/%m')} - {end.strftime('%d/%m')})"
@@ -1445,9 +1655,2008 @@ fig.update_layout(
 st.plotly_chart(fig, use_container_width=True)
 st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
 
+# --- STACKED COLUMN CHART TỪ EXCEL: OVERALL COST SPENT PER CATEGORY BY WEEKS (MVND)-----------
 
+if 'Tuần' in df_excel.columns:
+    x_col = 'Tuần'
+else:
+    x_col = df_excel.columns[0]
+category_cols = [col for col in df_excel.columns if col != x_col]
+fig_stack_excel = go.Figure()
+color_palette = [
+    '#1f77b4', '#ff7f0e', '#2ca02c', '#9467bd', '#8c564b',
+    '#e377c2', '#7f7f7f', '#bcbd22', '#17becf', '#f5b041',
+    '#229954', '#0bf4a3', '#e74c3c', '#f7dc6f', '#a569bd',
+    '#45b39d', '#f1948a', '#34495e', '#f39c12'
+]
+for i, cat in enumerate(category_cols):
+    y_values = df_excel[cat].apply(lambda v: int(round(v)) if pd.notnull(v) else 0).tolist()
+    text_labels = [str(v) if v != 0 else "" for v in y_values]
+    color = color_palette[i % len(color_palette)]
+    fig_stack_excel.add_trace(go.Bar(
+        name=cat,
+        x=df_excel[x_col],
+        y=y_values,
+        text=text_labels,
+        textposition="inside",
+        texttemplate="%{text}",
+        textangle=0,
+        textfont=dict(size=9),
+        marker_color=color
+    ))
+totals = df_excel[category_cols].apply(lambda col: col.apply(lambda v: int(round(v)) if pd.notnull(v) else 0)).sum(axis=1)
+totals_offset = totals + totals * 0.04
+fig_stack_excel.add_trace(go.Scatter(
+    x=df_excel[x_col],
+    y=totals_offset,
+    textposition="top center",
+    textfont=dict(size=16),
+    showlegend=False,
+    hoverinfo="skip",
+    texttemplate="%{text}"
+))
+for i, (x, y, t) in enumerate(zip(df_excel[x_col], totals_offset, totals)):
+    fig_stack_excel.add_annotation(
+        x=x,
+        y=y,
+        text=f"<span style='color:#e74c3c; font-weight:bold'>{int(t)}</span>",
+        showarrow=False,
+        font=dict(size=10, color="#e74c3c"),
+        align="center",
+        xanchor="center",
+        yanchor="bottom",
+        bgcolor="rgba(255,255,0,0.77)",
+        borderpad=4,
+        bordercolor="#e74c3c",
+        borderwidth=0
+    )
+fig_stack_excel.update_layout(
+    barmode='stack',
+    title=dict(
+        text="OVERALL COST SPENT PER CATEGORY BY WEEKS (MVND)",
+        x=0.5,
+        y=1.0,
+        xanchor='center',
+        yanchor='top',
+        font=dict(size=28)
+    ),
+    width=1400,
+    height=800,
+    legend=dict(
+        orientation="h",
+        yanchor="top",
+        y=1.08,
+        xanchor="center",
+        x=0.5
+    ),
+    xaxis=dict(
+        tickfont=dict(color='black'),
+        title=dict(text="Weeks", font=dict(color='black'))
+    ),
+    yaxis=dict(
+        tickfont=dict(color='black')
+    )
+)
 
-# Lấy danh sách category id và tên (chỉ lấy tên tiếng Anh ngắn gọn)
+# --- BOX SO SÁNH PHẦN TRĂM CHO STACKED COLUMN CHART TỪ EXCEL (CATEGORY) ---
+# idx_w: tuần hiện tại (kế cuối), idx_w1: tuần trước (trước kế cuối)
+idx_w = len(df_excel) - 1  # W27
+idx_w1 = len(df_excel) - 2 # W26
+w_label = df_excel[x_col].iloc[idx_w]
+active_categories = []
+percent_changes = {}
+category_positions = {}
+cumulative_height = 0
+def safe_to_int(v):
+    try:
+        return int(round(float(v)))
+    except:
+        return 0
+for cat in category_cols:
+    count_w = safe_to_int(df_excel[cat].iloc[idx_w])
+    if count_w <= 0:
+        continue
+    count_w1 = safe_to_int(df_excel[cat].iloc[idx_w1])
+    if count_w1 == 0:
+        percent = 100 if count_w > 0 else 0
+    else:
+        percent = ((count_w - count_w1) / count_w1) * 100
+    active_categories.append(cat)
+    percent_changes[cat] = percent
+    category_positions[cat] = cumulative_height + count_w / 2
+    cumulative_height += count_w
+if active_categories:
+    total_height = cumulative_height
+    x_vals = list(df_excel[x_col])
+    x_idx = x_vals.index(w_label)
+    x_offset = x_idx + 2
+    sorted_categories = sorted(active_categories, key=lambda x: category_positions[x])
+    for i, cat in enumerate(sorted_categories):
+        percent = percent_changes[cat]
+        if percent > 0:
+            percent_text = f"W vs W-1: +{percent:.1f}%"
+            bgcolor = "#f2c795"
+        elif percent < 0:
+            percent_text = f"W vs W-1: -{abs(percent):.1f}%"
+            bgcolor = "#abf3ab"
+        else:
+            percent_text = "W vs W-1: 0.0%"
+            bgcolor = "#f2c795"
+        y_col = category_positions[cat]
+        spacing_factor = 0.35
+        y_box = y_col + (total_height * spacing_factor * (i - len(sorted_categories)/2))
+        fig_stack_excel.add_annotation(
+            x=w_label, y=y_col,
+            ax=x_offset, ay=y_box,
+            xref="x", yref="y", axref="x", ayref="y",
+            text="", showarrow=True, arrowhead=0, arrowwidth=1, arrowcolor="black"
+        )
+        fig_stack_excel.add_annotation(
+            x=x_offset, y=y_box,
+            text=f"<b>{percent_text}</b>",
+            showarrow=False,
+            font=dict(size=11, color="black"),
+            align="left",
+            xanchor="left",
+            yanchor="middle",
+            bgcolor=bgcolor,
+            borderpad=3,
+            bordercolor="black",
+            borderwidth=1
+        )
+# --- Thêm gridline dọc gạch đứt phân chia các week ---
+y_max = totals_offset.max() * 1.05  # hoặc lấy max của các cột, nhân thêm 5% cho đẹp
+vertical_lines = []
+num_weeks = len(df_excel[x_col])
+for i in range(1, num_weeks):
+    vertical_lines.append(dict(
+        type="line",
+        xref="x",
+        yref="y",
+        x0=i - 0.5,
+        x1=i - 0.5,
+        y0=0,
+        y1=y_max,
+        line=dict(
+            color="gray",
+            width=1,
+            dash="dot"
+        ),
+        layer="below"
+    ))
+fig_stack_excel.update_layout(shapes=vertical_lines)
+st.plotly_chart(fig_stack_excel)
+st.markdown("<div style='height: 0.2rem'></div>", unsafe_allow_html=True)
+
+# --- AUTO DESCRIPTION CHO STACKED COLUMN CHART COST THEO CATEGORY (EXCEL) ---
+# Tính phần trăm thay đổi cho từng category giữa tuần hiện tại và tuần trước
+percent_changes_cat = {}
+for cat in category_cols:
+    count_w = safe_to_int(df_excel[cat].iloc[idx_w])
+    count_w1 = safe_to_int(df_excel[cat].iloc[idx_w1])
+    if count_w1 == 0:
+        percent = 100 if count_w > 0 else 0
+    else:
+        percent = ((count_w - count_w1) / count_w1) * 100
+    percent_changes_cat[cat] = percent
+
+# Top 2 giảm mạnh nhất (min), A, X% và O, K%
+neg_percents = sorted([(k, v) for k, v in percent_changes_cat.items() if v < 0], key=lambda x: x[1])
+if len(neg_percents) >= 2:
+    (A, X), (O, K) = neg_percents[0], neg_percents[1]
+elif len(neg_percents) == 1:
+    (A, X), (O, K) = neg_percents[0], (neg_percents[0][0], neg_percents[0][1])
+else:
+    min2 = sorted(percent_changes_cat.items(), key=lambda x: x[1])[:2]
+    (A, X), (O, K) = min2[0], min2[1]
+
+# Top 2 tăng mạnh nhất (max), B, Z% và P, H%
+pos_percents = sorted([(k, v) for k, v in percent_changes_cat.items() if v > 0], key=lambda x: x[1], reverse=True)
+if len(pos_percents) >= 2:
+    (B, Z), (P, H) = pos_percents[0], pos_percents[1]
+elif len(pos_percents) == 1:
+    (B, Z), (P, H) = pos_percents[0], (pos_percents[0][0], pos_percents[0][1])
+else:
+    max2 = sorted(percent_changes_cat.items(), key=lambda x: x[1], reverse=True)[:2]
+    (B, Z), (P, H) = max2[0], max2[1]
+
+# Y% là phần trăm thay đổi tổng số cost của tất cả category
+sum_w = sum([safe_to_int(df_excel[cat].iloc[idx_w]) for cat in category_cols])
+sum_w1 = sum([safe_to_int(df_excel[cat].iloc[idx_w1]) for cat in category_cols])
+if sum_w1 == 0:
+    Y = 100 if sum_w > 0 else 0
+else:
+    Y = ((sum_w - sum_w1) / sum_w1) * 100
+
+# C là 'increased' nếu Y > 0, ngược lại 'decreased'
+C = 'increased' if Y > 0 else 'decreased'
+
+# Hiển thị câu mô tả tự động
+A_html = f"<span style='color:#d62728; font-weight:bold'>{A}</span>"
+O_html = f"<span style='color:#d62728; font-weight:bold'>{O}</span>"
+B_html = f"<span style='color:#d62728; font-weight:bold'>{B}</span>"
+P_html = f"<span style='color:#d62728; font-weight:bold'>{P}</span>"
+C_html = f"<span style='color:#111; font-weight:bold'>{C}</span>"
+
+decrease_html = "<span style='font-weight:bold; color:#111'>decrease</span>"
+increase_html = "<span style='font-weight:bold; color:#111'>increase</span>"
+total_html = "<span style='font-weight:bold; color:#d62728'>Total</span>"
+
+# Xử lý logic remain unchanged và số dương cho 2 min (category)
+min1_unchanged = abs(X) < 1e-6
+min2_unchanged = abs(K) < 1e-6
+if min1_unchanged and min2_unchanged:
+    decrease_text = f"{A_html} and {O_html} remain unchanged"
+elif min1_unchanged:
+    decrease_text = f"{A_html} remains unchanged and {O_html} recorded the largest {decrease_html} at {abs(K):.1f}%"
+elif min2_unchanged:
+    decrease_text = f"{A_html} recorded the largest {decrease_html} at {abs(X):.1f}% and {O_html} remains unchanged"
+else:
+    decrease_text = f"{A_html} and {O_html} recorded the largest {decrease_html} at {abs(X):.1f}% and {abs(K):.1f}%, respectively"
+
+# Xử lý logic remain unchanged và số dương cho 2 max (category)
+max1_unchanged = abs(Z) < 1e-6
+max2_unchanged = abs(H) < 1e-6
+if max1_unchanged and max2_unchanged:
+    increase_text = f"{B_html} and {P_html} remain unchanged"
+elif max1_unchanged:
+    increase_text = f"{B_html} remains unchanged and {P_html} showed highest {increase_html} with {abs(H):.1f}%"
+elif max2_unchanged:
+    increase_text = f"{B_html} showed highest {increase_html} with {abs(Z):.1f}% and {P_html} remains unchanged"
+else:
+    increase_text = f"{B_html} and {P_html} showed highest {increase_html} with {abs(Z):.1f}% and {abs(H):.1f}%, respectively"
+
+st.markdown(
+    f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>"
+    f"{decrease_text}, while {increase_text}, compared to the previous week. "
+    f"Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
+    f"</div>",
+    unsafe_allow_html=True
+)
+st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+
+# --- STACKED COLUMN CHART TỪ EXCEL: OVERALL COST SPENT PER TEAM BY WEEKS (MVND)-----------
+
+if 'Tuần' in df_excel2.columns:
+    x_col2 = 'Tuần'
+else:
+    x_col2 = df_excel2.columns[0]
+team_cols = [col for col in df_excel2.columns if col != x_col2]
+fig_stack_excel2 = go.Figure()
+color_palette2 = [
+    '#1f77b4', '#ff7f0e', '#2ca02c', '#9467bd', '#8c564b',
+    '#e377c2', '#7f7f7f', '#bcbd22', '#17becf', '#f5b041',
+    '#229954', '#0bf4a3', '#e74c3c', '#f7dc6f', '#a569bd',
+    '#45b39d', '#f1948a', '#34495e', '#f39c12'
+]
+def safe_to_int2(v):
+    try:
+        return int(round(float(v)))
+    except:
+        return 0
+for i, team in enumerate(team_cols):
+    y_values = df_excel2[team].apply(safe_to_int2).tolist()
+    text_labels = [str(v) if v != 0 else "" for v in y_values]
+    color = color_palette2[i % len(color_palette2)]
+    fig_stack_excel2.add_trace(go.Bar(
+        name=team,
+        x=df_excel2[x_col2],
+        y=y_values,
+        text=text_labels,
+        textposition="inside",
+        texttemplate="%{text}",
+        textangle=0,
+        textfont=dict(size=9),
+        marker_color=color
+    ))
+totals2 = df_excel2[team_cols].applymap(safe_to_int2).sum(axis=1)
+totals_offset2 = totals2 + totals2 * 0.04
+fig_stack_excel2.add_trace(go.Scatter(
+    x=df_excel2[x_col2],
+    y=totals_offset2,
+    textposition="top center",
+    textfont=dict(size=16),
+    showlegend=False,
+    hoverinfo="skip",
+    texttemplate="%{text}"
+))
+for i, (x, y, t) in enumerate(zip(df_excel2[x_col2], totals_offset2, totals2)):
+    fig_stack_excel2.add_annotation(
+        x=x,
+        y=y,
+        text=f"<span style='color:#e74c3c; font-weight:bold'>{int(t)}</span>",
+        showarrow=False,
+        font=dict(size=10, color="#e74c3c"),
+        align="center",
+        xanchor="center",
+        yanchor="bottom",
+        bgcolor="rgba(255,255,0,0.77)",
+        borderpad=4,
+        bordercolor="#e74c3c",
+        borderwidth=0
+    )
+fig_stack_excel2.update_layout(
+    barmode='stack',
+    title=dict(
+        text="OVERALL COST SPENT PER TEAM BY WEEKS (MVND)",
+        x=0.5,
+        y=1.0,
+        xanchor='center',
+        yanchor='top',
+        font=dict(size=28)
+    ),
+    width=1400,
+    height=800,
+    legend=dict(
+        orientation="h",
+        yanchor="top",
+        y=1.08,
+        xanchor="center",
+        x=0.5
+    ),
+    xaxis=dict(
+        tickfont=dict(color='black'),
+        title=dict(text="Weeks", font=dict(color='black'))
+    ),
+    yaxis=dict(
+        tickfont=dict(color='black')
+    )
+)
+# --- BOX SO SÁNH PHẦN TRĂM ---
+idx_w2 = len(df_excel2) - 1
+idx_w1_2 = len(df_excel2) - 2
+w_label2 = df_excel2[x_col2].iloc[idx_w2]
+active_teams = []
+percent_changes2 = {}
+team_positions = {}
+cumulative_height2 = 0
+for team in team_cols:
+    count_w = safe_to_int2(df_excel2[team].iloc[idx_w2])
+    if count_w <= 0:
+        continue
+    count_w1 = safe_to_int2(df_excel2[team].iloc[idx_w1_2])
+    if count_w1 == 0:
+        percent = 100 if count_w > 0 else 0
+    else:
+        percent = ((count_w - count_w1) / count_w1) * 100
+    active_teams.append(team)
+    percent_changes2[team] = percent
+    team_positions[team] = cumulative_height2 + count_w / 2
+    cumulative_height2 += count_w
+if active_teams:
+    total_height2 = cumulative_height2
+    x_vals2 = list(df_excel2[x_col2])
+    x_idx2 = x_vals2.index(w_label2)
+    x_offset2 = x_idx2 + 2
+    sorted_teams = sorted(active_teams, key=lambda x: team_positions[x])
+    for i, team in enumerate(sorted_teams):
+        percent = percent_changes2[team]
+        if percent > 0:
+            percent_text = f"W vs W-1: +{percent:.1f}%"
+            bgcolor = "#f2c795"
+        elif percent < 0:
+            percent_text = f"W vs W-1: -{abs(percent):.1f}%"
+            bgcolor = "#abf3ab"
+        else:
+            percent_text = "W vs W-1: 0.0%"
+            bgcolor = "#f2c795"
+        y_col = team_positions[team]
+        spacing_factor = 0.35
+        y_box = y_col + (total_height2 * spacing_factor * (i - len(sorted_teams)/2))
+        fig_stack_excel2.add_annotation(
+            x=w_label2, y=y_col,
+            ax=x_offset2, ay=y_box,
+            xref="x", yref="y", axref="x", ayref="y",
+            text="", showarrow=True, arrowhead=0, arrowwidth=1, arrowcolor="black"
+        )
+        fig_stack_excel2.add_annotation(
+            x=x_offset2, y=y_box,
+            text=f"<b>{percent_text}</b>",
+            showarrow=False,
+            font=dict(size=11, color="black"),
+            align="left",
+            xanchor="left",
+            yanchor="middle",
+            bgcolor=bgcolor,
+            borderpad=3,
+            bordercolor="black",
+            borderwidth=1
+        )
+# --- Thêm gridline dọc gạch đứt ---
+y_max2 = totals_offset2.max() * 1.05
+vertical_lines2 = []
+num_weeks2 = len(df_excel2[x_col2])
+for i in range(1, num_weeks2):
+    vertical_lines2.append(dict(
+        type="line",
+        xref="x",
+        yref="y",
+        x0=i - 0.5,
+        x1=i - 0.5,
+        y0=0,
+        y1=y_max2,
+        line=dict(
+            color="gray",
+            width=1,
+            dash="dot"
+        ),
+        layer="below"
+    ))
+fig_stack_excel2.update_layout(shapes=vertical_lines2)
+st.plotly_chart(fig_stack_excel2)
+st.markdown("<div style='height: 0.2rem'></div>", unsafe_allow_html=True)
+
+# --- AUTO DESCRIPTION CHO STACKED COLUMN CHART COST THEO TEAM (EXCEL) ---
+percent_changes_team = {}
+for team in team_cols:
+    count_w = safe_to_int2(df_excel2[team].iloc[idx_w2])
+    count_w1 = safe_to_int2(df_excel2[team].iloc[idx_w1_2])
+    if count_w1 == 0:
+        percent = 100 if count_w > 0 else 0
+    else:
+        percent = ((count_w - count_w1) / count_w1) * 100
+    percent_changes_team[team] = percent
+neg_percents = sorted([(k, v) for k, v in percent_changes_team.items() if v < 0], key=lambda x: x[1])
+if len(neg_percents) >= 2:
+    (A, X), (O, K) = neg_percents[0], neg_percents[1]
+elif len(neg_percents) == 1:
+    (A, X), (O, K) = neg_percents[0], (neg_percents[0][0], neg_percents[0][1])
+else:
+    min2 = sorted(percent_changes_team.items(), key=lambda x: x[1])[:2]
+    (A, X), (O, K) = min2[0], min2[1]
+pos_percents = sorted([(k, v) for k, v in percent_changes_team.items() if v > 0], key=lambda x: x[1], reverse=True)
+if len(pos_percents) >= 2:
+    (B, Z), (P, H) = pos_percents[0], pos_percents[1]
+elif len(pos_percents) == 1:
+    (B, Z), (P, H) = pos_percents[0], (pos_percents[0][0], pos_percents[0][1])
+else:
+    max2 = sorted(percent_changes_team.items(), key=lambda x: x[1], reverse=True)[:2]
+    (B, Z), (P, H) = max2[0], max2[1]
+sum_w = sum([safe_to_int2(df_excel2[team].iloc[idx_w2]) for team in team_cols])
+sum_w1 = sum([safe_to_int2(df_excel2[team].iloc[idx_w1_2]) for team in team_cols])
+if sum_w1 == 0:
+    Y = 100 if sum_w > 0 else 0
+else:
+    Y = ((sum_w - sum_w1) / sum_w1) * 100
+C = 'increased' if Y > 0 else 'decreased'
+A_html = f"<span style='color:#d62728; font-weight:bold'>{A}</span>"
+O_html = f"<span style='color:#d62728; font-weight:bold'>{O}</span>"
+B_html = f"<span style='color:#d62728; font-weight:bold'>{B}</span>"
+P_html = f"<span style='color:#d62728; font-weight:bold'>{P}</span>"
+C_html = f"<span style='color:#111; font-weight:bold'>{C}</span>"
+decrease_html = "<span style='font-weight:bold; color:#111'>decrease</span>"
+increase_html = "<span style='font-weight:bold; color:#111'>increase</span>"
+total_html = "<span style='font-weight:bold; color:#d62728'>Total</span>"
+min1_unchanged = abs(X) < 1e-6
+min2_unchanged = abs(K) < 1e-6
+if min1_unchanged and min2_unchanged:
+    decrease_text = f"{A_html} and {O_html} remain unchanged"
+elif min1_unchanged:
+    decrease_text = f"{A_html} remains unchanged and {O_html} recorded the largest {decrease_html} at {abs(K):.1f}%"
+elif min2_unchanged:
+    decrease_text = f"{A_html} recorded the largest {decrease_html} at {abs(X):.1f}% and {O_html} remains unchanged"
+else:
+    decrease_text = f"{A_html} and {O_html} recorded the largest {decrease_html} at {abs(X):.1f}% and {abs(K):.1f}%, respectively"
+max1_unchanged = abs(Z) < 1e-6
+max2_unchanged = abs(H) < 1e-6
+if max1_unchanged and max2_unchanged:
+    increase_text = f"{B_html} and {P_html} remain unchanged"
+elif max1_unchanged:
+    increase_text = f"{B_html} remains unchanged and {P_html} showed highest {increase_html} with {abs(H):.1f}%"
+elif max2_unchanged:
+    increase_text = f"{B_html} showed highest {increase_html} with {abs(Z):.1f}% and {P_html} remains unchanged"
+else:
+    increase_text = f"{B_html} and {P_html} showed highest {increase_html} with {abs(Z):.1f}% and {abs(H):.1f}%, respectively"
+st.markdown(
+    f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>"
+    f"{decrease_text}, while {increase_text}, compared to the previous week. "
+    f"Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
+    f"</div>",
+    unsafe_allow_html=True
+)
+st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+
+# --- STACKED COLUMN CHART TỪ EXCEL: OVERALL COST SPENT PER BANNER BY WEEKS (MVND)-----------
+
+if 'Tuần' in df_excel3.columns:
+    x_col3 = 'Tuần'
+else:
+    x_col3 = df_excel3.columns[0]
+banner_cols3 = [col for col in df_excel3.columns if col != x_col3]
+fig_stack_excel3 = go.Figure()
+color_palette3 = [
+    '#1f77b4', '#ff7f0e', '#2ca02c', '#9467bd', '#8c564b',
+    '#e377c2', '#7f7f7f', '#bcbd22', '#17becf', '#f5b041',
+    '#229954', '#0bf4a3', '#e74c3c', '#f7dc6f', '#a569bd',
+    '#45b39d', '#f1948a', '#34495e', '#f39c12'
+]
+def safe_to_int3(v):
+    try:
+        return int(round(float(v)))
+    except:
+        return 0
+for i, banner in enumerate(banner_cols3):
+    y_values = df_excel3[banner].apply(safe_to_int3).tolist()
+    text_labels = [str(v) if v != 0 else "" for v in y_values]
+    color = color_palette3[i % len(color_palette3)]
+    fig_stack_excel3.add_trace(go.Bar(
+        name=banner,
+        x=df_excel3[x_col3],
+        y=y_values,
+        text=text_labels,
+        textposition="inside",
+        texttemplate="%{text}",
+        textangle=0,
+        textfont=dict(size=9),
+        marker_color=color
+    ))
+totals3 = df_excel3[banner_cols3].applymap(safe_to_int3).sum(axis=1)
+totals_offset3 = totals3 + totals3 * 0.04
+fig_stack_excel3.add_trace(go.Scatter(
+    x=df_excel3[x_col3],
+    y=totals_offset3,
+    textposition="top center",
+    textfont=dict(size=16),
+    showlegend=False,
+    hoverinfo="skip",
+    texttemplate="%{text}"
+))
+for i, (x, y, t) in enumerate(zip(df_excel3[x_col3], totals_offset3, totals3)):
+    fig_stack_excel3.add_annotation(
+        x=x,
+        y=y,
+        text=f"<span style='color:#e74c3c; font-weight:bold'>{int(t)}</span>",
+        showarrow=False,
+        font=dict(size=10, color="#e74c3c"),
+        align="center",
+        xanchor="center",
+        yanchor="bottom",
+        bgcolor="rgba(255,255,0,0.77)",
+        borderpad=4,
+        bordercolor="#e74c3c",
+        borderwidth=0
+    )
+fig_stack_excel3.update_layout(
+    barmode='stack',
+    title=dict(
+        text="OVERALL COST SPENT PER BANNER (MVND)",
+        x=0.5,
+        y=1.0,
+        xanchor='center',
+        yanchor='top',
+        font=dict(size=28)
+    ),
+    width=1400,
+    height=800,
+    legend=dict(
+        orientation="h",
+        yanchor="top",
+        y=1.08,
+        xanchor="center",
+        x=0.5
+    ),
+    xaxis=dict(
+        tickfont=dict(color='black'),
+        title=dict(text="Weeks", font=dict(color='black'))
+    ),
+    yaxis=dict(
+        tickfont=dict(color='black')
+    )
+)
+idx_w3 = len(df_excel3) - 1
+idx_w1_3 = len(df_excel3) - 2
+w_label3 = df_excel3[x_col3].iloc[idx_w3]
+active_banners3 = []
+percent_changes3 = {}
+banner_positions3 = {}
+cumulative_height3 = 0
+for banner in banner_cols3:
+    count_w = safe_to_int3(df_excel3[banner].iloc[idx_w3])
+    if count_w <= 0:
+        continue
+    count_w1 = safe_to_int3(df_excel3[banner].iloc[idx_w1_3])
+    if count_w1 == 0:
+        percent = 100 if count_w > 0 else 0
+    else:
+        percent = ((count_w - count_w1) / count_w1) * 100
+    active_banners3.append(banner)
+    percent_changes3[banner] = percent
+    banner_positions3[banner] = cumulative_height3 + count_w / 2
+    cumulative_height3 += count_w
+if active_banners3:
+    total_height3 = cumulative_height3
+    x_vals3 = list(df_excel3[x_col3])
+    x_idx3 = x_vals3.index(w_label3)
+    x_offset3 = x_idx3 + 2
+    sorted_banners3 = sorted(active_banners3, key=lambda x: banner_positions3[x])
+    for i, banner in enumerate(sorted_banners3):
+        percent = percent_changes3[banner]
+        if percent > 0:
+            percent_text = f"W vs W-1: +{percent:.1f}%"
+            bgcolor = "#f2c795"
+        elif percent < 0:
+            percent_text = f"W vs W-1: -{abs(percent):.1f}%"
+            bgcolor = "#abf3ab"
+        else:
+            percent_text = "W vs W-1: 0.0%"
+            bgcolor = "#f2c795"
+        y_col = banner_positions3[banner]
+        spacing_factor = 0.35
+        y_box = y_col + (total_height3 * spacing_factor * (i - len(sorted_banners3)/2))
+        fig_stack_excel3.add_annotation(
+            x=w_label3, y=y_col,
+            ax=x_offset3, ay=y_box,
+            xref="x", yref="y", axref="x", ayref="y",
+            text="", showarrow=True, arrowhead=0, arrowwidth=1, arrowcolor="black"
+        )
+        fig_stack_excel3.add_annotation(
+            x=x_offset3, y=y_box,
+            text=f"<b>{percent_text}</b>",
+            showarrow=False,
+            font=dict(size=11, color="black"),
+            align="left",
+            xanchor="left",
+            yanchor="middle",
+            bgcolor=bgcolor,
+            borderpad=3,
+            bordercolor="black",
+            borderwidth=1
+        )
+# Gridline dọc
+y_max3 = totals_offset3.max() * 1.05
+vertical_lines3 = []
+num_weeks3 = len(df_excel3[x_col3])
+for i in range(1, num_weeks3):
+    vertical_lines3.append(dict(
+        type="line",
+        xref="x",
+        yref="y",
+        x0=i - 0.5,
+        x1=i - 0.5,
+        y0=0,
+        y1=y_max3,
+        line=dict(
+            color="gray",
+            width=1,
+            dash="dot"
+        ),
+        layer="below"
+    ))
+fig_stack_excel3.update_layout(shapes=vertical_lines3)
+st.plotly_chart(fig_stack_excel3)
+st.markdown("<div style='height: 0.2rem'></div>", unsafe_allow_html=True)
+
+# Tính phần trăm thay đổi cho từng banner giữa tuần hiện tại và tuần trước
+percent_changes_banner3 = {}
+for banner in banner_cols3:
+    count_w = safe_to_int3(df_excel3[banner].iloc[idx_w3])
+    count_w1 = safe_to_int3(df_excel3[banner].iloc[idx_w1_3])
+    if count_w1 == 0:
+        percent = 100 if count_w > 0 else 0
+    else:
+        percent = ((count_w - count_w1) / count_w1) * 100
+    percent_changes_banner3[banner] = percent
+
+# Top 2 giảm mạnh nhất (min), A, X% và O, K%
+neg_percents = sorted([(k, v) for k, v in percent_changes_banner3.items() if v < 0], key=lambda x: x[1])
+if len(neg_percents) >= 2:
+    (A, X), (O, K) = neg_percents[0], neg_percents[1]
+elif len(neg_percents) == 1:
+    (A, X), (O, K) = neg_percents[0], (neg_percents[0][0], neg_percents[0][1])
+else:
+    min2 = sorted(percent_changes_banner3.items(), key=lambda x: x[1])[:2]
+    (A, X), (O, K) = min2[0], min2[1]
+
+# Top 2 tăng mạnh nhất (max), B, Z% và P, H%
+pos_percents = sorted([(k, v) for k, v in percent_changes_banner3.items() if v > 0], key=lambda x: x[1], reverse=True)
+if len(pos_percents) >= 2:
+    (B, Z), (P, H) = pos_percents[0], pos_percents[1]
+elif len(pos_percents) == 1:
+    (B, Z), (P, H) = pos_percents[0], (pos_percents[0][0], pos_percents[0][1])
+else:
+    max2 = sorted(percent_changes_banner3.items(), key=lambda x: x[1], reverse=True)[:2]
+    (B, Z), (P, H) = max2[0], max2[1]
+
+# Y% là phần trăm thay đổi tổng số cost của tất cả banner
+sum_w = sum([safe_to_int3(df_excel3[banner].iloc[idx_w3]) for banner in banner_cols3])
+sum_w1 = sum([safe_to_int3(df_excel3[banner].iloc[idx_w1_3]) for banner in banner_cols3])
+if sum_w1 == 0:
+    Y = 100 if sum_w > 0 else 0
+else:
+    Y = ((sum_w - sum_w1) / sum_w1) * 100
+
+C = 'increased' if Y > 0 else 'decreased'
+
+A_html = f"<span style='color:#d62728; font-weight:bold'>{A}</span>"
+O_html = f"<span style='color:#d62728; font-weight:bold'>{O}</span>"
+B_html = f"<span style='color:#d62728; font-weight:bold'>{B}</span>"
+P_html = f"<span style='color:#d62728; font-weight:bold'>{P}</span>"
+C_html = f"<span style='color:#111; font-weight:bold'>{C}</span>"
+decrease_html = "<span style='font-weight:bold; color:#111'>decrease</span>"
+increase_html = "<span style='font-weight:bold; color:#111'>increase</span>"
+total_html = "<span style='font-weight:bold; color:#d62728'>Total</span>"
+
+min1_unchanged = abs(X) < 1e-6
+min2_unchanged = abs(K) < 1e-6
+if min1_unchanged and min2_unchanged:
+    decrease_text = f"{A_html} and {O_html} remain unchanged"
+elif min1_unchanged:
+    decrease_text = f"{A_html} remains unchanged and {O_html} recorded the largest {decrease_html} at {abs(K):.1f}%"
+elif min2_unchanged:
+    decrease_text = f"{A_html} recorded the largest {decrease_html} at {abs(X):.1f}% and {O_html} remains unchanged"
+else:
+    decrease_text = f"{A_html} and {O_html} recorded the largest {decrease_html} at {abs(X):.1f}% and {abs(K):.1f}%, respectively"
+
+max1_unchanged = abs(Z) < 1e-6
+max2_unchanged = abs(H) < 1e-6
+if max1_unchanged and max2_unchanged:
+    increase_text = f"{B_html} and {P_html} remain unchanged"
+elif max1_unchanged:
+    increase_text = f"{B_html} remains unchanged and {P_html} showed highest {increase_html} with {abs(H):.1f}%"
+elif max2_unchanged:
+    increase_text = f"{B_html} showed highest {increase_html} with {abs(Z):.1f}% and {P_html} remains unchanged"
+else:
+    increase_text = f"{B_html} and {P_html} showed highest {increase_html} with {abs(Z):.1f}% and {abs(H):.1f}%, respectively"
+
+st.markdown(
+    f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>"
+    f"{decrease_text}, while {increase_text}, compared to the previous week. "
+    f"Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
+    f"</div>",
+    unsafe_allow_html=True
+)
+st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+
+# ------------------- 100% STACKED COLUMN CHART TỪ EXCEL------------------------
+
+import plotly.graph_objects as go
+
+# 1. Xác định các cột cần vẽ (giả sử là 8 cột đầu tiên)
+column_names = list(df_excel4.columns)
+label_col = df_excel4.columns[0]  # Cột đầu tiên (không có header, chứa Jan, Feb,...)
+x_cols = df_excel4.columns[1:9]   # 8 cột tiếp theo: GO Mall ... Total
+row_labels = df_excel4[label_col].astype(str).tolist()  # Lấy đúng tên tháng
+
+# 2. Lấy nhãn dòng (tuần, hoặc index)
+if 'Tuần' in df_excel4.columns:
+    row_labels = df_excel4['Tuần'].astype(str).tolist()
+    data = df_excel4[x_cols].copy()
+else:
+    data = df_excel4[x_cols].copy()
+
+# --- THÊM DÒNG NÀY ĐỂ CHUYỂN TOÀN BỘ SANG SỐ ---
+data = data.apply(pd.to_numeric, errors='coerce').fillna(0)
+
+# 3. Tính phần trăm từng dòng trên tổng của mỗi cột
+percent_data = data.div(data.sum(axis=0), axis=1) * 100
+
+# 4. Vẽ 100% stacked column chart
+fig_100stack = go.Figure()
+color_palette = [
+    '#1f77b4', '#ff7f0e', '#2ca02c', '#9467bd', '#8c564b',
+    '#e377c2', '#7f7f7f', '#bcbd22', '#17becf', '#f5b041',
+    '#229954', '#0bf4a3', '#e74c3c', '#f7dc6f', '#a569bd',
+    '#45b39d', '#f1948a', '#34495e', '#f39c12'
+]
+for i, row_label in enumerate(row_labels):
+    y_values = percent_data.iloc[i].tolist()
+    text_labels = [f"{row_label}: {v:.1f}%" if v > 0 else "" for v in y_values]
+    label_lower = row_label.strip().lower()
+    if label_lower == "remaining year budget":
+        color = "#27ae60"  # Xanh lá
+    elif label_lower in ["jul'", "jun'"]:
+        color = "#e53935"  # Đỏ tươi cho cả Jul' và Jun'
+    else:
+        color = "#1976d2"
+    fig_100stack.add_trace(go.Bar(
+        name=row_label,
+        x=x_cols,
+        y=y_values,
+        text=text_labels,
+        textposition="inside",
+        texttemplate="%{text}",
+        marker_color=color,
+        marker_line_color="black",      # Thêm dòng này
+        marker_line_width=1,            # Và dòng này (có thể tăng lên 2 nếu muốn đậm hơn)
+        textfont=dict(size=10),
+        textangle=0,
+        hovertemplate=f"<b>{row_label}</b><br>%{{x}}: %{{y:.1f}}%<extra></extra>"
+    ))
+
+fig_100stack.update_layout(
+barmode='stack',
+title=dict(
+    text="PERCENTAGE OF OVERALL COST SPENT PER BANNER",
+    x=0.5,
+    y=0.97,
+    xanchor='center',
+    yanchor='top',
+    font=dict(size=24)
+),
+width=1200,
+height=700,
+showlegend=False,  # Ẩn legend mặc định
+xaxis=dict(
+    title="Banner",
+    tickfont=dict(size=13, color='black')
+),
+yaxis=dict(
+    title="Percentage (%)",
+    range=[0, 100],
+    tickfont=dict(size=13, color='black')
+)
+)
+
+# Thêm 3 trace dummy để tạo custom legend (dùng visible='legendonly')
+fig_100stack.add_trace(go.Bar(
+    x=[-999], y=[0],
+    name="Actual cost within budget",
+    marker_color="#1976d2",  # Xanh nước biển
+    showlegend=True,
+    visible='legendonly'
+))
+fig_100stack.add_trace(go.Bar(
+    x=[-999], y=[0],
+    name="Actual cost exceeding budget",
+    marker_color="#e53935",  # Đỏ
+    showlegend=True,
+    visible='legendonly'
+))
+fig_100stack.add_trace(go.Bar(
+    x=[-999], y=[0],
+    name="Remaining budget",
+    marker_color="#27ae60",  # Xanh lá
+    showlegend=True,
+    visible='legendonly'
+))
+
+# Xác định vị trí cột "Total" trên trục x
+total_idx = list(x_cols).index("Total")
+fig_100stack.add_shape(
+    type="rect",
+    xref="x",
+    yref="paper",
+    x0=total_idx - 0.5,   # Mở rộng sang trái
+    x1=total_idx + 0.5,   # Mở rộng sang phải
+    y0=-0.06,
+    y1=1.05,
+    line=dict(
+        color="red",
+        width=5,
+        dash="solid"
+    ),
+    fillcolor="rgba(0,0,0,0)",
+    layer="above"
+)
+
+st.plotly_chart(fig_100stack, use_container_width=True)
+st.markdown("""
+<div style="width: 100%; display: flex; justify-content: center; margin-bottom: 1.5rem; margin-top: 0.1rem;">
+<div style="display: flex; gap: 2.5rem; align-items: center;">
+    <div style="display: flex; align-items: center;">
+    <span style="width: 32px; height: 18px; background: #1976d2; display: inline-block; border-radius: 3px; margin-right: 8px;"></span>
+    <span style="font-size: 18px;">Actual cost within budget</span>
+    </div>
+    <div style="display: flex; align-items: center;">
+    <span style="width: 32px; height: 18px; background: #e53935; display: inline-block; border-radius: 3px; margin-right: 8px;"></span>
+    <span style="font-size: 18px;">Actual cost exceeding budget</span>
+    </div>
+    <div style="display: flex; align-items: center;">
+    <span style="width: 32px; height: 18px; background: #27ae60; display: inline-block; border-radius: 3px; margin-right: 8px;"></span>
+    <span style="font-size: 18px;">Remaining budget</span>
+    </div>
+</div>
+</div>
+""", unsafe_allow_html=True)
+st.markdown("<div style='height: 1rem'></div>", unsafe_allow_html=True)
+
+st.markdown(
+    """
+    <div style="text-align: center; margin-top: 0.5rem; margin-bottom: 1.5rem; font-size: 28px;">
+        <span style="color: #e53935; font-weight: bold;">*Note:</span>
+        Budget in this chart is a dummy data, real budget will be added in in the future
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+
+# --- STACKED COLUMN CHART TỪ EXCEL: OVERALL COST SPENT PER CATEGORY BY MONTH (MVND)-----------
+
+if 'Months' in df_excel5.columns:
+    x_col_month = 'Months'
+else:
+    x_col_month = df_excel5.columns[0]
+category_cols_month = [col for col in df_excel5.columns if col != x_col_month]
+fig_stack_excel_month = go.Figure()
+color_palette = [
+    '#1f77b4', '#ff7f0e', '#2ca02c', '#9467bd', '#8c564b',
+    '#e377c2', '#7f7f7f', '#bcbd22', '#17becf', '#f5b041',
+    '#229954', '#0bf4a3', '#e74c3c', '#f7dc6f', '#a569bd',
+    '#45b39d', '#f1948a', '#34495e', '#f39c12'
+]
+for i, cat in enumerate(category_cols_month):
+    y_values = df_excel5[cat].apply(lambda v: int(round(v)) if pd.notnull(v) else 0).tolist()
+    text_labels = [str(v) if v != 0 else "" for v in y_values]
+    color = color_palette[i % len(color_palette)]
+    fig_stack_excel_month.add_trace(go.Bar(
+        name=cat,
+        x=df_excel5[x_col_month],
+        y=y_values,
+        text=text_labels,
+        textposition="inside",
+        texttemplate="%{text}",
+        textangle=0,
+        textfont=dict(size=9),
+        marker_color=color
+    ))
+totals = df_excel5[category_cols_month].apply(lambda col: col.apply(lambda v: int(round(v)) if pd.notnull(v) else 0)).sum(axis=1)
+totals_offset = totals + totals * 0.04
+fig_stack_excel_month.add_trace(go.Scatter(
+    x=df_excel5[x_col_month],
+    y=totals_offset,
+    textposition="top center",
+    textfont=dict(size=16),
+    showlegend=False,
+    hoverinfo="skip",
+    texttemplate="%{text}"
+))
+for i, (x, y, t) in enumerate(zip(df_excel5[x_col_month], totals_offset, totals)):
+    fig_stack_excel_month.add_annotation(
+        x=x,
+        y=y,
+        text=f"<span style='color:#e74c3c; font-weight:bold'>{int(t)}</span>",
+        showarrow=False,
+        font=dict(size=10, color="#e74c3c"),
+        align="center",
+        xanchor="center",
+        yanchor="bottom",
+        bgcolor="rgba(255,255,0,0.77)",
+        borderpad=4,
+        bordercolor="#e74c3c",
+        borderwidth=0
+    )
+fig_stack_excel_month.update_layout(
+    barmode='stack',
+    title=dict(
+        text="OVERALL COST SPENT PER CATEGORY BY MONTH (MVND)",
+        x=0.5,
+        y=1.0,
+        xanchor='center',
+        yanchor='top',
+        font=dict(size=28)
+    ),
+    width=1400,
+    height=800,
+    legend=dict(
+        orientation="h",
+        yanchor="top",
+        y=1.08,
+        xanchor="center",
+        x=0.5
+    ),
+    xaxis=dict(
+        tickfont=dict(color='black'),
+        title=dict(text="Months", font=dict(color='black'))
+    ),
+    yaxis=dict(
+        tickfont=dict(color='black')
+    )
+)
+# --- BOX SO SÁNH PHẦN TRĂM ---
+idx_w = len(df_excel5) - 1
+idx_w1 = len(df_excel5) - 2
+w_label = df_excel5[x_col_month].iloc[idx_w]
+active_categories = []
+percent_changes = {}
+category_positions = {}
+cumulative_height = 0
+def safe_to_int(v):
+    try:
+        return int(round(float(v)))
+    except:
+        return 0
+for cat in category_cols_month:
+    count_w = safe_to_int(df_excel5[cat].iloc[idx_w])
+    if count_w <= 0:
+        continue
+    count_w1 = safe_to_int(df_excel5[cat].iloc[idx_w1])
+    if count_w1 == 0:
+        percent = 100 if count_w > 0 else 0
+    else:
+        percent = ((count_w - count_w1) / count_w1) * 100
+    active_categories.append(cat)
+    percent_changes[cat] = percent
+    category_positions[cat] = cumulative_height + count_w / 2
+    cumulative_height += count_w
+if active_categories:
+    total_height = cumulative_height
+    x_vals = list(df_excel5[x_col_month])
+    x_idx = x_vals.index(w_label)
+    x_offset = x_idx + 2
+    sorted_categories = sorted(active_categories, key=lambda x: category_positions[x])
+    for i, cat in enumerate(sorted_categories):
+        percent = percent_changes[cat]
+        if percent > 0:
+            percent_text = f"M vs M-1: +{percent:.1f}%"
+            bgcolor = "#f2c795"
+        elif percent < 0:
+            percent_text = f"M vs M-1: -{abs(percent):.1f}%"
+            bgcolor = "#abf3ab"
+        else:
+            percent_text = "M vs M-1: 0.0%"
+            bgcolor = "#f2c795"
+        y_col = category_positions[cat]
+        spacing_factor = 0.35
+        y_box = y_col + (total_height * spacing_factor * (i - len(sorted_categories)/2))
+        fig_stack_excel_month.add_annotation(
+            x=w_label, y=y_col,
+            ax=x_offset, ay=y_box,
+            xref="x", yref="y", axref="x", ayref="y",
+            text="", showarrow=True, arrowhead=0, arrowwidth=1, arrowcolor="black"
+        )
+        fig_stack_excel_month.add_annotation(
+            x=x_offset, y=y_box,
+            text=f"<b>{percent_text}</b>",
+            showarrow=False,
+            font=dict(size=11, color="black"),
+            align="left",
+            xanchor="left",
+            yanchor="middle",
+            bgcolor=bgcolor,
+            borderpad=3,
+            bordercolor="black",
+            borderwidth=1
+        )
+# --- Thêm gridline dọc gạch đứt phân chia các tháng ---
+y_max = totals_offset.max() * 1.05
+vertical_lines = []
+num_months = len(df_excel5[x_col_month])
+for i in range(1, num_months):
+    vertical_lines.append(dict(
+        type="line",
+        xref="x",
+        yref="y",
+        x0=i - 0.5,
+        x1=i - 0.5,
+        y0=0,
+        y1=y_max,
+        line=dict(
+            color="gray",
+            width=1,
+            dash="dot"
+        ),
+        layer="below"
+    ))
+fig_stack_excel_month.update_layout(shapes=vertical_lines)
+st.plotly_chart(fig_stack_excel_month)
+st.markdown("<div style='height: 0.2rem'></div>", unsafe_allow_html=True)
+
+# --- AUTO DESCRIPTION ---
+percent_changes_cat = {}
+for cat in category_cols_month:
+    count_w = safe_to_int(df_excel5[cat].iloc[idx_w])
+    count_w1 = safe_to_int(df_excel5[cat].iloc[idx_w1])
+    if count_w1 == 0:
+        percent = 100 if count_w > 0 else 0
+    else:
+        percent = ((count_w - count_w1) / count_w1) * 100
+    percent_changes_cat[cat] = percent
+
+neg_percents = sorted([(k, v) for k, v in percent_changes_cat.items() if v < 0], key=lambda x: x[1])
+if len(neg_percents) >= 2:
+    (A, X), (O, K) = neg_percents[0], neg_percents[1]
+elif len(neg_percents) == 1:
+    (A, X), (O, K) = neg_percents[0], (neg_percents[0][0], neg_percents[0][1])
+else:
+    min2 = sorted(percent_changes_cat.items(), key=lambda x: x[1])[:2]
+    (A, X), (O, K) = min2[0], min2[1]
+
+pos_percents = sorted([(k, v) for k, v in percent_changes_cat.items() if v > 0], key=lambda x: x[1], reverse=True)
+if len(pos_percents) >= 2:
+    (B, Z), (P, H) = pos_percents[0], pos_percents[1]
+elif len(pos_percents) == 1:
+    (B, Z), (P, H) = pos_percents[0], (pos_percents[0][0], pos_percents[0][1])
+else:
+    max2 = sorted(percent_changes_cat.items(), key=lambda x: x[1], reverse=True)[:2]
+    (B, Z), (P, H) = max2[0], max2[1]
+
+sum_w = sum([safe_to_int(df_excel5[cat].iloc[idx_w]) for cat in category_cols_month])
+sum_w1 = sum([safe_to_int(df_excel5[cat].iloc[idx_w1]) for cat in category_cols_month])
+if sum_w1 == 0:
+    Y = 100 if sum_w > 0 else 0
+else:
+    Y = ((sum_w - sum_w1) / sum_w1) * 100
+
+C = 'increased' if Y > 0 else 'decreased'
+
+A_html = f"<span style='color:#d62728; font-weight:bold'>{A}</span>"
+O_html = f"<span style='color:#d62728; font-weight:bold'>{O}</span>"
+B_html = f"<span style='color:#d62728; font-weight:bold'>{B}</span>"
+P_html = f"<span style='color:#d62728; font-weight:bold'>{P}</span>"
+C_html = f"<span style='color:#111; font-weight:bold'>{C}</span>"
+decrease_html = "<span style='font-weight:bold; color:#111'>decrease</span>"
+increase_html = "<span style='font-weight:bold; color:#111'>increase</span>"
+total_html = "<span style='font-weight:bold; color:#d62728'>Total</span>"
+
+min1_unchanged = abs(X) < 1e-6
+min2_unchanged = abs(K) < 1e-6
+if min1_unchanged and min2_unchanged:
+    decrease_text = f"{A_html} and {O_html} remain unchanged"
+elif min1_unchanged:
+    decrease_text = f"{A_html} remains unchanged and {O_html} recorded the largest {decrease_html} at {abs(K):.1f}%"
+elif min2_unchanged:
+    decrease_text = f"{A_html} recorded the largest {decrease_html} at {abs(X):.1f}% and {O_html} remains unchanged"
+else:
+    decrease_text = f"{A_html} and {O_html} recorded the largest {decrease_html} at {abs(X):.1f}% and {abs(K):.1f}%, respectively"
+
+max1_unchanged = abs(Z) < 1e-6
+max2_unchanged = abs(H) < 1e-6
+if max1_unchanged and max2_unchanged:
+    increase_text = f"{B_html} and {P_html} remain unchanged"
+elif max1_unchanged:
+    increase_text = f"{B_html} remains unchanged and {P_html} showed highest {increase_html} with {abs(H):.1f}%"
+elif max2_unchanged:
+    increase_text = f"{B_html} showed highest {increase_html} with {abs(Z):.1f}% and {P_html} remains unchanged"
+else:
+    increase_text = f"{B_html} and {P_html} showed highest {increase_html} with {abs(Z):.1f}% and {abs(H):.1f}%, respectively"
+
+st.markdown(
+    f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>"
+    f"{decrease_text}, while {increase_text}, compared to the previous month. "
+    f"Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
+    f"</div>",
+    unsafe_allow_html=True
+)
+st.markdown("<div style='height: 7rem'></div>", unsafe_allow_html=True)
+
+# --- STACKED COLUMN CHART TỪ EXCEL: OVERALL COST SPENT PER TEAM BY MONTH (MVND)-----------
+
+if 'Months' in df_excel6.columns:
+    x_col_month_team = 'Months'
+else:
+    x_col_month_team = df_excel6.columns[0]
+team_cols_month = [col for col in df_excel6.columns if col != x_col_month_team]
+fig_stack_excel_month_team = go.Figure()
+color_palette_team = [
+    '#1f77b4', '#ff7f0e', '#2ca02c', '#9467bd', '#8c564b',
+    '#e377c2', '#7f7f7f', '#bcbd22', '#17becf', '#f5b041',
+    '#229954', '#0bf4a3', '#e74c3c', '#f7dc6f', '#a569bd',
+    '#45b39d', '#f1948a', '#34495e', '#f39c12'
+]
+def safe_to_int_team(v):
+    try:
+        return int(round(float(v)))
+    except:
+        return 0
+for i, team in enumerate(team_cols_month):
+    y_values = df_excel6[team].apply(safe_to_int_team).tolist()
+    text_labels = [str(v) if v != 0 else "" for v in y_values]
+    color = color_palette_team[i % len(color_palette_team)]
+    fig_stack_excel_month_team.add_trace(go.Bar(
+        name=team,
+        x=df_excel6[x_col_month_team],
+        y=y_values,
+        text=text_labels,
+        textposition="inside",
+        texttemplate="%{text}",
+        textangle=0,
+        textfont=dict(size=9),
+        marker_color=color
+    ))
+totals_team = df_excel6[team_cols_month].applymap(safe_to_int_team).sum(axis=1)
+totals_offset_team = totals_team + totals_team * 0.04
+fig_stack_excel_month_team.add_trace(go.Scatter(
+    x=df_excel6[x_col_month_team],
+    y=totals_offset_team,
+    textposition="top center",
+    textfont=dict(size=16),
+    showlegend=False,
+    hoverinfo="skip",
+    texttemplate="%{text}"
+))
+for i, (x, y, t) in enumerate(zip(df_excel6[x_col_month_team], totals_offset_team, totals_team)):
+    fig_stack_excel_month_team.add_annotation(
+        x=x,
+        y=y,
+        text=f"<span style='color:#e74c3c; font-weight:bold'>{int(t)}</span>",
+        showarrow=False,
+        font=dict(size=10, color="#e74c3c"),
+        align="center",
+        xanchor="center",
+        yanchor="bottom",
+        bgcolor="rgba(255,255,0,0.77)",
+        borderpad=4,
+        bordercolor="#e74c3c",
+        borderwidth=0
+    )
+fig_stack_excel_month_team.update_layout(
+    barmode='stack',
+    title=dict(
+        text="OVERALL COST SPENT PER TEAM BY MONTH (MVND)",
+        x=0.5,
+        y=1.0,
+        xanchor='center',
+        yanchor='top',
+        font=dict(size=28)
+    ),
+    width=1400,
+    height=800,
+    legend=dict(
+        orientation="h",
+        yanchor="top",
+        y=1.08,
+        xanchor="center",
+        x=0.5
+    ),
+    xaxis=dict(
+        tickfont=dict(color='black'),
+        title=dict(text="Months", font=dict(color='black'))
+    ),
+    yaxis=dict(
+        tickfont=dict(color='black')
+    )
+)
+# --- BOX SO SÁNH PHẦN TRĂM ---
+idx_w_team = len(df_excel6) - 1
+idx_w1_team = len(df_excel6) - 2
+w_label_team = df_excel6[x_col_month_team].iloc[idx_w_team]
+active_teams = []
+percent_changes_team = {}
+team_positions = {}
+cumulative_height_team = 0
+for team in team_cols_month:
+    count_w = safe_to_int_team(df_excel6[team].iloc[idx_w_team])
+    if count_w <= 0:
+        continue
+    count_w1 = safe_to_int_team(df_excel6[team].iloc[idx_w1_team])
+    if count_w1 == 0:
+        percent = 100 if count_w > 0 else 0
+    else:
+        percent = ((count_w - count_w1) / count_w1) * 100
+    active_teams.append(team)
+    percent_changes_team[team] = percent
+    team_positions[team] = cumulative_height_team + count_w / 2
+    cumulative_height_team += count_w
+if active_teams:
+    total_height_team = cumulative_height_team
+    x_vals_team = list(df_excel6[x_col_month_team])
+    x_idx_team = x_vals_team.index(w_label_team)
+    x_offset_team = x_idx_team + 2
+    sorted_teams = sorted(active_teams, key=lambda x: team_positions[x])
+    for i, team in enumerate(sorted_teams):
+        percent = percent_changes_team[team]
+        if percent > 0:
+            percent_text = f"M vs M-1: +{percent:.1f}%"
+            bgcolor = "#f2c795"
+        elif percent < 0:
+            percent_text = f"M vs M-1: -{abs(percent):.1f}%"
+            bgcolor = "#abf3ab"
+        else:
+            percent_text = "M vs M-1: 0.0%"
+            bgcolor = "#f2c795"
+        y_col = team_positions[team]
+        spacing_factor = 0.35
+        y_box = y_col + (total_height_team * spacing_factor * (i - len(sorted_teams)/2))
+        fig_stack_excel_month_team.add_annotation(
+            x=w_label_team, y=y_col,
+            ax=x_offset_team, ay=y_box,
+            xref="x", yref="y", axref="x", ayref="y",
+            text="", showarrow=True, arrowhead=0, arrowwidth=1, arrowcolor="black"
+        )
+        fig_stack_excel_month_team.add_annotation(
+            x=x_offset_team, y=y_box,
+            text=f"<b>{percent_text}</b>",
+            showarrow=False,
+            font=dict(size=11, color="black"),
+            align="left",
+            xanchor="left",
+            yanchor="middle",
+            bgcolor=bgcolor,
+            borderpad=3,
+            bordercolor="black",
+            borderwidth=1
+        )
+# --- Thêm gridline dọc gạch đứt phân chia các tháng ---
+y_max_team = totals_offset_team.max() * 1.05
+vertical_lines_team = []
+num_months_team = len(df_excel6[x_col_month_team])
+for i in range(1, num_months_team):
+    vertical_lines_team.append(dict(
+        type="line",
+        xref="x",
+        yref="y",
+        x0=i - 0.5,
+        x1=i - 0.5,
+        y0=0,
+        y1=y_max_team,
+        line=dict(
+            color="gray",
+            width=1,
+            dash="dot"
+        ),
+        layer="below"
+    ))
+fig_stack_excel_month_team.update_layout(shapes=vertical_lines_team)
+st.plotly_chart(fig_stack_excel_month_team)
+st.markdown("<div style='height: 0.2rem'></div>", unsafe_allow_html=True)
+
+# --- AUTO DESCRIPTION ---
+percent_changes_team_desc = {}
+for team in team_cols_month:
+    count_w = safe_to_int_team(df_excel6[team].iloc[idx_w_team])
+    count_w1 = safe_to_int_team(df_excel6[team].iloc[idx_w1_team])
+    if count_w1 == 0:
+        percent = 100 if count_w > 0 else 0
+    else:
+        percent = ((count_w - count_w1) / count_w1) * 100
+    percent_changes_team_desc[team] = percent
+
+neg_percents = sorted([(k, v) for k, v in percent_changes_team_desc.items() if v < 0], key=lambda x: x[1])
+if len(neg_percents) >= 2:
+    (A, X), (O, K) = neg_percents[0], neg_percents[1]
+elif len(neg_percents) == 1:
+    (A, X), (O, K) = neg_percents[0], (neg_percents[0][0], neg_percents[0][1])
+else:
+    min2 = sorted(percent_changes_team_desc.items(), key=lambda x: x[1])[:2]
+    (A, X), (O, K) = min2[0], min2[1]
+
+pos_percents = sorted([(k, v) for k, v in percent_changes_team_desc.items() if v > 0], key=lambda x: x[1], reverse=True)
+if len(pos_percents) >= 2:
+    (B, Z), (P, H) = pos_percents[0], pos_percents[1]
+elif len(pos_percents) == 1:
+    (B, Z), (P, H) = pos_percents[0], (pos_percents[0][0], pos_percents[0][1])
+else:
+    max2 = sorted(percent_changes_team_desc.items(), key=lambda x: x[1], reverse=True)[:2]
+    (B, Z), (P, H) = max2[0], max2[1]
+
+sum_w = sum([safe_to_int_team(df_excel6[team].iloc[idx_w_team]) for team in team_cols_month])
+sum_w1 = sum([safe_to_int_team(df_excel6[team].iloc[idx_w1_team]) for team in team_cols_month])
+if sum_w1 == 0:
+    Y = 100 if sum_w > 0 else 0
+else:
+    Y = ((sum_w - sum_w1) / sum_w1) * 100
+
+C = 'increased' if Y > 0 else 'decreased'
+
+A_html = f"<span style='color:#d62728; font-weight:bold'>{A}</span>"
+O_html = f"<span style='color:#d62728; font-weight:bold'>{O}</span>"
+B_html = f"<span style='color:#d62728; font-weight:bold'>{B}</span>"
+P_html = f"<span style='color:#d62728; font-weight:bold'>{P}</span>"
+C_html = f"<span style='color:#111; font-weight:bold'>{C}</span>"
+decrease_html = "<span style='font-weight:bold; color:#111'>decrease</span>"
+increase_html = "<span style='font-weight:bold; color:#111'>increase</span>"
+total_html = "<span style='font-weight:bold; color:#d62728'>Total</span>"
+
+min1_unchanged = abs(X) < 1e-6
+min2_unchanged = abs(K) < 1e-6
+if min1_unchanged and min2_unchanged:
+    decrease_text = f"{A_html} and {O_html} remain unchanged"
+elif min1_unchanged:
+    decrease_text = f"{A_html} remains unchanged and {O_html} recorded the largest {decrease_html} at {abs(K):.1f}%"
+elif min2_unchanged:
+    decrease_text = f"{A_html} recorded the largest {decrease_html} at {abs(X):.1f}% and {O_html} remains unchanged"
+else:
+    decrease_text = f"{A_html} and {O_html} recorded the largest {decrease_html} at {abs(X):.1f}% and {abs(K):.1f}%, respectively"
+
+max1_unchanged = abs(Z) < 1e-6
+max2_unchanged = abs(H) < 1e-6
+if max1_unchanged and max2_unchanged:
+    increase_text = f"{B_html} and {P_html} remain unchanged"
+elif max1_unchanged:
+    increase_text = f"{B_html} remains unchanged and {P_html} showed highest {increase_html} with {abs(H):.1f}%"
+elif max2_unchanged:
+    increase_text = f"{B_html} showed highest {increase_html} with {abs(Z):.1f}% and {P_html} remains unchanged"
+else:
+    increase_text = f"{B_html} and {P_html} showed highest {increase_html} with {abs(Z):.1f}% and {abs(H):.1f}%, respectively"
+
+st.markdown(
+    f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>"
+    f"{decrease_text}, while {increase_text}, compared to the previous month. "
+    f"Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
+    f"</div>",
+    unsafe_allow_html=True
+)
+st.markdown("<div style='height: 7rem'></div>", unsafe_allow_html=True)
+
+# --- STACKED COLUMN CHART TỪ EXCEL: OVERALL COST SPENT PER BANNER BY MONTH (MVND)-----------
+
+if 'Months' in df_excel7.columns:
+    x_col_month_banner = 'Months'
+else:
+    x_col_month_banner = df_excel7.columns[0]
+banner_cols_month = [col for col in df_excel7.columns if col != x_col_month_banner]
+fig_stack_excel_month_banner = go.Figure()
+color_palette_banner = [
+    '#1f77b4', '#ff7f0e', '#2ca02c', '#9467bd', '#8c564b',
+    '#e377c2', '#7f7f7f', '#bcbd22', '#17becf', '#f5b041',
+    '#229954', '#0bf4a3', '#e74c3c', '#f7dc6f', '#a569bd',
+    '#45b39d', '#f1948a', '#34495e', '#f39c12'
+]
+def safe_to_int_banner(v):
+    try:
+        return int(round(float(v)))
+    except:
+        return 0
+for i, banner in enumerate(banner_cols_month):
+    y_values = df_excel7[banner].apply(safe_to_int_banner).tolist()
+    text_labels = [str(v) if v != 0 else "" for v in y_values]
+    color = color_palette_banner[i % len(color_palette_banner)]
+    fig_stack_excel_month_banner.add_trace(go.Bar(
+        name=banner,
+        x=df_excel7[x_col_month_banner],
+        y=y_values,
+        text=text_labels,
+        textposition="inside",
+        texttemplate="%{text}",
+        textangle=0,
+        textfont=dict(size=9),
+        marker_color=color
+    ))
+totals_banner = df_excel7[banner_cols_month].applymap(safe_to_int_banner).sum(axis=1)
+totals_offset_banner = totals_banner + totals_banner * 0.04
+fig_stack_excel_month_banner.add_trace(go.Scatter(
+    x=df_excel7[x_col_month_banner],
+    y=totals_offset_banner,
+    textposition="top center",
+    textfont=dict(size=16),
+    showlegend=False,
+    hoverinfo="skip",
+    texttemplate="%{text}"
+))
+for i, (x, y, t) in enumerate(zip(df_excel7[x_col_month_banner], totals_offset_banner, totals_banner)):
+    fig_stack_excel_month_banner.add_annotation(
+        x=x,
+        y=y,
+        text=f"<span style='color:#e74c3c; font-weight:bold'>{int(t)}</span>",
+        showarrow=False,
+        font=dict(size=10, color="#e74c3c"),
+        align="center",
+        xanchor="center",
+        yanchor="bottom",
+        bgcolor="rgba(255,255,0,0.77)",
+        borderpad=4,
+        bordercolor="#e74c3c",
+        borderwidth=0
+    )
+fig_stack_excel_month_banner.update_layout(
+    barmode='stack',
+    title=dict(
+        text="OVERALL COST SPENT PER BANNER BY MONTH (MVND)",
+        x=0.5,
+        y=1.0,
+        xanchor='center',
+        yanchor='top',
+        font=dict(size=28)
+    ),
+    width=1400,
+    height=800,
+    legend=dict(
+        orientation="h",
+        yanchor="top",
+        y=1.08,
+        xanchor="center",
+        x=0.5
+    ),
+    xaxis=dict(
+        tickfont=dict(color='black'),
+        title=dict(text="Months", font=dict(color='black'))
+    ),
+    yaxis=dict(
+        tickfont=dict(color='black')
+    )
+)
+# --- BOX SO SÁNH PHẦN TRĂM ---
+idx_w_banner = len(df_excel7) - 1
+idx_w1_banner = len(df_excel7) - 2
+w_label_banner = df_excel7[x_col_month_banner].iloc[idx_w_banner]
+active_banners = []
+percent_changes_banner = {}
+banner_positions = {}
+cumulative_height_banner = 0
+for banner in banner_cols_month:
+    count_w = safe_to_int_banner(df_excel7[banner].iloc[idx_w_banner])
+    if count_w <= 0:
+        continue
+    count_w1 = safe_to_int_banner(df_excel7[banner].iloc[idx_w1_banner])
+    if count_w1 == 0:
+        percent = 100 if count_w > 0 else 0
+    else:
+        percent = ((count_w - count_w1) / count_w1) * 100
+    active_banners.append(banner)
+    percent_changes_banner[banner] = percent
+    banner_positions[banner] = cumulative_height_banner + count_w / 2
+    cumulative_height_banner += count_w
+if active_banners:
+    total_height_banner = cumulative_height_banner
+    x_vals_banner = list(df_excel7[x_col_month_banner])
+    x_idx_banner = x_vals_banner.index(w_label_banner)
+    x_offset_banner = x_idx_banner + 2
+    sorted_banners = sorted(active_banners, key=lambda x: banner_positions[x])
+    for i, banner in enumerate(sorted_banners):
+        percent = percent_changes_banner[banner]
+        if percent > 0:
+            percent_text = f"M vs M-1: +{percent:.1f}%"
+            bgcolor = "#f2c795"
+        elif percent < 0:
+            percent_text = f"M vs M-1: -{abs(percent):.1f}%"
+            bgcolor = "#abf3ab"
+        else:
+            percent_text = "M vs M-1: 0.0%"
+            bgcolor = "#f2c795"
+        y_col = banner_positions[banner]
+        spacing_factor = 0.35
+        y_box = y_col + (total_height_banner * spacing_factor * (i - len(sorted_banners)/2))
+        fig_stack_excel_month_banner.add_annotation(
+            x=w_label_banner, y=y_col,
+            ax=x_offset_banner, ay=y_box,
+            xref="x", yref="y", axref="x", ayref="y",
+            text="", showarrow=True, arrowhead=0, arrowwidth=1, arrowcolor="black"
+        )
+        fig_stack_excel_month_banner.add_annotation(
+            x=x_offset_banner, y=y_box,
+            text=f"<b>{percent_text}</b>",
+            showarrow=False,
+            font=dict(size=11, color="black"),
+            align="left",
+            xanchor="left",
+            yanchor="middle",
+            bgcolor=bgcolor,
+            borderpad=3,
+            bordercolor="black",
+            borderwidth=1
+        )
+# --- Thêm gridline dọc gạch đứt phân chia các tháng ---
+y_max_banner = totals_offset_banner.max() * 1.05
+vertical_lines_banner = []
+num_months_banner = len(df_excel7[x_col_month_banner])
+for i in range(1, num_months_banner):
+    vertical_lines_banner.append(dict(
+        type="line",
+        xref="x",
+        yref="y",
+        x0=i - 0.5,
+        x1=i - 0.5,
+        y0=0,
+        y1=y_max_banner,
+        line=dict(
+            color="gray",
+            width=1,
+            dash="dot"
+        ),
+        layer="below"
+    ))
+fig_stack_excel_month_banner.update_layout(shapes=vertical_lines_banner)
+st.plotly_chart(fig_stack_excel_month_banner)
+st.markdown("<div style='height: 0.2rem'></div>", unsafe_allow_html=True)
+
+# --- AUTO DESCRIPTION ---
+percent_changes_banner_desc = {}
+for banner in banner_cols_month:
+    count_w = safe_to_int_banner(df_excel7[banner].iloc[idx_w_banner])
+    count_w1 = safe_to_int_banner(df_excel7[banner].iloc[idx_w1_banner])
+    if count_w1 == 0:
+        percent = 100 if count_w > 0 else 0
+    else:
+        percent = ((count_w - count_w1) / count_w1) * 100
+    percent_changes_banner_desc[banner] = percent
+
+neg_percents = sorted([(k, v) for k, v in percent_changes_banner_desc.items() if v < 0], key=lambda x: x[1])
+if len(neg_percents) >= 2:
+    (A, X), (O, K) = neg_percents[0], neg_percents[1]
+elif len(neg_percents) == 1:
+    (A, X), (O, K) = neg_percents[0], (neg_percents[0][0], neg_percents[0][1])
+else:
+    min2 = sorted(percent_changes_banner_desc.items(), key=lambda x: x[1])[:2]
+    (A, X), (O, K) = min2[0], min2[1]
+
+pos_percents = sorted([(k, v) for k, v in percent_changes_banner_desc.items() if v > 0], key=lambda x: x[1], reverse=True)
+if len(pos_percents) >= 2:
+    (B, Z), (P, H) = pos_percents[0], pos_percents[1]
+elif len(pos_percents) == 1:
+    (B, Z), (P, H) = pos_percents[0], (pos_percents[0][0], pos_percents[0][1])
+else:
+    max2 = sorted(percent_changes_banner_desc.items(), key=lambda x: x[1], reverse=True)[:2]
+    (B, Z), (P, H) = max2[0], max2[1]
+
+sum_w = sum([safe_to_int_banner(df_excel7[banner].iloc[idx_w_banner]) for banner in banner_cols_month])
+sum_w1 = sum([safe_to_int_banner(df_excel7[banner].iloc[idx_w1_banner]) for banner in banner_cols_month])
+if sum_w1 == 0:
+    Y = 100 if sum_w > 0 else 0
+else:
+    Y = ((sum_w - sum_w1) / sum_w1) * 100
+
+C = 'increased' if Y > 0 else 'decreased'
+
+A_html = f"<span style='color:#d62728; font-weight:bold'>{A}</span>"
+O_html = f"<span style='color:#d62728; font-weight:bold'>{O}</span>"
+B_html = f"<span style='color:#d62728; font-weight:bold'>{B}</span>"
+P_html = f"<span style='color:#d62728; font-weight:bold'>{P}</span>"
+C_html = f"<span style='color:#111; font-weight:bold'>{C}</span>"
+decrease_html = "<span style='font-weight:bold; color:#111'>decrease</span>"
+increase_html = "<span style='font-weight:bold; color:#111'>increase</span>"
+total_html = "<span style='font-weight:bold; color:#d62728'>Total</span>"
+
+min1_unchanged = abs(X) < 1e-6
+min2_unchanged = abs(K) < 1e-6
+if min1_unchanged and min2_unchanged:
+    decrease_text = f"{A_html} and {O_html} remain unchanged"
+elif min1_unchanged:
+    decrease_text = f"{A_html} remains unchanged and {O_html} recorded the largest {decrease_html} at {abs(K):.1f}%"
+elif min2_unchanged:
+    decrease_text = f"{A_html} recorded the largest {decrease_html} at {abs(X):.1f}% and {O_html} remains unchanged"
+else:
+    decrease_text = f"{A_html} and {O_html} recorded the largest {decrease_html} at {abs(X):.1f}% and {abs(K):.1f}%, respectively"
+
+max1_unchanged = abs(Z) < 1e-6
+max2_unchanged = abs(H) < 1e-6
+if max1_unchanged and max2_unchanged:
+    increase_text = f"{B_html} and {P_html} remain unchanged"
+elif max1_unchanged:
+    increase_text = f"{B_html} remains unchanged and {P_html} showed highest {increase_html} with {abs(H):.1f}%"
+elif max2_unchanged:
+    increase_text = f"{B_html} showed highest {increase_html} with {abs(Z):.1f}% and {P_html} remains unchanged"
+else:
+    increase_text = f"{B_html} and {P_html} showed highest {increase_html} with {abs(Z):.1f}% and {abs(H):.1f}%, respectively"
+
+st.markdown(
+    f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>"
+    f"{decrease_text}, while {increase_text}, compared to the previous month. "
+    f"Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
+    f"</div>",
+    unsafe_allow_html=True
+)
+st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+
+# --------------------------- BẢNG Actual cost ---------------------------
+
+import matplotlib.colors as mcolors
+import numpy as np
+
+# Làm tròn số cho toàn bộ các cột số, không lấy số thập phân
+df_excel8_rounded = df_excel8.copy()
+num_cols = df_excel8_rounded.select_dtypes(include='number').columns
+df_excel8_rounded[num_cols] = df_excel8_rounded[num_cols].round(0).astype(int)
+
+# Tạo colormap từ đỏ nhạt đến đỏ đậm
+red_cmap = mcolors.LinearSegmentedColormap.from_list("red_grad", ["#fff0f0", "#e57373"])
+
+def red_gradient(val, vmin=None, vmax=None):
+    try:
+        if abs(float(val)) < 1e-8:
+            return 'background-color: white; color: black;'
+        if vmin is None or vmax is None:
+            vmin = df_excel8_rounded.select_dtypes(include='number').min().min()
+            vmax = df_excel8_rounded.select_dtypes(include='number').max().max()
+        norm = (float(val) - vmin) / (vmax - vmin) if vmax > vmin else 0
+        color = mcolors.to_hex(red_cmap(norm))
+        return f'background-color: {color}; color: black;'
+    except:
+        return ''
+
+# Lấy các cột số
+num_cols = df_excel8_rounded.select_dtypes(include='number').columns
+
+# Tính min/max cho gradient
+vmin = df_excel8_rounded[num_cols].min().min()
+vmax = df_excel8_rounded[num_cols].max().max()
+
+styled_df = df_excel8_rounded.style.applymap(lambda v: red_gradient(v, vmin, vmax), subset=num_cols)
+
+num_rows = df_excel8_rounded.shape[0]
+row_height = 35  # hoặc 35 tùy font
+total_height = num_rows * row_height + 35  # +38 cho header
+
+st.markdown("""
+<h3 style='text-align: center; margin-top: 2rem; margin-bottom: 1rem;'>Actual cost per cat 1</h3>
+""", unsafe_allow_html=True)
+st.dataframe(styled_df, use_container_width=True, height=total_height)
+st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+
+# --------------------------- STACKED BAR CHART CHO BẢNG Actual cost ---------------------------
+
+if df_excel8.shape[1] > 1:
+    # Xác định cột category (cột đầu tiên) và các cột tháng
+    cat_col = df_excel8.columns[0]
+    month_cols = list(df_excel8.columns[1:])
+    # Làm tròn số cho các cột số
+    df_excel8_chart = df_excel8.copy()
+    df_excel8_chart[month_cols] = df_excel8_chart[month_cols].round(0).astype(int)
+    # Tạo stacked bar chart
+import plotly.graph_objects as go
+fig_excel8 = go.Figure()
+color_palette = [
+    '#1f77b4', '#ff7f0e', '#2ca02c', '#9467bd', '#8c564b',
+    '#e377c2', '#7f7f7f', '#bcbd22', '#17becf', '#f5b041',
+    '#229954', '#0bf4a3', '#e74c3c', '#f7dc6f', '#a569bd',
+    '#45b39d', '#f1948a', '#34495e', '#f39c12'
+]
+for i, month in enumerate(month_cols):
+    y_values = df_excel8_chart[month].tolist()
+    text_labels = [str(v) if v != 0 else "" for v in y_values]
+    color = color_palette[i % len(color_palette)]
+    fig_excel8.add_trace(go.Bar(
+        name=month,
+        x=df_excel8_chart[cat_col],
+        y=y_values,
+        text=text_labels,
+        textposition="inside",
+        texttemplate="%{text}",
+        textangle=0,
+        textfont=dict(size=10),
+        marker_color=color
+    ))
+fig_excel8.update_layout(
+    barmode='stack',
+    title=dict(
+        text="TOTAL ACTUAL COST CONFIRMED BY CATEGORY (MVND)",
+        x=0.5,
+        y=1,
+        xanchor='center',
+        yanchor='top',
+        font=dict(size=24)
+    ),
+    width=1400,
+    height=800,
+    legend=dict(
+        orientation="h",
+        yanchor="bottom",
+        y=1.055,
+        xanchor="center",
+        x=0.5
+    ),
+    xaxis=dict(
+    tickangle=-45,  # hoặc -60 nếu muốn nghiêng nhiều hơn
+    tickfont=dict(size=13, color='black')
+    )
+)
+    # --- Thêm giá trị total trên đầu mỗi cột (category) ---
+totals = df_excel8_chart[month_cols].sum(axis=1)
+totals_offset = totals + totals * 0.04
+for i, (x, y, t) in enumerate(zip(df_excel8_chart[cat_col], totals_offset, totals)):
+    fig_excel8.add_annotation(
+        x=x,
+        y=y,
+        text=f"<span style='color:#e74c3c; font-weight:bold'>{int(t)}</span>",
+        showarrow=False,
+        font=dict(size=10, color="#e74c3c"),
+        align="center",
+        xanchor="center",
+        yanchor="bottom",
+        bgcolor="rgba(255,255,0,0.77)",
+        borderpad=4,
+        bordercolor="#e74c3c",
+        borderwidth=0
+    )
+fig_excel8.add_trace(go.Scatter(
+    x=df_excel8_chart[cat_col],
+    y=totals,
+    mode="lines+markers",
+    name="Total",
+    line=dict(color="#ffc107", width=3),
+    marker=dict(size=10, color="#ffc107"),
+    showlegend=False
+))
+st.plotly_chart(fig_excel8, use_container_width=True)
+st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+
+# --------------------------- BẢNG Actual cost per cat 2 ---------------------------
+
+import matplotlib.colors as mcolors
+import numpy as np
+
+# Làm tròn số cho toàn bộ các cột số, không lấy số thập phân
+df_excel9_rounded = df_excel9.copy().fillna(0)
+num_cols9 = df_excel9_rounded.select_dtypes(include='number').columns
+df_excel9_rounded[num_cols9] = df_excel9_rounded[num_cols9].round(1)  # Giữ 1 chữ số thập phân
+
+# Tạo colormap từ đỏ nhạt đến đỏ đậm
+red_cmap9 = mcolors.LinearSegmentedColormap.from_list("red_grad9", ["#fff0f0", "#e57373"])
+
+def red_gradient9(val, vmin=None, vmax=None):
+    try:
+        if abs(float(val)) < 1e-8:
+            return 'background-color: white; color: black;'
+        if vmin is None or vmax is None:
+            vmin = df_excel9_rounded.select_dtypes(include='number').min().min()
+            vmax = df_excel9_rounded.select_dtypes(include='number').max().max()
+        norm = (float(val) - vmin) / (vmax - vmin) if vmax > vmin else 0
+        color = mcolors.to_hex(red_cmap9(norm))
+        return f'background-color: {color}; color: black;'
+    except:
+        return ''
+
+# Lấy các cột số
+num_cols9 = df_excel9_rounded.select_dtypes(include='number').columns
+
+# Tính min/max cho gradient
+vmin9 = df_excel9_rounded[num_cols9].min().min()
+vmax9 = df_excel9_rounded[num_cols9].max().max()
+
+styled_df9 = (
+    df_excel9_rounded
+    .style
+    .format({col: (lambda x: "0" if x == 0 else f"{x:.1f}") for col in num_cols9})
+    .applymap(lambda v: red_gradient9(v, vmin9, vmax9), subset=num_cols9)
+)
+
+num_rows9 = df_excel9_rounded.shape[0]
+row_height9 = 35
+total_height9 = num_rows9 * row_height9 + 35
+
+st.markdown("""
+<h3 style='text-align: center; margin-top: 2rem; margin-bottom: 1rem;'>Actual cost per cat 2</h3>
+""", unsafe_allow_html=True)
+st.dataframe(styled_df9, use_container_width=True, height=total_height9)
+st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+
+# --------------------------- BẢNG Actual cost per sub region 1 ---------------------------
+
+df_excel10_rounded = df_excel10.copy()
+num_cols10 = df_excel10_rounded.select_dtypes(include='number').columns
+df_excel10_rounded[num_cols10] = df_excel10_rounded[num_cols10].round(0).astype(int)
+
+red_cmap10 = mcolors.LinearSegmentedColormap.from_list("red_grad10", ["#fff0f0", "#e57373"])
+
+def red_gradient10(val, vmin=None, vmax=None):
+    try:
+        if abs(float(val)) < 1e-8:
+            return 'background-color: white; color: black;'
+        if vmin is None or vmax is None:
+            vmin = df_excel10_rounded.select_dtypes(include='number').min().min()
+            vmax = df_excel10_rounded.select_dtypes(include='number').max().max()
+        norm = (float(val) - vmin) / (vmax - vmin) if vmax > vmin else 0
+        color = mcolors.to_hex(red_cmap10(norm))
+        return f'background-color: {color}; color: black;'
+    except:
+        return ''
+
+num_cols10 = df_excel10_rounded.select_dtypes(include='number').columns
+vmin10 = df_excel10_rounded[num_cols10].min().min()
+vmax10 = df_excel10_rounded[num_cols10].max().max()
+
+styled_df10 = df_excel10_rounded.style.applymap(lambda v: red_gradient10(v, vmin10, vmax10), subset=num_cols10)
+
+num_rows10 = df_excel10_rounded.shape[0]
+row_height10 = 35
+total_height10 = num_rows10 * row_height10 + 35
+
+st.markdown("""
+<h3 style='text-align: center; margin-top: 2rem; margin-bottom: 1rem;'>Actual cost per sub region 1</h3>
+""", unsafe_allow_html=True)
+st.dataframe(styled_df10, use_container_width=True, height=total_height10)
+st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+
+# --------------------------- STACKED BAR CHART CHO BẢNG Actual cost per sub region 1 ---------------------------
+
+if df_excel10.shape[1] > 1:
+    cat_col10 = df_excel10.columns[0]
+    month_cols10 = list(df_excel10.columns[1:])
+    df_excel10_chart = df_excel10.copy()
+    df_excel10_chart[month_cols10] = df_excel10_chart[month_cols10].round(0).astype(int)
+    import plotly.graph_objects as go
+    fig_excel10 = go.Figure()
+    color_palette10 = [
+        '#1f77b4', '#ff7f0e', '#2ca02c', '#9467bd', '#8c564b',
+        '#e377c2', '#7f7f7f', '#bcbd22', '#17becf', '#f5b041',
+        '#229954', '#0bf4a3', '#e74c3c', '#f7dc6f', '#a569bd',
+        '#45b39d', '#f1948a', '#34495e', '#f39c12'
+    ]
+    for i, month in enumerate(month_cols10):
+        y_values = df_excel10_chart[month].tolist()
+        text_labels = [str(v) if v != 0 else "" for v in y_values]
+        color = color_palette10[i % len(color_palette10)]
+        fig_excel10.add_trace(go.Bar(
+            name=month,
+            x=df_excel10_chart[cat_col10],
+            y=y_values,
+            text=text_labels,
+            textposition="inside",
+            texttemplate="%{text}",
+            textangle=0,
+            textfont=dict(size=10),
+            marker_color=color
+        ))
+    fig_excel10.update_layout(
+        barmode='stack',
+        title=dict(
+            text="TOTAL ACTUAL COST CONFIRMED BY SUB REGION (MVND)",
+            x=0.5,
+            y=1,
+            xanchor='center',
+            yanchor='top',
+            font=dict(size=24)
+        ),
+        width=1400,
+        height=800,
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.055,
+            xanchor="center",
+            x=0.5
+        ),
+        xaxis=dict(
+            tickangle=-45,
+            tickfont=dict(size=13, color='black')
+        )
+    )
+    # --- Thêm giá trị total trên đầu mỗi cột (category) ---
+    totals10 = df_excel10_chart[month_cols10].sum(axis=1)
+    totals_offset10 = totals10 + totals10 * 0.04
+    for i, (x, y, t) in enumerate(zip(df_excel10_chart[cat_col10], totals_offset10, totals10)):
+        fig_excel10.add_annotation(
+            x=x,
+            y=y,
+            text=f"<span style='color:#e74c3c; font-weight:bold'>{int(t)}</span>",
+            showarrow=False,
+            font=dict(size=10, color="#e74c3c"),
+            align="center",
+            xanchor="center",
+            yanchor="bottom",
+            bgcolor="rgba(255,255,0,0.77)",
+            borderpad=4,
+            bordercolor="#e74c3c",
+            borderwidth=0
+        )
+    fig_excel10.add_trace(go.Scatter(
+        x=df_excel10_chart[cat_col10],
+        y=totals10,
+        mode="lines+markers",
+        name="Total",
+        line=dict(color="#ffc107", width=3),
+        marker=dict(size=10, color="#ffc107"),
+        showlegend=False
+    ))
+    st.plotly_chart(fig_excel10, use_container_width=True)
+    st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+
+# --------------------------- BẢNG Actual cost per sub region 2 ---------------------------
+
+df_excel11_rounded = df_excel11.copy().fillna(0)
+num_cols11 = df_excel11_rounded.select_dtypes(include='number').columns
+df_excel11_rounded[num_cols11] = df_excel11_rounded[num_cols11].round(1)
+
+# Tạo colormap từ đỏ nhạt đến đỏ đậm
+red_cmap11 = mcolors.LinearSegmentedColormap.from_list("red_grad11", ["#fff0f0", "#e57373"])
+
+def red_gradient11(val, vmin=None, vmax=None):
+    try:
+        if abs(float(val)) < 1e-8:
+            return 'background-color: white; color: black;'
+        if vmin is None or vmax is None:
+            vmin = df_excel11_rounded.select_dtypes(include='number').min().min()
+            vmax = df_excel11_rounded.select_dtypes(include='number').max().max()
+        norm = (float(val) - vmin) / (vmax - vmin) if vmax > vmin else 0
+        color = mcolors.to_hex(red_cmap11(norm))
+        return f'background-color: {color}; color: black;'
+    except:
+        return ''
+
+num_cols11 = df_excel11_rounded.select_dtypes(include='number').columns
+vmin11 = df_excel11_rounded[num_cols11].min().min()
+vmax11 = df_excel11_rounded[num_cols11].max().max()
+
+styled_df11 = (
+    df_excel11_rounded
+    .style
+    .format({col: (lambda x: "0" if x == 0 else f"{x:.1f}") for col in num_cols11})
+    .applymap(lambda v: red_gradient11(v, vmin11, vmax11), subset=num_cols11)
+)
+
+num_rows11 = df_excel11_rounded.shape[0]
+row_height11 = 35
+total_height11 = num_rows11 * row_height11 + 35
+
+st.markdown("""
+<h3 style='text-align: center; margin-top: 2rem; margin-bottom: 1rem;'>Actual cost per sub region 2</h3>
+""", unsafe_allow_html=True)
+st.dataframe(styled_df11, use_container_width=True, height=total_height11)
+st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+
+# --------------------------- BẢNG HELPDESK TICKET D-1 ---------------------------
+
 def extract_short_en_name(val):
     try:
         if isinstance(val, dict):
