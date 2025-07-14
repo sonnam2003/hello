@@ -6,3 +6,4 @@ psycopg2-binary
 streamlit-aggrid
 numpy
 matplotlib
+openpyxl
