@@ -735,15 +735,6 @@ if active_priorities:
         )
 totals = df_table_priority[priority_cols].sum(axis=1)
 totals_offset = totals + totals * 0.04
-fig_stack_priority.add_trace(go.Scatter(
-    x=df_table_priority["Tuần"],
-    y=totals_offset,
-    textposition="top center",
-    textfont=dict(size=16),
-    showlegend=False,
-    hoverinfo="skip",
-    texttemplate="%{text}"
-))
 for i, (x, y, t) in enumerate(zip(df_table_priority["Tuần"], totals_offset, totals)):
     fig_stack_priority.add_annotation(
         x=x,
@@ -774,7 +765,7 @@ fig_stack_priority.update_layout(
     legend=dict(
         orientation="h",
         yanchor="top",
-        y=1.05,
+        y=1.075,
         xanchor="center",
         x=0.5
     ),
@@ -791,7 +782,6 @@ st.plotly_chart(fig_stack_priority)
 st.markdown("<div style='height: 2rem'></div>", unsafe_allow_html=True)
 
 # --- Tính X%, Z%, Y% và sinh câu mô tả tự động mới ---
-# Lấy lại các giá trị đã tính ở trên
 idx_w = len(df_table_priority["Tuần"]) - 1
 idx_w1 = idx_w - 1
 
@@ -882,7 +872,6 @@ st.markdown(
     f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>{description}</div>",
     unsafe_allow_html=True
 )
-
 st.markdown("<div style='height: 5rem'></div>", unsafe_allow_html=True)
 
 # Stacked Column Chart theo Category
@@ -962,15 +951,6 @@ if active_categories:
         )
 totals = df_table[category_names].sum(axis=1)
 totals_offset = totals + totals * 0.04
-fig_stack.add_trace(go.Scatter(
-    x=df_table["Tuần"],
-    y=totals_offset,
-    textposition="top center",
-    textfont=dict(size=16),
-    showlegend=False,
-    hoverinfo="skip",
-    texttemplate="%{text}"
-))
 for i, (x, y, t) in enumerate(zip(df_table["Tuần"], totals_offset, totals)):
     fig_stack.add_annotation(
         x=x,
@@ -1118,12 +1098,11 @@ st.markdown(
     f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>{description}</div>",
     unsafe_allow_html=True
 )
-
 st.markdown("<div style='height: 5rem'></div>", unsafe_allow_html=True)
 
-# Stacked Column Chart theo Team
+# -------------------------Stacked Column Chart theo Team--------------------------
+
 fig_stack_team = go.Figure()
-# Định nghĩa bảng màu đủ dài, không trùng, dễ phân biệt
 team_colors = [
     '#1f77b4',  # xanh dương
     '#2d5cf4',  # xanh lá
@@ -1226,15 +1205,6 @@ if active_teams:
         )
 totals = df_table_team[team_cols].sum(axis=1)
 totals_offset = totals + totals * 0.04
-fig_stack_team.add_trace(go.Scatter(
-    x=df_table_team["Tuần"],
-    y=totals_offset,
-    textposition="top center",
-    textfont=dict(size=16),
-    showlegend=False,
-    hoverinfo="skip",
-    texttemplate="%{text}"
-))
 for i, (x, y, t) in enumerate(zip(df_table_team["Tuần"], totals_offset, totals)):
     fig_stack_team.add_annotation(
         x=x,
@@ -1280,7 +1250,6 @@ fig_stack_team.update_layout(
 st.plotly_chart(fig_stack_team)
 st.markdown("<div style='height: 1rem'></div>", unsafe_allow_html=True)
 
-# Sau khi st.plotly_chart(fig_stack_team)
 # --- Tính top 2 giảm/tăng mạnh nhất và sinh câu mô tả tự động cho Region (Team) ---
 team_cols = [col for col in df_table_team.columns if col != "Tuần"]
 idx_w = len(df_table_team["Tuần"]) - 1
@@ -1484,15 +1453,6 @@ if active_banners:
         )
 totals = df_table_banner[banner_cols].sum(axis=1)
 totals_offset = totals + totals * 0.04
-fig_stack_banner.add_trace(go.Scatter(
-    x=df_table_banner["Tuần"],
-    y=totals_offset,
-    textposition="top center",
-    textfont=dict(size=16),
-    showlegend=False,
-    hoverinfo="skip",
-    texttemplate="%{text}"
-))
 for i, (x, y, t) in enumerate(zip(df_table_banner["Tuần"], totals_offset, totals)):
     fig_stack_banner.add_annotation(
         x=x,
@@ -4686,7 +4646,14 @@ fig_line_priority.update_layout(
     margin=dict(l=40, r=40, t=80, b=120)
 )
 st.plotly_chart(fig_line_priority, use_container_width=True)
-st.markdown("<div style='height: 7rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 5rem'></div>", unsafe_allow_html=True)
+
+st.markdown(
+"<hr style='border: 1.5px solid #222; margin: 30px 0;'>",
+unsafe_allow_html=True
+)
+
+st.markdown("<div style='height: 5rem'></div>", unsafe_allow_html=True)
 
 # -------------------------------NORTH 1------------------------------------------------------
 
@@ -4929,15 +4896,6 @@ for cat in category_names_north1:
     ))
 totals = df_table_north1[category_names_north1].sum(axis=1)
 totals_offset = totals + totals * 0.04
-fig_stack_north1.add_trace(go.Scatter(
-    x=df_table_north1["Tuần"],
-    y=totals_offset,
-    textposition="top center",
-    textfont=dict(size=16),
-    showlegend=False,
-    hoverinfo="skip",
-    texttemplate="%{text}"
-))
 for i, (x, y, t) in enumerate(zip(df_table_north1["Tuần"], totals_offset, totals)):
     fig_stack_north1.add_annotation(
         x=x,
@@ -5204,15 +5162,6 @@ if active_priorities:
         )
 totals = df_table_priority_north1[priority_cols].sum(axis=1)
 totals_offset = totals + totals * 0.04
-fig_stack_priority_north1.add_trace(go.Scatter(
-    x=df_table_priority_north1["Tuần"],
-    y=totals_offset,
-    textposition="top center",
-    textfont=dict(size=16),
-    showlegend=False,
-    hoverinfo="skip",
-    texttemplate="%{text}"
-))
 for i, (x, y, t) in enumerate(zip(df_table_priority_north1["Tuần"], totals_offset, totals)):
     fig_stack_priority_north1.add_annotation(
         x=x,
@@ -5898,15 +5847,6 @@ for cat in category_names_north2:
     ))
 totals2 = df_table_north2[category_names_north2].sum(axis=1)
 totals_offset2 = totals2 + totals2 * 0.04
-fig_stack_north2.add_trace(go.Scatter(
-    x=df_table_north2["Tuần"],
-    y=totals_offset2,
-    textposition="top center",
-    textfont=dict(size=16),
-    showlegend=False,
-    hoverinfo="skip",
-    texttemplate="%{text}"
-))
 for i, (x, y, t) in enumerate(zip(df_table_north2["Tuần"], totals_offset2, totals2)):
     fig_stack_north2.add_annotation(
         x=x,
@@ -6156,15 +6096,6 @@ if active_priorities2:
         )
 totals2 = df_table_priority_north2[priority_cols2].sum(axis=1)
 totals_offset2 = totals2 + totals2 * 0.04
-fig_stack_priority_north2.add_trace(go.Scatter(
-    x=df_table_priority_north2["Tuần"],
-    y=totals_offset2,
-    textposition="top center",
-    textfont=dict(size=16),
-    showlegend=False,
-    hoverinfo="skip",
-    texttemplate="%{text}"
-))
 for i, (x, y, t) in enumerate(zip(df_table_priority_north2["Tuần"], totals_offset2, totals2)):
     fig_stack_priority_north2.add_annotation(
         x=x,
@@ -6818,15 +6749,6 @@ for cat in category_names_north3:
     ))
 totals3 = df_table_north3[category_names_north3].sum(axis=1)
 totals_offset3 = totals3 + totals3 * 0.04
-fig_stack_north3.add_trace(go.Scatter(
-    x=df_table_north3["Tuần"],
-    y=totals_offset3,
-    textposition="top center",
-    textfont=dict(size=16),
-    showlegend=False,
-    hoverinfo="skip",
-    texttemplate="%{text}"
-))
 for i, (x, y, t) in enumerate(zip(df_table_north3["Tuần"], totals_offset3, totals3)):
     fig_stack_north3.add_annotation(
         x=x,
@@ -7074,15 +6996,6 @@ if active_priorities3:
         )
 totals3 = df_table_priority_north3[priority_cols3].sum(axis=1)
 totals_offset3 = totals3 + totals3 * 0.04
-fig_stack_priority_north3.add_trace(go.Scatter(
-    x=df_table_priority_north3["Tuần"],
-    y=totals_offset3,
-    textposition="top center",
-    textfont=dict(size=16),
-    showlegend=False,
-    hoverinfo="skip",
-    texttemplate="%{text}"
-))
 for i, (x, y, t) in enumerate(zip(df_table_priority_north3["Tuần"], totals_offset3, totals3)):
     fig_stack_priority_north3.add_annotation(
         x=x,
@@ -7745,15 +7658,6 @@ for cat in category_names_center1:
     ))
 totals = df_table_center1[category_names_center1].sum(axis=1)
 totals_offset = totals + totals * 0.04
-fig_stack_center1.add_trace(go.Scatter(
-    x=df_table_center1["Tuần"],
-    y=totals_offset,
-    textposition="top center",
-    textfont=dict(size=16),
-    showlegend=False,
-    hoverinfo="skip",
-    texttemplate="%{text}"
-))
 for i, (x, y, t) in enumerate(zip(df_table_center1["Tuần"], totals_offset, totals)):
     fig_stack_center1.add_annotation(
         x=x,
@@ -8001,15 +7905,6 @@ if active_priorities:
         )
 totals = df_table_priority_center1[priority_cols].sum(axis=1)
 totals_offset = totals + totals * 0.04
-fig_stack_priority_center1.add_trace(go.Scatter(
-    x=df_table_priority_center1["Tuần"],
-    y=totals_offset,
-    textposition="top center",
-    textfont=dict(size=16),
-    showlegend=False,
-    hoverinfo="skip",
-    texttemplate="%{text}"
-))
 for i, (x, y, t) in enumerate(zip(df_table_priority_center1["Tuần"], totals_offset, totals)):
     fig_stack_priority_center1.add_annotation(
         x=x,
@@ -8642,15 +8537,6 @@ for cat in category_names_center2:
     ))
 totals = df_table_center2[category_names_center2].sum(axis=1)
 totals_offset = totals + totals * 0.04
-fig_stack_center2.add_trace(go.Scatter(
-    x=df_table_center2["Tuần"],
-    y=totals_offset,
-    textposition="top center",
-    textfont=dict(size=16),
-    showlegend=False,
-    hoverinfo="skip",
-    texttemplate="%{text}"
-))
 for i, (x, y, t) in enumerate(zip(df_table_center2["Tuần"], totals_offset, totals)):
     fig_stack_center2.add_annotation(
         x=x,
@@ -8898,15 +8784,6 @@ if active_priorities:
         )
 totals = df_table_priority_center2[priority_cols].sum(axis=1)
 totals_offset = totals + totals * 0.04
-fig_stack_priority_center2.add_trace(go.Scatter(
-    x=df_table_priority_center2["Tuần"],
-    y=totals_offset,
-    textposition="top center",
-    textfont=dict(size=16),
-    showlegend=False,
-    hoverinfo="skip",
-    texttemplate="%{text}"
-))
 for i, (x, y, t) in enumerate(zip(df_table_priority_center2["Tuần"], totals_offset, totals)):
     fig_stack_priority_center2.add_annotation(
         x=x,
@@ -9545,15 +9422,6 @@ for cat in category_names_center3:
     ))
 totals = df_table_center3[category_names_center3].sum(axis=1)
 totals_offset = totals + totals * 0.04
-fig_stack_center3.add_trace(go.Scatter(
-    x=df_table_center3["Tuần"],
-    y=totals_offset,
-    textposition="top center",
-    textfont=dict(size=16),
-    showlegend=False,
-    hoverinfo="skip",
-    texttemplate="%{text}"
-))
 for i, (x, y, t) in enumerate(zip(df_table_center3["Tuần"], totals_offset, totals)):
     fig_stack_center3.add_annotation(
         x=x,
@@ -9801,15 +9669,6 @@ if active_priorities:
         )
 totals = df_table_priority_center3[priority_cols].sum(axis=1)
 totals_offset = totals + totals * 0.04
-fig_stack_priority_center3.add_trace(go.Scatter(
-    x=df_table_priority_center3["Tuần"],
-    y=totals_offset,
-    textposition="top center",
-    textfont=dict(size=16),
-    showlegend=False,
-    hoverinfo="skip",
-    texttemplate="%{text}"
-))
 for i, (x, y, t) in enumerate(zip(df_table_priority_center3["Tuần"], totals_offset, totals)):
     fig_stack_priority_center3.add_annotation(
         x=x,
@@ -10449,15 +10308,6 @@ for cat in category_names_center4:
     ))
 totals = df_table_center4[category_names_center4].sum(axis=1)
 totals_offset = totals + totals * 0.04
-fig_stack_center4.add_trace(go.Scatter(
-    x=df_table_center4["Tuần"],
-    y=totals_offset,
-    textposition="top center",
-    textfont=dict(size=16),
-    showlegend=False,
-    hoverinfo="skip",
-    texttemplate="%{text}"
-))
 for i, (x, y, t) in enumerate(zip(df_table_center4["Tuần"], totals_offset, totals)):
     fig_stack_center4.add_annotation(
         x=x,
@@ -10705,15 +10555,6 @@ if active_priorities:
         )
 totals = df_table_priority_center4[priority_cols].sum(axis=1)
 totals_offset = totals + totals * 0.04
-fig_stack_priority_center4.add_trace(go.Scatter(
-    x=df_table_priority_center4["Tuần"],
-    y=totals_offset,
-    textposition="top center",
-    textfont=dict(size=16),
-    showlegend=False,
-    hoverinfo="skip",
-    texttemplate="%{text}"
-))
 for i, (x, y, t) in enumerate(zip(df_table_priority_center4["Tuần"], totals_offset, totals)):
     fig_stack_priority_center4.add_annotation(
         x=x,
@@ -11348,15 +11189,6 @@ for cat in category_names_south1:
     ))
 totals = df_table_south1[category_names_south1].sum(axis=1)
 totals_offset = totals + totals * 0.04
-fig_stack_south1.add_trace(go.Scatter(
-    x=df_table_south1["Tuần"],
-    y=totals_offset,
-    textposition="top center",
-    textfont=dict(size=16),
-    showlegend=False,
-    hoverinfo="skip",
-    texttemplate="%{text}"
-))
 for i, (x, y, t) in enumerate(zip(df_table_south1["Tuần"], totals_offset, totals)):
     fig_stack_south1.add_annotation(
         x=x,
@@ -11604,15 +11436,6 @@ if active_priorities:
         )
 totals = df_table_priority_south1[priority_cols].sum(axis=1)
 totals_offset = totals + totals * 0.04
-fig_stack_priority_south1.add_trace(go.Scatter(
-    x=df_table_priority_south1["Tuần"],
-    y=totals_offset,
-    textposition="top center",
-    textfont=dict(size=16),
-    showlegend=False,
-    hoverinfo="skip",
-    texttemplate="%{text}"
-))
 for i, (x, y, t) in enumerate(zip(df_table_priority_south1["Tuần"], totals_offset, totals)):
     fig_stack_priority_south1.add_annotation(
         x=x,
@@ -12248,15 +12071,6 @@ for cat in category_names_south2:
     ))
 totals = df_table_south2[category_names_south2].sum(axis=1)
 totals_offset = totals + totals * 0.04
-fig_stack_south2.add_trace(go.Scatter(
-    x=df_table_south2["Tuần"],
-    y=totals_offset,
-    textposition="top center",
-    textfont=dict(size=16),
-    showlegend=False,
-    hoverinfo="skip",
-    texttemplate="%{text}"
-))
 for i, (x, y, t) in enumerate(zip(df_table_south2["Tuần"], totals_offset, totals)):
     fig_stack_south2.add_annotation(
         x=x,
@@ -12504,15 +12318,6 @@ if active_priorities:
         )
 totals = df_table_priority_south2[priority_cols].sum(axis=1)
 totals_offset = totals + totals * 0.04
-fig_stack_priority_south2.add_trace(go.Scatter(
-    x=df_table_priority_south2["Tuần"],
-    y=totals_offset,
-    textposition="top center",
-    textfont=dict(size=16),
-    showlegend=False,
-    hoverinfo="skip",
-    texttemplate="%{text}"
-))
 for i, (x, y, t) in enumerate(zip(df_table_priority_south2["Tuần"], totals_offset, totals)):
     fig_stack_priority_south2.add_annotation(
         x=x,
@@ -13155,15 +12960,6 @@ for cat in category_names_south3:
     ))
 totals = df_table_south3[category_names_south3].sum(axis=1)
 totals_offset = totals + totals * 0.04
-fig_stack_south3.add_trace(go.Scatter(
-    x=df_table_south3["Tuần"],
-    y=totals_offset,
-    textposition="top center",
-    textfont=dict(size=16),
-    showlegend=False,
-    hoverinfo="skip",
-    texttemplate="%{text}"
-))
 for i, (x, y, t) in enumerate(zip(df_table_south3["Tuần"], totals_offset, totals)):
     fig_stack_south3.add_annotation(
         x=x,
@@ -13411,15 +13207,6 @@ if active_priorities:
         )
 totals = df_table_priority_south3[priority_cols].sum(axis=1)
 totals_offset = totals + totals * 0.04
-fig_stack_priority_south3.add_trace(go.Scatter(
-    x=df_table_priority_south3["Tuần"],
-    y=totals_offset,
-    textposition="top center",
-    textfont=dict(size=16),
-    showlegend=False,
-    hoverinfo="skip",
-    texttemplate="%{text}"
-))
 for i, (x, y, t) in enumerate(zip(df_table_priority_south3["Tuần"], totals_offset, totals)):
     fig_stack_priority_south3.add_annotation(
         x=x,
@@ -14056,15 +13843,6 @@ for cat in category_names_south4:
     ))
 totals = df_table_south4[category_names_south4].sum(axis=1)
 totals_offset = totals + totals * 0.04
-fig_stack_south4.add_trace(go.Scatter(
-    x=df_table_south4["Tuần"],
-    y=totals_offset,
-    textposition="top center",
-    textfont=dict(size=16),
-    showlegend=False,
-    hoverinfo="skip",
-    texttemplate="%{text}"
-))
 for i, (x, y, t) in enumerate(zip(df_table_south4["Tuần"], totals_offset, totals)):
     fig_stack_south4.add_annotation(
         x=x,
@@ -14312,15 +14090,6 @@ if active_priorities:
         )
 totals = df_table_priority_south4[priority_cols].sum(axis=1)
 totals_offset = totals + totals * 0.04
-fig_stack_priority_south4.add_trace(go.Scatter(
-    x=df_table_priority_south4["Tuần"],
-    y=totals_offset,
-    textposition="top center",
-    textfont=dict(size=16),
-    showlegend=False,
-    hoverinfo="skip",
-    texttemplate="%{text}"
-))
 for i, (x, y, t) in enumerate(zip(df_table_priority_south4["Tuần"], totals_offset, totals)):
     fig_stack_priority_south4.add_annotation(
         x=x,
@@ -14964,15 +14733,6 @@ for cat in category_names_south5:
     ))
 totals = df_table_south5[category_names_south5].sum(axis=1)
 totals_offset = totals + totals * 0.04
-fig_stack_south5.add_trace(go.Scatter(
-    x=df_table_south5["Tuần"],
-    y=totals_offset,
-    textposition="top center",
-    textfont=dict(size=16),
-    showlegend=False,
-    hoverinfo="skip",
-    texttemplate="%{text}"
-))
 for i, (x, y, t) in enumerate(zip(df_table_south5["Tuần"], totals_offset, totals)):
     fig_stack_south5.add_annotation(
         x=x,
@@ -15220,15 +14980,6 @@ if active_priorities:
         )
 totals = df_table_priority_south5[priority_cols].sum(axis=1)
 totals_offset = totals + totals * 0.04
-fig_stack_priority_south5.add_trace(go.Scatter(
-    x=df_table_priority_south5["Tuần"],
-    y=totals_offset,
-    textposition="top center",
-    textfont=dict(size=16),
-    showlegend=False,
-    hoverinfo="skip",
-    texttemplate="%{text}"
-))
 for i, (x, y, t) in enumerate(zip(df_table_priority_south5["Tuần"], totals_offset, totals)):
     fig_stack_priority_south5.add_annotation(
         x=x,
