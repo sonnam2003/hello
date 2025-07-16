@@ -639,6 +639,135 @@ try:
 except Exception as e:
     st.warning(f"Không thể đọc dữ liệu từ file Excel online thứ 11: {e}")
 
+toc_html = """
+<style>
+#toc-float {
+    position: fixed;
+    top: 80px;
+    left: 18px;
+    z-index: 9999;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(231,76,60,0.10), 0 1.5px 8px rgba(44,62,80,0.08);
+    padding: 0;
+    width: 60px;
+    height: 60px;
+    transition: width 0.35s, height 0.35s, opacity 0.3s;
+    overflow: hidden;
+    opacity: 0.85;
+    border: none;
+}
+#toc-float:hover {
+    width: 340px;
+    height: 780px;
+    min-height: 780px;
+    opacity: 1;
+    overflow: visible;
+    box-shadow: 0 8px 32px rgba(231,76,60,0.18), 0 2px 12px rgba(44,62,80,0.10);
+}
+#toc-float .toc-icon {
+    font-size: 38px;
+    color: #e74c3c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 60px;
+    width: 60px;
+    transition: opacity 0.2s;
+}
+#toc-float:hover .toc-icon {
+    opacity: 0;
+    pointer-events: none;
+}
+#toc-float .toc-title {
+    font-weight: 700;
+    font-size: 22px;
+    color: #e74c3c;
+    margin: 18px 0 12px 18px;
+    display: none;
+    letter-spacing: 1px;
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+#toc-float:hover .toc-title {
+    display: block;
+}
+#toc-float ul {
+    list-style: none;
+    padding: 0 0 0 10px;
+    margin: 0;
+    display: none;
+}
+#toc-float:hover ul {
+    display: block;
+}
+#toc-float li {
+    margin-bottom: 6px;
+    border-radius: 8px;
+    transition: background 0.18s;
+}
+#toc-float a {
+    display: block;
+    color: #222;
+    text-decoration: none;
+    font-size: 17px;
+    font-weight: 500;
+    padding: 8px 18px 8px 18px;
+    border-radius: 8px;
+    transition: background 0.18s, color 0.18s;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    position: relative;
+}
+#toc-float a:hover, #toc-float li:hover > a {
+    background: #ffeaea;
+    color: #e74c3c;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(231,76,60,0.07);
+}
+#toc-float a:before {
+    content: "›";
+    color: #e74c3c;
+    font-size: 15px;
+    margin-right: 10px;
+    opacity: 0.7;
+    transition: opacity 0.18s;
+}
+#toc-float a:hover:before, #toc-float li:hover > a:before {
+    opacity: 1;
+}
+</style>
+<div id="toc-float">
+    <div class="toc-icon">☰</div>
+    <div class="toc-title">TABLE OF CONTENTS</div>
+    <ul>
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#north1">North 1</a></li>
+        <li><a href="#north2">North 2</a></li>
+        <li><a href="#north3">North 3</a></li>
+        <li><a href="#center1">Center 1</a></li>
+        <li><a href="#center2">Center 2</a></li>
+        <li><a href="#center3">Center 3</a></li>
+        <li><a href="#center4">Center 4</a></li>
+        <li><a href="#south1">South 1</a></li>
+        <li><a href="#south2">South 2</a></li>
+        <li><a href="#south3">South 3</a></li>
+        <li><a href="#south4">South 4</a></li>
+        <li><a href="#south5">South 5</a></li>
+    </ul>
+</div>
+<script>
+document.querySelectorAll('#toc-float a').forEach(function(link) {
+    link.onclick = function(e) {
+        e.preventDefault();
+        var id = this.getAttribute('href').substring(1);
+        var el = document.getElementById(id);
+        if (el) {
+            el.scrollIntoView({behavior: 'smooth', block: 'start'});
+        }
+    }
+});
+</script>
+"""
+st.markdown(toc_html, unsafe_allow_html=True)
 
     # Căn giữa title ở top center
 st.markdown(
@@ -649,7 +778,7 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-
+st.markdown('<a id="overview"></a>', unsafe_allow_html=True)
 # Stacked Column Chart theo Priority
 fig_stack_priority = go.Figure()
 priority_cols = ['Low priority', 'Medium priority', 'High priority', 'Emergency']
@@ -4657,6 +4786,8 @@ st.markdown("<div style='height: 5rem'></div>", unsafe_allow_html=True)
 
 # -------------------------------NORTH 1------------------------------------------------------
 
+st.markdown('<a id="north1"></a>', unsafe_allow_html=True)
+
 st.markdown("<h2 style='text-align: center;color: #ab3f3f;'>NORTH 1 - Nguyen Van Khuong</h2>", unsafe_allow_html=True)
 df_north1 = df[df['team_id'] == 17]  # team_id = 17 cho North 1
 st.markdown("<div style='height: 6rem'></div>", unsafe_allow_html=True)
@@ -5622,6 +5753,8 @@ unsafe_allow_html=True
 
 st.markdown("<div style='height: 3rem'></div>", unsafe_allow_html=True)
 
+st.markdown('<a id="north2"></a>', unsafe_allow_html=True)
+
 st.markdown("<h2 style='text-align: center;color: #ab3f3f;'>NORTH 2 - Vu Ngoc Hieu</h2>", unsafe_allow_html=True)
 df_north2 = df[df['team_id'] == 2]  # team_id = 2 cho North 2
 st.markdown("<div style='height: 6rem'></div>", unsafe_allow_html=True)
@@ -6525,7 +6658,7 @@ unsafe_allow_html=True
 st.markdown("<div style='height: 3rem'></div>", unsafe_allow_html=True)
 
 
-
+st.markdown('<a id="north3"></a>', unsafe_allow_html=True)
 st.markdown("<h2 style='text-align: center;color: #ab3f3f;'>NORTH 3 - Do Van Nam</h2>", unsafe_allow_html=True)
 df_north3 = df[df['team_id'] == 1]  # team_id = 1 cho North 3
 st.markdown("<div style='height: 6rem'></div>", unsafe_allow_html=True)
@@ -7438,7 +7571,7 @@ unsafe_allow_html=True
 
 st.markdown("<div style='height: 3rem'></div>", unsafe_allow_html=True)
 
-
+st.markdown('<a id="center1"></a>', unsafe_allow_html=True)
 st.markdown("<h2 style='text-align: center;color: #ab3f3f;'>CENTER 1 - Huynh Bao Dang</h2>", unsafe_allow_html=True)
 df_center1 = df[df['team_id'] == 18]
 st.markdown("<div style='height: 6rem'></div>", unsafe_allow_html=True)
@@ -8318,6 +8451,7 @@ unsafe_allow_html=True
 
 st.markdown("<div style='height: 3rem'></div>", unsafe_allow_html=True)
 
+st.markdown('<a id="center2"></a>', unsafe_allow_html=True)
 st.markdown("<h2 style='text-align: center;color: #ab3f3f;'>CENTER 2 - Luu Duc Thach</h2>", unsafe_allow_html=True)
 df_center2 = df[df['team_id'] == 3]
 st.markdown("<div style='height: 6rem'></div>", unsafe_allow_html=True)
@@ -9204,6 +9338,7 @@ unsafe_allow_html=True
 
 st.markdown("<div style='height: 3rem'></div>", unsafe_allow_html=True)
 
+st.markdown('<a id="center3"></a>', unsafe_allow_html=True)
 st.markdown("<h2 style='text-align: center;color: #ab3f3f;'>CENTER 3 - Le Duc Thanh</h2>", unsafe_allow_html=True)
 df_center3 = df[df['team_id'] == 19]
 st.markdown("<div style='height: 6rem'></div>", unsafe_allow_html=True)
@@ -10090,6 +10225,7 @@ unsafe_allow_html=True
 
 st.markdown("<div style='height: 3rem'></div>", unsafe_allow_html=True)
 
+st.markdown('<a id="center4"></a>', unsafe_allow_html=True)
 st.markdown("<h2 style='text-align: center;color: #ab3f3f;'>CENTER 4 & NINH BINH - Le Anh Sinh</h2>", unsafe_allow_html=True)
 df_center4 = df[df['team_id'] == 20]
 st.markdown("<div style='height: 6rem'></div>", unsafe_allow_html=True)
@@ -10970,6 +11106,8 @@ unsafe_allow_html=True
 )
 
 st.markdown("<div style='height: 3rem'></div>", unsafe_allow_html=True)
+
+st.markdown('<a id="south1"></a>', unsafe_allow_html=True)
 
 st.markdown("<h2 style='text-align: center;color: #ab3f3f;'>SOUTH 1 - Nguyen Duc Tuan</h2>", unsafe_allow_html=True)
 df_south1 = df[df['team_id'] == 21]
@@ -11852,6 +11990,8 @@ unsafe_allow_html=True
 )
 
 st.markdown("<div style='height: 3rem'></div>", unsafe_allow_html=True)
+
+st.markdown('<a id="south2"></a>', unsafe_allow_html=True)
 
 st.markdown("<h2 style='text-align: center;color: #ab3f3f;'>SOUTH 2 - Nguyen Huu Hau</h2>", unsafe_allow_html=True)
 df_south2 = df[df['team_id'] == 5]
@@ -12742,6 +12882,8 @@ unsafe_allow_html=True
 
 st.markdown("<div style='height: 3rem'></div>", unsafe_allow_html=True)
 
+st.markdown('<a id="south3"></a>', unsafe_allow_html=True)
+
 st.markdown("<h2 style='text-align: center;color: #ab3f3f;'>SOUTH 3 - Mai Thanh Long</h2>", unsafe_allow_html=True)
 df_south3 = df[df['team_id'] == 4]
 st.markdown("<div style='height: 6rem'></div>", unsafe_allow_html=True)
@@ -13624,6 +13766,8 @@ unsafe_allow_html=True
 )
 
 st.markdown("<div style='height: 3rem'></div>", unsafe_allow_html=True)
+
+st.markdown('<a id="south4"></a>', unsafe_allow_html=True)
 
 st.markdown("<h2 style='text-align: center;color: #ab3f3f;'>SOUTH 4 - Dang Thanh Danh</h2>", unsafe_allow_html=True)
 df_south4 = df[df['team_id'] == 22]
@@ -14514,6 +14658,8 @@ unsafe_allow_html=True
 )
 
 st.markdown("<div style='height: 3rem'></div>", unsafe_allow_html=True)
+
+st.markdown('<a id="south5"></a>', unsafe_allow_html=True)
 
 st.markdown("<h2 style='text-align: center;color: #ab3f3f;'>SOUTH 5 - Nguyen Ngoc Ho</h2>", unsafe_allow_html=True)
 df_south5 = df[df['team_id'] == 23]
