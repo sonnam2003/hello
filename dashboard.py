@@ -211,10 +211,35 @@ df['custom_end_date'] = df['custom_end_date'].apply(
     lambda x: "not yet end" if x == "not yet end" else (x.strftime("%Y-%m-%d %H:%M:%S") if pd.notnull(x) and not isinstance(x, str) else x)
 )
 
-# 6. Tạo tuần
-week_starts = [datetime(2025, 3, 3) + timedelta(weeks=i) for i in range(20)]
+
+# Ngày bắt đầu gốc (thứ 2, 19/05/2025)
+base_start = datetime(2025, 5, 19)
+
+# Lấy ngày hôm nay (hoặc bạn có thể thay bằng ngày bất kỳ để test)
+today = datetime.today()
+
+# Tìm thứ 2 gần nhất trước hoặc bằng hôm nay
+def get_monday(d):
+    return d - timedelta(days=d.weekday())
+
+# Tìm tuần hiện tại so với base_start
+current_monday = get_monday(today)
+weeks_since_base = (current_monday - base_start).days // 7
+
+# Nếu chưa đến tuần base_start thì vẫn lấy từ base_start
+if weeks_since_base < 0:
+    weeks_since_base = 0
+
+# Tạo danh sách 10 tuần, kết thúc ở tuần hiện tại
+start_week_index = max(0, weeks_since_base - 9)
+week_starts = [base_start + timedelta(weeks=i) for i in range(start_week_index, weeks_since_base + 1)]
 week_ends = [start + timedelta(days=6, hours=23, minutes=59, seconds=59) for start in week_starts]
-week_labels = [f"W{10+i} ({start.strftime('%d/%m')} - {end.strftime('%d/%m')})" for i, (start, end) in enumerate(zip(week_starts, week_ends))]
+
+# Tạo nhãn tuần với số tuần trong năm (ISO week number)
+week_labels = [
+    f"W{start.isocalendar()[1]} ({start.strftime('%d/%m')} - {end.strftime('%d/%m')})"
+    for start, end in zip(week_starts, week_ends)
+]
 
 # 7. Tạo bảng kiểm tra theo Category
 df['category_name'] = df['category_name'].astype(str)
@@ -322,10 +347,15 @@ for i, end in enumerate(week_ends):
 df_table_priority = pd.DataFrame(table_data_priority)
 
 # WATERFALL CHART - Tính bảng kiểm tra số lượng Created và Solved ticket theo tuần (dùng cho cả hai trang)
+# WATERFALL CHART - Tính bảng kiểm tra số lượng Created và Solved ticket theo tuần (dùng cho cả hai trang)
 created_counts = []
 solved_counts = []
 waterfall_week_labels = []
-for i in range(15):
+
+# Số tuần sẽ tự động lấy theo độ dài của week_starts (hoặc week_labels)
+num_weeks = len(week_starts)
+
+for i in range(num_weeks):
     start = week_starts[i]
     end = week_ends[i]
     week_label = week_labels[i]
@@ -334,11 +364,13 @@ for i in range(15):
     solved = df[(pd.to_datetime(df['custom_end_date'], errors='coerce') >= start) & (pd.to_datetime(df['custom_end_date'], errors='coerce') <= end)].shape[0]
     created_counts.append(created)
     solved_counts.append(solved)
+
 result_df = pd.DataFrame({
     'Tuần': waterfall_week_labels,
     'Created': created_counts,
     'Solved': solved_counts
 })
+
 
 # Tạo bảng kiểm tra theo Banner
 banner_names = [
@@ -1722,15 +1754,10 @@ st.markdown(
 st.markdown("<div style='height: 5rem'></div>", unsafe_allow_html=True)
 
 # Waterfall Chart
-week_start = datetime(2025, 3, 3)
-week_labels = []
 created_counts = []
 solved_counts = []
-for i in range(20):
-    start = week_start + timedelta(weeks=i)
-    end = start + timedelta(days=6)
-    week_label = f"W{10+i} ({start.strftime('%d/%m')} - {end.strftime('%d/%m')})"
-    week_labels.append(week_label)
+
+for start, end in zip(week_starts, week_ends):
     created = df[(df['create_date'] >= start) & (df['create_date'] <= end)].shape[0]
     solved = df[(pd.to_datetime(df['custom_end_date'], errors='coerce') >= start) & (pd.to_datetime(df['custom_end_date'], errors='coerce') <= end)].shape[0]
     created_counts.append(created)
