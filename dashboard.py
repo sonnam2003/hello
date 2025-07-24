@@ -3761,7 +3761,7 @@ row_height9 = 35
 total_height9 = num_rows9 * row_height9 + 35
 
 st.markdown("""
-<h3 style='text-align: center; margin-top: 2rem; margin-bottom: 1rem;'>AVERAGE ACTUAL COST PER CONFIRMED TICKET BY SUB-REGION (MVND)</h3>
+<h3 style='text-align: center; margin-top: 2rem; margin-bottom: 1rem;'>AVERAGE ACTUAL COST PER CONFIRMED TICKET BY CATEGORY (MVND)</h3>
 """, unsafe_allow_html=True)
 st.dataframe(styled_df9, use_container_width=True, height=total_height9)
 st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
