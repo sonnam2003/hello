@@ -2825,7 +2825,7 @@ st.markdown(
     """
     <div style="text-align: center; margin-top: 0.5rem; margin-bottom: 1.5rem; font-size: 28px;">
         <span style="color: #e53935; font-weight: bold;">*Note:</span>
-        Budget in this chart is a dummy data, real budget will be added in in the future
+         The budget for mini go! and CBS is still a dummy data, real budget will be added in in the future
     </div>
     """,
     unsafe_allow_html=True
