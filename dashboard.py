@@ -472,7 +472,7 @@ def load_excel_online(excel_url, sheet_name, usecols, skiprows, nrows):
     df_excel = pd.read_excel(excel_data, sheet_name=sheet_name, usecols=usecols, skiprows=skiprows, nrows=nrows)
     return df_excel
 
-excel_url = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=YCBOfu&download=1"
+excel_url = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=Y91Xjx&download=1"
 sheet_name = "VISUALIZE (fin) by weeks"
 usecols = "BF:BQ"
 skiprows = 7
@@ -492,7 +492,7 @@ def load_excel_online2(excel_url2, sheet_name2, usecols2, skiprows2, nrows2):
     df_excel2 = pd.read_excel(excel_data2, sheet_name=sheet_name2, usecols=usecols2, skiprows=skiprows2, nrows=nrows2)
     return df_excel2
 
-excel_url2 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=YCBOfu&download=1"
+excel_url2 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=Y91Xjx&download=1"
 sheet_name2 = "VISUALIZE (fin) by weeks"
 usecols2 = "BW:CI"
 skiprows2 = 7
@@ -512,7 +512,7 @@ def load_excel_online3(excel_url3, sheet_name3, usecols3, skiprows3, nrows3):
     df_excel3 = pd.read_excel(excel_data3, sheet_name=sheet_name3, usecols=usecols3, skiprows=skiprows3, nrows=nrows3)
     return df_excel3
 
-excel_url3 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=YCBOfu&download=1"
+excel_url3 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=Y91Xjx&download=1"
 sheet_name3 = "VISUALIZE (fin) by weeks"
 usecols3 = "DD:DK"
 skiprows3 = 10
@@ -530,7 +530,7 @@ def load_excel_online4(excel_url4, sheet_name4, usecols4, skiprows4, nrows4):
     df_excel4 = pd.read_excel(excel_data4, sheet_name=sheet_name4, usecols=usecols4, skiprows=skiprows4, nrows=nrows4)
     return df_excel4
 
-excel_url4 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=YCBOfu&download=1"
+excel_url4 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=Y91Xjx&download=1"
 sheet_name4 = "VISUALIZE (fin) by weeks"
 usecols4 = "EF:EN"
 skiprows4 = 28
@@ -549,7 +549,7 @@ def load_excel_online5(excel_url5, sheet_name5, usecols5, skiprows5, nrows5):
     df_excel5 = pd.read_excel(excel_data5, sheet_name=sheet_name5, usecols=usecols5, skiprows=skiprows5, nrows=nrows5)
     return df_excel5
 
-excel_url5 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=YCBOfu&download=1"
+excel_url5 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=Y91Xjx&download=1"
 sheet_name5 = "VISUALIZE (fin) by months"
 usecols5 = "BF:BQ"
 skiprows5 = 7
@@ -568,7 +568,7 @@ def load_excel_online6(excel_url6, sheet_name6, usecols6, skiprows6, nrows6):
     df_excel6 = pd.read_excel(excel_data6, sheet_name=sheet_name6, usecols=usecols6, skiprows=skiprows6, nrows=nrows6)
     return df_excel6
 
-excel_url6 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=YCBOfu&download=1"
+excel_url6 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=Y91Xjx&download=1"
 sheet_name6 = "VISUALIZE (fin) by months"
 usecols6 = "BY:CK"
 skiprows6 = 7
@@ -586,7 +586,7 @@ def load_excel_online7(excel_url7, sheet_name7, usecols7, skiprows7, nrows7):
     df_excel7 = pd.read_excel(excel_data7, sheet_name=sheet_name7, usecols=usecols7, skiprows=skiprows7, nrows=nrows7)
     return df_excel7
 
-excel_url7 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=YCBOfu&download=1"
+excel_url7 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=Y91Xjx&download=1"
 sheet_name7 = "VISUALIZE (fin) by months"
 usecols7 = "DF:DM"
 skiprows7 = 10
@@ -604,7 +604,7 @@ def load_excel_online8(excel_url8, sheet_name8, usecols8, skiprows8, nrows8):
     df_excel8 = pd.read_excel(excel_data8, sheet_name=sheet_name8, usecols=usecols8, skiprows=skiprows8, nrows=nrows8)
     return df_excel8
 
-excel_url8 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=YCBOfu&download=1"
+excel_url8 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=Y91Xjx&download=1"
 sheet_name8 = "Actual cost per cat"
 usecols8 = "Y:AK"
 skiprows8 = 3
@@ -623,7 +623,7 @@ def load_excel_online9(excel_url9, sheet_name9, usecols9, skiprows9, nrows9):
     df_excel9 = pd.read_excel(excel_data9, sheet_name=sheet_name9, usecols=usecols9, skiprows=skiprows9, nrows=nrows9)
     return df_excel9
 
-excel_url9 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=YCBOfu&download=1"
+excel_url9 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=Y91Xjx&download=1"
 sheet_name9 = "Actual cost per cat"
 usecols9 = "Y:AK"
 skiprows9 = 44
@@ -642,7 +642,7 @@ def load_excel_online10(excel_url10, sheet_name10, usecols10, skiprows10, nrows1
     df_excel10 = pd.read_excel(excel_data10, sheet_name=sheet_name10, usecols=usecols10, skiprows=skiprows10, nrows=nrows10)
     return df_excel10
 
-excel_url10 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=YCBOfu&download=1"
+excel_url10 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=Y91Xjx&download=1"
 sheet_name10 = "Actual cost per sub region"
 usecols10 = "AA:AM"
 skiprows10 = 3
@@ -661,7 +661,7 @@ def load_excel_online11(excel_url11, sheet_name11, usecols11, skiprows11, nrows1
     df_excel11 = pd.read_excel(excel_data11, sheet_name=sheet_name11, usecols=usecols11, skiprows=skiprows11, nrows=nrows11)
     return df_excel11
 
-excel_url11 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=YCBOfu&download=1"
+excel_url11 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=Y91Xjx&download=1"
 sheet_name11 = "Actual cost per sub region"
 usecols11 = "AA:AM"
 skiprows11 = 45
@@ -1534,7 +1534,7 @@ st.markdown(
     f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>{description}</div>",
     unsafe_allow_html=True
 )
-st.markdown("<div style='height: 5rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 10rem'></div>", unsafe_allow_html=True)
 
 # Stacked Column Chart theo Banner
 fig_stack_banner = go.Figure()
@@ -1751,7 +1751,7 @@ st.markdown(
     f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>{description}</div>",
     unsafe_allow_html=True
 )
-st.markdown("<div style='height: 5rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 24rem'></div>", unsafe_allow_html=True)
 
 # Waterfall Chart
 created_counts = []
@@ -1847,7 +1847,7 @@ fig.update_layout(
     plot_bgcolor='white'
 )
 st.plotly_chart(fig, use_container_width=True)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 20rem'></div>", unsafe_allow_html=True)
 
 # --- STACKED COLUMN CHART TỪ EXCEL: OVERALL COST SPENT PER CATEGORY BY WEEKS (MVND)-----------
 
@@ -2168,7 +2168,7 @@ else:
         f"</div>",
         unsafe_allow_html=True
     )
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 25rem'></div>", unsafe_allow_html=True)
 
 # --- STACKED COLUMN CHART TỪ EXCEL: OVERALL COST SPENT PER TEAM BY WEEKS (MVND)-----------
 
@@ -2435,6 +2435,7 @@ else:
         desc = ", while ".join(desc_parts) + f", respectively, compared to the previous week. Overall, the {total_html} change is {'decreased' if total_percent < 0 else 'increased'} by {total_percent_html(total_percent)}"
 
 st.markdown(f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>{desc}</div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 15rem'></div>", unsafe_allow_html=True)
 
 # --- STACKED COLUMN CHART TỪ EXCEL: OVERALL COST SPENT PER BANNER BY WEEKS (MVND)-----------
 
@@ -2490,7 +2491,7 @@ for i, (x, y, t) in enumerate(zip(df_excel3[x_col3], totals_offset3, totals3)):
 fig_stack_excel3.update_layout(
     barmode='stack',
     title=dict(
-        text="OVERALL COST SPENT PER BANNER (MVND)",
+        text="OVERALL COST SPENT PER BANNER BY WEEKS (MVND)",
         x=0.5,
         y=1.0,
         xanchor='center',
@@ -2681,7 +2682,7 @@ st.markdown(
     f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>{description}</div>",
     unsafe_allow_html=True
 )
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 15rem'></div>", unsafe_allow_html=True)
 
 # ------------------- 100% STACKED COLUMN CHART TỪ EXCEL------------------------
 
@@ -2830,7 +2831,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 18rem'></div>", unsafe_allow_html=True)
 
 # --- STACKED COLUMN CHART TỪ EXCEL: OVERALL COST SPENT PER CATEGORY BY MONTH (MVND)-----------
 
@@ -3087,7 +3088,7 @@ else:
         desc = ", while ".join(desc_parts) + f", respectively, compared to the previous month. Overall, the {total_html} change is {'decreased' if total_percent < 0 else 'increased'} by {total_percent_html(total_percent)}"
 
 st.markdown(f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>{desc}</div>", unsafe_allow_html=True)
-st.markdown("<div style='height: 7rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 12rem'></div>", unsafe_allow_html=True)
 
 # --- STACKED COLUMN CHART TỪ EXCEL: OVERALL COST SPENT PER TEAM BY MONTH (MVND)-----------
 
@@ -3344,7 +3345,7 @@ else:
         desc = ", while ".join(desc_parts) + f", respectively, compared to the previous month. Overall, the {total_html} change is {'decreased' if total_percent < 0 else 'increased'} by {total_percent_html(total_percent)}"
 
 st.markdown(f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>{desc}</div>", unsafe_allow_html=True)
-st.markdown("<div style='height: 7rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 14rem'></div>", unsafe_allow_html=True)
 
 # --- STACKED COLUMN CHART TỪ EXCEL: OVERALL COST SPENT PER BANNER BY MONTH (MVND)-----------
 
@@ -3714,7 +3715,7 @@ for i, (x, y, t) in enumerate(zip(df_excel8_chart[cat_col], totals_offset, total
         borderwidth=0
     )
 st.plotly_chart(fig_excel8, use_container_width=True)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 5rem'></div>", unsafe_allow_html=True)
 
 # --------------------------- BẢNG Actual cost per cat 2 ---------------------------
 
@@ -3764,7 +3765,7 @@ st.markdown("""
 <h3 style='text-align: center; margin-top: 2rem; margin-bottom: 1rem;'>AVERAGE ACTUAL COST PER CONFIRMED TICKET BY CATEGORY (MVND)</h3>
 """, unsafe_allow_html=True)
 st.dataframe(styled_df9, use_container_width=True, height=total_height9)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 15rem'></div>", unsafe_allow_html=True)
 
 # --------------------------- BẢNG Actual cost per sub region 1 ---------------------------
 
@@ -3876,7 +3877,7 @@ if df_excel10.shape[1] > 1:
             borderwidth=0
         )
     st.plotly_chart(fig_excel10, use_container_width=True)
-    st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 2rem'></div>", unsafe_allow_html=True)
 
 # --------------------------- BẢNG Actual cost per sub region 2 ---------------------------
 
@@ -4355,7 +4356,7 @@ num_rows = len(pivot.index)
 row_height = 35
 total_height = (num_rows + 1) * row_height
 st.dataframe(styled, use_container_width=True, height=total_height)
-st.markdown("<div style='height: 7rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 22rem'></div>", unsafe_allow_html=True)
 
 
 import plotly.graph_objects as go
@@ -4469,6 +4470,7 @@ fig.update_layout(
 )
 
 st.plotly_chart(fig, use_container_width=True)
+st.markdown("<div style='height: 15rem'></div>", unsafe_allow_html=True)
 
 # --- BAR CHART OA CỦA TỪNG CATEGORY VÀ TEAM ---
 # Lấy các cột OA (chỉ lấy đúng '[category] OA', không lấy SLA Late OA, Emerg OA...)
@@ -4573,7 +4575,7 @@ fig_oa.update_layout(
     shapes=shapes_oa
 )
 st.plotly_chart(fig_oa, use_container_width=True)
-st.markdown("<div style='height: 7rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 20rem'></div>", unsafe_allow_html=True)
 
 
 # --- LINE CHART DAILY OA TICKETS BY CATEGORY ---
@@ -4657,7 +4659,7 @@ fig_line.update_layout(
     margin=dict(l=40, r=40, t=80, b=120)
 )
 st.plotly_chart(fig_line, use_container_width=True)
-st.markdown("<div style='height: 7rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 20rem'></div>", unsafe_allow_html=True)
 
 
     # --- LINE CHART DAILY OA TICKETS BY PRIORITY ---
@@ -5010,7 +5012,7 @@ fig.update_layout(
     yaxis=dict(tickfont=dict(color='black'))
 )
 st.plotly_chart(fig, use_container_width=True)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 3rem'></div>", unsafe_allow_html=True)
 
 
 # (Các phần biểu đồ khác, bảng site, ... giữ nguyên như cũ, đặt sau các phần trên)
@@ -5354,7 +5356,7 @@ fig_stack_priority_north1.update_layout(
     yaxis=dict(tickfont=dict(color='black'))
 )
 st.plotly_chart(fig_stack_priority_north1)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 20rem'></div>", unsafe_allow_html=True)
 
 
 # Clustered Chart: Created/Solved ticket High Priority (Emergency & Non-Emergency)
@@ -5451,7 +5453,7 @@ fig.update_layout(
     )
 )
 st.plotly_chart(fig, use_container_width=True)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 20rem'></div>", unsafe_allow_html=True)
 
 
 
@@ -5967,8 +5969,6 @@ fig2.update_layout(
 st.plotly_chart(fig2, use_container_width=True)
 st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
 
-# ...phần đầu giữ nguyên...
-
 # --- Stacked Bar Chart theo Category cho North 2 ---
 category_names_north2 = df_north2['category_name'].dropna().unique()
 table_data_north2 = []
@@ -6290,7 +6290,7 @@ fig_stack_priority_north2.update_layout(
     yaxis=dict(tickfont=dict(color='black'))
 )
 st.plotly_chart(fig_stack_priority_north2)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 20rem'></div>", unsafe_allow_html=True)
 
 # --- Clustered Chart: Created/Solved ticket High Priority (Emergency & Non-Emergency) ---
 created_counts_high2 = []
@@ -6374,7 +6374,7 @@ fig_high2.update_layout(
     )
 )
 st.plotly_chart(fig_high2, use_container_width=True)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 20rem'></div>", unsafe_allow_html=True)
 
 # --- Clustered Chart: Created/Solved ticket Low & Medium Priority ---
 created_counts_lowmed2 = []
@@ -6674,7 +6674,7 @@ num_rows2 = df_sites_north2.shape[0]
 row_height2 = 35
 header_height2 = 38
 st.dataframe(styled2, use_container_width=True, height=num_rows2 * row_height2 + header_height2)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 30rem'></div>", unsafe_allow_html=True)
 
 
 st.markdown(
@@ -7190,7 +7190,7 @@ fig_stack_priority_north3.update_layout(
     yaxis=dict(tickfont=dict(color='black'))
 )
 st.plotly_chart(fig_stack_priority_north3)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 18rem'></div>", unsafe_allow_html=True)
 
 # --- Clustered Chart: Created/Solved ticket High Priority (Emergency & Non-Emergency) ---
 created_counts_high3 = []
@@ -7274,7 +7274,7 @@ fig_high3.update_layout(
     )
 )
 st.plotly_chart(fig_high3, use_container_width=True)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 18rem'></div>", unsafe_allow_html=True)
 
 # --- Clustered Chart: Created/Solved ticket Low & Medium Priority ---
 created_counts_lowmed3 = []
@@ -7588,7 +7588,7 @@ num_rows3 = df_sites_north3.shape[0]
 row_height3 = 35
 header_height3 = 38
 st.dataframe(styled3, use_container_width=True, height=num_rows3 * row_height3 + header_height3)
-st.markdown("<div style='height: 5rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 1rem'></div>", unsafe_allow_html=True)
 
 
 st.markdown(
@@ -7596,12 +7596,12 @@ st.markdown(
 unsafe_allow_html=True
 )
 
-st.markdown("<div style='height: 3rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 1rem'></div>", unsafe_allow_html=True)
 
 st.markdown('<a id="center1"></a>', unsafe_allow_html=True)
 st.markdown("<h2 style='text-align: center;color: #ab3f3f;'>CENTER 1 - Huynh Bao Dang</h2>", unsafe_allow_html=True)
 df_center1 = df[df['team_id'] == 18]
-st.markdown("<div style='height: 6rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 2rem'></div>", unsafe_allow_html=True)
 
 # Pivot cho gauge
 pivot_center1 = pd.pivot_table(
@@ -7728,7 +7728,7 @@ with col2:
     st.plotly_chart(fig_gauge)
     st.markdown("</div>", unsafe_allow_html=True)
 
-st.markdown("<div style='height: 7rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 4rem'></div>", unsafe_allow_html=True)
 
 # Clustered column chart: Created vs Solved ticket per week
 created_counts = []
@@ -7778,7 +7778,7 @@ fig.update_layout(
     yaxis=dict(tickfont=dict(color='black'))
 )
 st.plotly_chart(fig, use_container_width=True)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 3rem'></div>", unsafe_allow_html=True)
 
 # Stacked Bar Chart theo Category cho Center 1
 category_names_center1 = df_center1['category_name'].dropna().unique()
@@ -8099,7 +8099,7 @@ fig_stack_priority_center1.update_layout(
     yaxis=dict(tickfont=dict(color='black'))
 )
 st.plotly_chart(fig_stack_priority_center1)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 20rem'></div>", unsafe_allow_html=True)
 
 # Clustered Chart: Created/Solved ticket High Priority (Emergency & Non-Emergency)
 created_counts = []
@@ -8183,7 +8183,7 @@ fig.update_layout(
     )
 )
 st.plotly_chart(fig, use_container_width=True)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 20rem'></div>", unsafe_allow_html=True)
 
 # Clustered Chart: Created/Solved ticket Low & Medium Priority 
 created_counts = []
@@ -8279,7 +8279,7 @@ fig.update_layout(
     )
 )
 st.plotly_chart(fig, use_container_width=True)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 15rem'></div>", unsafe_allow_html=True)
 
 # Bảng Sites cho Center 1
 st.markdown("<h3 style='text-align: center;'>CENTER 1 - DETAIL VIEW PER SITE</h3>", unsafe_allow_html=True)
@@ -8468,7 +8468,7 @@ num_rows = df_sites_center1.shape[0]
 row_height = 35
 header_height = 38
 st.dataframe(styled, use_container_width=True, height=num_rows * row_height + header_height)
-st.markdown("<div style='height: 5rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 32rem'></div>", unsafe_allow_html=True)
 
 
 st.markdown(
@@ -8481,7 +8481,7 @@ st.markdown("<div style='height: 3rem'></div>", unsafe_allow_html=True)
 st.markdown('<a id="center2"></a>', unsafe_allow_html=True)
 st.markdown("<h2 style='text-align: center;color: #ab3f3f;'>CENTER 2 - Luu Duc Thach</h2>", unsafe_allow_html=True)
 df_center2 = df[df['team_id'] == 3]
-st.markdown("<div style='height: 6rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 2rem'></div>", unsafe_allow_html=True)
 
 # Pivot cho gauge
 pivot_center2 = pd.pivot_table(
@@ -8808,7 +8808,7 @@ fig_stack_center2.update_layout(
     margin=dict(r=50, b=5),
 )
 st.plotly_chart(fig_stack_center2)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 18rem'></div>", unsafe_allow_html=True)
 
 # Stacked Bar Chart theo Priority cho Center 2
 priority_cols = ['Low priority', 'Medium priority', 'High priority', 'Emergency']
@@ -8979,7 +8979,7 @@ fig_stack_priority_center2.update_layout(
     yaxis=dict(tickfont=dict(color='black'))
 )
 st.plotly_chart(fig_stack_priority_center2)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 20rem'></div>", unsafe_allow_html=True)
 
 # Clustered Chart: Created/Solved ticket High Priority (Emergency & Non-Emergency)
 created_counts = []
@@ -9063,7 +9063,7 @@ fig.update_layout(
     )
 )
 st.plotly_chart(fig, use_container_width=True)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 15rem'></div>", unsafe_allow_html=True)
 
 # Clustered Chart: Created/Solved ticket Low & Medium Priority 
 created_counts = []
@@ -9356,7 +9356,7 @@ num_rows = df_sites_center2.shape[0]
 row_height = 35  # hoặc 32, tuỳ font
 header_height = 38
 st.dataframe(styled, use_container_width=True, height=num_rows * row_height + header_height)
-st.markdown("<div style='height: 5rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 20rem'></div>", unsafe_allow_html=True)
 
 st.markdown(
 "<hr style='border: 1.5px solid #222; margin: 30px 0;'>",
@@ -9865,7 +9865,7 @@ fig_stack_priority_center3.update_layout(
     yaxis=dict(tickfont=dict(color='black'))
 )
 st.plotly_chart(fig_stack_priority_center3)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 20rem'></div>", unsafe_allow_html=True)
 
 # Clustered Chart: Created/Solved ticket High Priority (Emergency & Non-Emergency)
 created_counts = []
@@ -9949,7 +9949,7 @@ fig.update_layout(
     )
 )
 st.plotly_chart(fig, use_container_width=True)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 15rem'></div>", unsafe_allow_html=True)
 
 # Clustered Chart: Created/Solved ticket Low & Medium Priority 
 created_counts = []
@@ -10243,7 +10243,7 @@ num_rows = df_sites_center3.shape[0]
 row_height = 35
 header_height = 38
 st.dataframe(styled, use_container_width=True, height=num_rows * row_height + header_height)
-st.markdown("<div style='height: 5rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 13rem'></div>", unsafe_allow_html=True)
 
 st.markdown(
 "<hr style='border: 1.5px solid #222; margin: 30px 0;'>",
@@ -10255,7 +10255,7 @@ st.markdown("<div style='height: 3rem'></div>", unsafe_allow_html=True)
 st.markdown('<a id="center4"></a>', unsafe_allow_html=True)
 st.markdown("<h2 style='text-align: center;color: #ab3f3f;'>CENTER 4 & NINH BINH - Le Anh Sinh</h2>", unsafe_allow_html=True)
 df_center4 = df[df['team_id'] == 20]
-st.markdown("<div style='height: 6rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 3rem'></div>", unsafe_allow_html=True)
 
 # Pivot cho gauge
 pivot = pd.pivot_table(
@@ -10581,7 +10581,7 @@ fig_stack_center4.update_layout(
     margin=dict(r=50, b=5),
 )
 st.plotly_chart(fig_stack_center4)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 15rem'></div>", unsafe_allow_html=True)
 
 # Stacked Bar Chart theo Priority cho Center 4 & Ninh Binh
 priority_cols = ['Low priority', 'Medium priority', 'High priority', 'Emergency']
@@ -10752,7 +10752,7 @@ fig_stack_priority_center4.update_layout(
     yaxis=dict(tickfont=dict(color='black'))
 )
 st.plotly_chart(fig_stack_priority_center4)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 20rem'></div>", unsafe_allow_html=True)
 
 # Clustered Chart: Created/Solved ticket High Priority (Emergency & Non-Emergency)
 created_counts = []
@@ -10836,7 +10836,7 @@ fig.update_layout(
     )
 )
 st.plotly_chart(fig, use_container_width=True)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 15rem'></div>", unsafe_allow_html=True)
 
 # Clustered Chart: Created/Solved ticket Low & Medium Priority 
 created_counts = []
@@ -11125,7 +11125,7 @@ num_rows = df_sites_center4.shape[0]
 row_height = 35
 header_height = 38
 st.dataframe(styled, use_container_width=True, height=num_rows * row_height + header_height)
-st.markdown("<div style='height: 5rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 35rem'></div>", unsafe_allow_html=True)
 
 st.markdown(
 "<hr style='border: 1.5px solid #222; margin: 30px 0;'>",
@@ -11635,7 +11635,7 @@ fig_stack_priority_south1.update_layout(
     yaxis=dict(tickfont=dict(color='black'))
 )
 st.plotly_chart(fig_stack_priority_south1)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 20rem'></div>", unsafe_allow_html=True)
 
 # Clustered Chart: Created/Solved ticket High Priority (Emergency & Non-Emergency)
 created_counts = []
@@ -11719,7 +11719,7 @@ fig.update_layout(
     )
 )
 st.plotly_chart(fig, use_container_width=True)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 20rem'></div>", unsafe_allow_html=True)
 
 # Clustered Chart: Created/Solved ticket Low & Medium Priority 
 created_counts = []
@@ -11815,7 +11815,7 @@ fig.update_layout(
     )
 )
 st.plotly_chart(fig, use_container_width=True)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 20rem'></div>", unsafe_allow_html=True)
 
 # Bảng Sites cho South 1
 st.markdown("<h3 style='text-align: center;'>SOUTH 1 - DETAIL VIEW PER SITE</h3>", unsafe_allow_html=True)
@@ -12009,7 +12009,7 @@ num_rows = df_sites_south1.shape[0]
 row_height = 35
 header_height = 38
 st.dataframe(styled, use_container_width=True, height=num_rows * row_height + header_height)
-st.markdown("<div style='height: 5rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 15rem'></div>", unsafe_allow_html=True)
 
 st.markdown(
 "<hr style='border: 1.5px solid #222; margin: 30px 0;'>",
@@ -12519,7 +12519,7 @@ fig_stack_priority_south2.update_layout(
     yaxis=dict(tickfont=dict(color='black'))
 )
 st.plotly_chart(fig_stack_priority_south2)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 20rem'></div>", unsafe_allow_html=True)
 
 # Clustered Chart: Created/Solved ticket High Priority (Emergency & Non-Emergency)
 created_counts = []
@@ -12603,7 +12603,7 @@ fig.update_layout(
     )
 )
 st.plotly_chart(fig, use_container_width=True)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 17rem'></div>", unsafe_allow_html=True)
 
 # Clustered Chart: Created/Solved ticket Low & Medium Priority 
 created_counts = []
@@ -12699,7 +12699,7 @@ fig.update_layout(
     )
 )
 st.plotly_chart(fig, use_container_width=True)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 3rem'></div>", unsafe_allow_html=True)
 
 # Bảng Sites cho South 2
 st.markdown("<h3 style='text-align: center;'>SOUTH 2 - DETAIL VIEW PER SITE</h3>", unsafe_allow_html=True)
@@ -12900,7 +12900,7 @@ num_rows = df_sites_south2.shape[0]
 row_height = 35
 header_height = 38
 st.dataframe(styled, use_container_width=True, height=num_rows * row_height + header_height)
-st.markdown("<div style='height: 5rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 2rem'></div>", unsafe_allow_html=True)
 
 st.markdown(
 "<hr style='border: 1.5px solid #222; margin: 30px 0;'>",
@@ -13410,7 +13410,7 @@ fig_stack_priority_south3.update_layout(
     yaxis=dict(tickfont=dict(color='black'))
 )
 st.plotly_chart(fig_stack_priority_south3)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 20rem'></div>", unsafe_allow_html=True)
 
 # Clustered Chart: Created/Solved ticket High Priority (Emergency & Non-Emergency)
 created_counts = []
@@ -13494,7 +13494,7 @@ fig.update_layout(
     )
 )
 st.plotly_chart(fig, use_container_width=True)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 20rem'></div>", unsafe_allow_html=True)
 
 # Clustered Chart: Created/Solved ticket Low & Medium Priority 
 created_counts = []
@@ -13590,7 +13590,7 @@ fig.update_layout(
     )
 )
 st.plotly_chart(fig, use_container_width=True)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 20rem'></div>", unsafe_allow_html=True)
 
 # Bảng Sites cho South 3
 st.markdown("<h3 style='text-align: center;'>SOUTH 3 - DETAIL VIEW PER SITE</h3>", unsafe_allow_html=True)
@@ -13785,7 +13785,7 @@ num_rows = df_sites_south3.shape[0]
 row_height = 35
 header_height = 38
 st.dataframe(styled, use_container_width=True, height=num_rows * row_height + header_height)
-st.markdown("<div style='height: 5rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 18rem'></div>", unsafe_allow_html=True)
 
 st.markdown(
 "<hr style='border: 1.5px solid #222; margin: 30px 0;'>",
@@ -14295,7 +14295,7 @@ fig_stack_priority_south4.update_layout(
     yaxis=dict(tickfont=dict(color='black'))
 )
 st.plotly_chart(fig_stack_priority_south4)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 18rem'></div>", unsafe_allow_html=True)
 
 # Clustered Chart: Created/Solved ticket High Priority (Emergency & Non-Emergency)
 created_counts = []
@@ -14379,7 +14379,7 @@ fig.update_layout(
     )
 )
 st.plotly_chart(fig, use_container_width=True)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 18rem'></div>", unsafe_allow_html=True)
 
 # Clustered Chart: Created/Solved ticket Low & Medium Priority 
 created_counts = []
@@ -14475,7 +14475,7 @@ fig.update_layout(
     )
 )
 st.plotly_chart(fig, use_container_width=True)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 1rem'></div>", unsafe_allow_html=True)
 
 # Bảng Sites cho South 4
 st.markdown("<h3 style='text-align: center;'>SOUTH 4 - DETAIL VIEW PER SITE</h3>", unsafe_allow_html=True)
@@ -14677,20 +14677,20 @@ num_rows = df_sites_south4.shape[0]
 row_height = 35
 header_height = 38
 st.dataframe(styled, use_container_width=True, height=num_rows * row_height + header_height)
-st.markdown("<div style='height: 5rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 1rem'></div>", unsafe_allow_html=True)
 
 st.markdown(
 "<hr style='border: 1.5px solid #222; margin: 30px 0;'>",
 unsafe_allow_html=True
 )
 
-st.markdown("<div style='height: 3rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 0.2rem'></div>", unsafe_allow_html=True)
 
 st.markdown('<a id="south5"></a>', unsafe_allow_html=True)
 
 st.markdown("<h2 style='text-align: center;color: #ab3f3f;'>SOUTH 5 - Nguyen Ngoc Ho</h2>", unsafe_allow_html=True)
 df_south5 = df[df['team_id'] == 23]
-st.markdown("<div style='height: 6rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 2rem'></div>", unsafe_allow_html=True)
 
 # Pivot cho gauge
 pivot = pd.pivot_table(
@@ -14866,7 +14866,7 @@ fig.update_layout(
     yaxis=dict(tickfont=dict(color='black'))
 )
 st.plotly_chart(fig, use_container_width=True)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 3rem'></div>", unsafe_allow_html=True)
 
 # Stacked Bar Chart theo Category cho South 5
 category_names_south5 = df_south5['category_name'].dropna().unique()
@@ -15016,7 +15016,7 @@ fig_stack_south5.update_layout(
     margin=dict(r=50, b=5),
 )
 st.plotly_chart(fig_stack_south5)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 15rem'></div>", unsafe_allow_html=True)
 
 # Stacked Bar Chart theo Priority cho South 5
 priority_cols = ['Low priority', 'Medium priority', 'High priority', 'Emergency']
@@ -15187,7 +15187,7 @@ fig_stack_priority_south5.update_layout(
     yaxis=dict(tickfont=dict(color='black'))
 )
 st.plotly_chart(fig_stack_priority_south5)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 20rem'></div>", unsafe_allow_html=True)
 
 # Clustered Chart: Created/Solved ticket High Priority (Emergency & Non-Emergency)
 created_counts = []
@@ -15271,7 +15271,7 @@ fig.update_layout(
     )
 )
 st.plotly_chart(fig, use_container_width=True)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 20rem'></div>", unsafe_allow_html=True)
 
 # Clustered Chart: Created/Solved ticket Low & Medium Priority 
 created_counts = []
@@ -15367,7 +15367,7 @@ fig.update_layout(
     )
 )
 st.plotly_chart(fig, use_container_width=True)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 18rem'></div>", unsafe_allow_html=True)
 
 # Bảng Sites cho South 5
 st.markdown("<h3 style='text-align: center;'>SOUTH 5 - DETAIL VIEW PER SITE</h3>", unsafe_allow_html=True)
