@@ -695,7 +695,7 @@ toc_html = """
 <style>
 #toc-float {
     position: fixed;
-    top: 80px;
+    top: 30px;
     left: 18px;
     z-index: 9999;
     background: #fff;
