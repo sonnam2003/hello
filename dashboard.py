@@ -472,7 +472,7 @@ def load_excel_online(excel_url, sheet_name, usecols, skiprows, nrows):
     df_excel = pd.read_excel(excel_data, sheet_name=sheet_name, usecols=usecols, skiprows=skiprows, nrows=nrows)
     return df_excel
 
-excel_url = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=Y91Xjx&download=1"
+excel_url = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=8Vy150&download=1"
 sheet_name = "VISUALIZE (fin) by weeks"
 usecols = "BF:BQ"
 skiprows = 7
@@ -492,7 +492,7 @@ def load_excel_online2(excel_url2, sheet_name2, usecols2, skiprows2, nrows2):
     df_excel2 = pd.read_excel(excel_data2, sheet_name=sheet_name2, usecols=usecols2, skiprows=skiprows2, nrows=nrows2)
     return df_excel2
 
-excel_url2 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=Y91Xjx&download=1"
+excel_url2 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=8Vy150&download=1"
 sheet_name2 = "VISUALIZE (fin) by weeks"
 usecols2 = "BW:CI"
 skiprows2 = 7
@@ -512,7 +512,7 @@ def load_excel_online3(excel_url3, sheet_name3, usecols3, skiprows3, nrows3):
     df_excel3 = pd.read_excel(excel_data3, sheet_name=sheet_name3, usecols=usecols3, skiprows=skiprows3, nrows=nrows3)
     return df_excel3
 
-excel_url3 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=Y91Xjx&download=1"
+excel_url3 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=8Vy150&download=1"
 sheet_name3 = "VISUALIZE (fin) by weeks"
 usecols3 = "DD:DK"
 skiprows3 = 10
@@ -530,7 +530,7 @@ def load_excel_online4(excel_url4, sheet_name4, usecols4, skiprows4, nrows4):
     df_excel4 = pd.read_excel(excel_data4, sheet_name=sheet_name4, usecols=usecols4, skiprows=skiprows4, nrows=nrows4)
     return df_excel4
 
-excel_url4 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=Y91Xjx&download=1"
+excel_url4 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=8Vy150&download=1"
 sheet_name4 = "VISUALIZE (fin) by weeks"
 usecols4 = "EF:EN"
 skiprows4 = 28
@@ -549,7 +549,7 @@ def load_excel_online5(excel_url5, sheet_name5, usecols5, skiprows5, nrows5):
     df_excel5 = pd.read_excel(excel_data5, sheet_name=sheet_name5, usecols=usecols5, skiprows=skiprows5, nrows=nrows5)
     return df_excel5
 
-excel_url5 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=Y91Xjx&download=1"
+excel_url5 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=8Vy150&download=1"
 sheet_name5 = "VISUALIZE (fin) by months"
 usecols5 = "BF:BQ"
 skiprows5 = 7
@@ -568,7 +568,7 @@ def load_excel_online6(excel_url6, sheet_name6, usecols6, skiprows6, nrows6):
     df_excel6 = pd.read_excel(excel_data6, sheet_name=sheet_name6, usecols=usecols6, skiprows=skiprows6, nrows=nrows6)
     return df_excel6
 
-excel_url6 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=Y91Xjx&download=1"
+excel_url6 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=8Vy150&download=1"
 sheet_name6 = "VISUALIZE (fin) by months"
 usecols6 = "BY:CK"
 skiprows6 = 7
@@ -586,7 +586,7 @@ def load_excel_online7(excel_url7, sheet_name7, usecols7, skiprows7, nrows7):
     df_excel7 = pd.read_excel(excel_data7, sheet_name=sheet_name7, usecols=usecols7, skiprows=skiprows7, nrows=nrows7)
     return df_excel7
 
-excel_url7 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=Y91Xjx&download=1"
+excel_url7 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=8Vy150&download=1"
 sheet_name7 = "VISUALIZE (fin) by months"
 usecols7 = "DF:DM"
 skiprows7 = 10
@@ -604,7 +604,7 @@ def load_excel_online8(excel_url8, sheet_name8, usecols8, skiprows8, nrows8):
     df_excel8 = pd.read_excel(excel_data8, sheet_name=sheet_name8, usecols=usecols8, skiprows=skiprows8, nrows=nrows8)
     return df_excel8
 
-excel_url8 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=Y91Xjx&download=1"
+excel_url8 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=8Vy150&download=1"
 sheet_name8 = "Actual cost per cat"
 usecols8 = "Y:AK"
 skiprows8 = 3
@@ -623,7 +623,7 @@ def load_excel_online9(excel_url9, sheet_name9, usecols9, skiprows9, nrows9):
     df_excel9 = pd.read_excel(excel_data9, sheet_name=sheet_name9, usecols=usecols9, skiprows=skiprows9, nrows=nrows9)
     return df_excel9
 
-excel_url9 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=Y91Xjx&download=1"
+excel_url9 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=8Vy150&download=1"
 sheet_name9 = "Actual cost per cat"
 usecols9 = "Y:AK"
 skiprows9 = 44
@@ -642,7 +642,7 @@ def load_excel_online10(excel_url10, sheet_name10, usecols10, skiprows10, nrows1
     df_excel10 = pd.read_excel(excel_data10, sheet_name=sheet_name10, usecols=usecols10, skiprows=skiprows10, nrows=nrows10)
     return df_excel10
 
-excel_url10 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=Y91Xjx&download=1"
+excel_url10 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=8Vy150&download=1"
 sheet_name10 = "Actual cost per sub region"
 usecols10 = "AA:AM"
 skiprows10 = 3
@@ -661,7 +661,7 @@ def load_excel_online11(excel_url11, sheet_name11, usecols11, skiprows11, nrows1
     df_excel11 = pd.read_excel(excel_data11, sheet_name=sheet_name11, usecols=usecols11, skiprows=skiprows11, nrows=nrows11)
     return df_excel11
 
-excel_url11 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=Y91Xjx&download=1"
+excel_url11 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=8Vy150&download=1"
 sheet_name11 = "Actual cost per sub region"
 usecols11 = "AA:AM"
 skiprows11 = 45
@@ -670,6 +670,26 @@ try:
     df_excel11 = load_excel_online11(excel_url11, sheet_name11, usecols11, skiprows11, nrows11)
 except Exception as e:
     st.warning(f"Không thể đọc dữ liệu từ file Excel online thứ 11: {e}")
+
+
+# --- Đọc dữ liệu từ file Excel online thứ 12---
+@st.cache_data(show_spinner=True) 
+def load_excel_online12(excel_url12, sheet_name12, usecols12, skiprows12, nrows12):
+    response12 = requests.get(excel_url12)
+    excel_data12 = BytesIO(response12.content)
+    df_excel12 = pd.read_excel(excel_data12, sheet_name=sheet_name12, usecols=usecols12, skiprows=skiprows12, nrows=nrows12)
+    return df_excel12
+
+excel_url12 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=8Vy150&download=1"
+sheet_name12 = "Top 10 Equip Fre"
+usecols12 = "G:L"
+skiprows12 = 0
+nrows12 = 10
+try:
+    df_excel12 = load_excel_online12(excel_url12, sheet_name12, usecols12, skiprows12, nrows12)
+except Exception as e:
+    st.warning(f"Không thể đọc dữ liệu từ file Excel online thứ 12: {e}")
+
 
 toc_html = """
 <style>
@@ -4659,7 +4679,7 @@ fig_line.update_layout(
     margin=dict(l=40, r=40, t=80, b=120)
 )
 st.plotly_chart(fig_line, use_container_width=True)
-st.markdown("<div style='height: 20rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 3rem'></div>", unsafe_allow_html=True)
 
 
     # --- LINE CHART DAILY OA TICKETS BY PRIORITY ---
@@ -4804,14 +4824,37 @@ fig_line_priority.update_layout(
     margin=dict(l=40, r=40, t=80, b=120)
 )
 st.plotly_chart(fig_line_priority, use_container_width=True)
-st.markdown("<div style='height: 5rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 1rem'></div>", unsafe_allow_html=True)
+
+#------------------BẢNG EQUIPMENT FREQUENCY-----------------------------------------------
+
+latest_ticket_col = df_excel12.columns[0]
+mall_col = df_excel12.columns[1]
+cate_col = df_excel12.columns[2]
+equip_col = df_excel12.columns[4]
+freq_col = df_excel12.columns[5]
+
+# Làm tròn cột freq_col về 1 chữ số thập phân (chuẩn round-half-up)
+freq_rounded = df_excel12[freq_col].apply(lambda x: round(x, 1) if pd.notnull(x) else x)
+
+df_latest_ticket = pd.DataFrame({
+    "Latest incident ticket": df_excel12[latest_ticket_col],
+    "Mall": df_excel12[mall_col],
+    "Category": df_excel12[cate_col],
+    "Equipment": df_excel12[equip_col],
+    "Average incident frequency by month": freq_rounded,
+})
+
+st.markdown("<h3 style='text-align: center; margin-top: 2rem;'>TOP EQUIPMENT BY MONTHLY INCIDENT RATE</h3>", unsafe_allow_html=True)
+st.dataframe(df_latest_ticket, use_container_width=True)
+
+#-------------------------------------------------------------------
 
 st.markdown(
 "<hr style='border: 1.5px solid #222; margin: 30px 0;'>",
 unsafe_allow_html=True
 )
-
-st.markdown("<div style='height: 5rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 1rem'></div>", unsafe_allow_html=True)
 
 # -------------------------------NORTH 1------------------------------------------------------
 
