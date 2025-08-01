@@ -139,7 +139,6 @@ def load_helpdesk_ticket():
     connection.close()
     return df
 
-
 df = load_ticket()
 df_category = load_category()
 df_team = load_team()
@@ -476,7 +475,7 @@ excel_url = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mz
 sheet_name = "VISUALIZE (fin) by weeks"
 usecols = "BF:BQ"
 skiprows = 7
-nrows = 19
+nrows = 10
 try:
     df_excel = load_excel_online(excel_url, sheet_name, usecols, skiprows, nrows)
 except Exception as e:
@@ -496,7 +495,7 @@ excel_url2 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9m
 sheet_name2 = "VISUALIZE (fin) by weeks"
 usecols2 = "BW:CI"
 skiprows2 = 7
-nrows2 = 19
+nrows2 = 10
 try:
     df_excel2 = load_excel_online2(excel_url2, sheet_name2, usecols2, skiprows2, nrows2)
 except Exception as e:
@@ -516,7 +515,7 @@ excel_url3 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9m
 sheet_name3 = "VISUALIZE (fin) by weeks"
 usecols3 = "DD:DK"
 skiprows3 = 10
-nrows3 = 19
+nrows3 = 10
 try:
     df_excel3 = load_excel_online3(excel_url3, sheet_name3, usecols3, skiprows3, nrows3)
 except Exception as e:
@@ -842,7 +841,10 @@ priority_colors = {
 }
 for priority in priority_cols:
     y_values = df_table_priority[priority].tolist()
-    text_labels = [str(v) if v != 0 else "" for v in y_values]
+    if priority == "Emergency":
+        text_labels = [""] * len(y_values)  # Ẩn text mặc định
+    else:
+        text_labels = [str(v) if v != 0 else "" for v in y_values]
     fig_stack_priority.add_trace(go.Bar(
         name=priority,
         x=df_table_priority["Tuần"],
@@ -851,9 +853,36 @@ for priority in priority_cols:
         textposition="inside",
         texttemplate="%{text}",
         textangle=0,
-        textfont=dict(size=9),
+        textfont=dict(size=15),
         marker_color=priority_colors[priority]
     ))
+
+# Thêm annotation ép font cho value "Emergency"
+emergency_y = df_table_priority["Emergency"].tolist()
+for i, (x, y) in enumerate(zip(df_table_priority["Tuần"], emergency_y)):
+    if y != 0:
+        # Tính vị trí y (giữa stack Emergency)
+        y_stack = y / 2
+        # Nếu có các stack phía dưới, cộng dồn lên
+        for below_priority in priority_cols:
+            if below_priority == "Emergency":
+                break
+            y_stack += df_table_priority[below_priority].iloc[i]
+        fig_stack_priority.add_annotation(
+            x=x,
+            y=y_stack,
+            text=f"<b>{int(y)}</b>",
+            showarrow=False,
+            font=dict(size=15, color="black"),  # Size lớn, màu trắng nổi bật trên nền đỏ
+            align="center",
+            xanchor="center",
+            yanchor="middle",
+            borderpad=2,
+            bordercolor="#e74c3c",
+            borderwidth=0,
+            bgcolor="rgba(0,0,0,0)"  # Không nền
+        )
+
 # --- Thêm box so sánh % giữa tuần hiện tại và tuần trước cho từng priority ---
 idx_w = len(df_table_priority["Tuần"]) - 1
 idx_w1 = idx_w - 1
@@ -922,11 +951,11 @@ for i, (x, y, t) in enumerate(zip(df_table_priority["Tuần"], totals_offset, to
         y=y,
         text=f"<span style='color:#e74c3c; font-weight:bold'>{t}</span>",
         showarrow=False,
-        font=dict(size=10, color="#e74c3c"),
+        font=dict(size=20, color="#e74c3c"),
         align="center",
         xanchor="center",
         yanchor="bottom",
-        bgcolor="rgba(255,255,0,0.77)",
+        #bgcolor="rgba(255,255,0,0.77)",
         borderpad=4,
         bordercolor="#e74c3c",
         borderwidth=0
@@ -1138,11 +1167,11 @@ for i, (x, y, t) in enumerate(zip(df_table["Tuần"], totals_offset, totals)):
         y=y,
         text=f"<span style='color:#e74c3c; font-weight:bold'>{t}</span>",
         showarrow=False,
-        font=dict(size=10, color="#e74c3c"),
+        font=dict(size=20, color="#e74c3c"),
         align="center",
         xanchor="center",
         yanchor="bottom",
-        bgcolor="rgba(255,255,0,0.77)",
+        #bgcolor="rgba(255,255,0,0.77)",
         borderpad=4,
         bordercolor="#e74c3c",
         borderwidth=0
@@ -1392,11 +1421,11 @@ for i, (x, y, t) in enumerate(zip(df_table_team["Tuần"], totals_offset, totals
         y=y,
         text=f"<span style='color:#e74c3c; font-weight:bold'>{t}</span>",
         showarrow=False,
-        font=dict(size=10, color="#e74c3c"),
+        font=dict(size=20, color="#e74c3c"),
         align="center",
         xanchor="center",
         yanchor="bottom",
-        bgcolor="rgba(255,255,0,0.77)",
+        #bgcolor="rgba(255,255,0,0.77)",
         borderpad=4,
         bordercolor="#e74c3c",
         borderwidth=0
@@ -1640,11 +1669,11 @@ for i, (x, y, t) in enumerate(zip(df_table_banner["Tuần"], totals_offset, tota
         y=y,
         text=f"<span style='color:#e74c3c; font-weight:bold'>{t}</span>",
         showarrow=False,
-        font=dict(size=10, color="#e74c3c"),
+        font=dict(size=20, color="#e74c3c"),
         align="center",
         xanchor="center",
         yanchor="bottom",
-        bgcolor="rgba(255,255,0,0.77)",
+        #bgcolor="rgba(255,255,0,0.77)",
         borderpad=4,
         bordercolor="#e74c3c",
         borderwidth=0
@@ -1773,7 +1802,244 @@ st.markdown(
 )
 st.markdown("<div style='height: 24rem'></div>", unsafe_allow_html=True)
 
-# Waterfall Chart
+# -------------------------Stacked Column Chart theo Banner theo tháng--------------------------
+
+import calendar
+from datetime import datetime, timedelta
+
+# 1. Tạo danh sách ngày cuối từng tháng từ tháng 1 đến tháng hiện tại
+today = datetime.today()
+start_month = datetime(today.year, 1, 1)
+months = []
+month_labels = []
+month_ends = []
+
+for m in range(1, today.month + 1):
+    last_day = calendar.monthrange(today.year, m)[1]
+    end_date = datetime(today.year, m, last_day, 23, 59, 59)
+    month_ends.append(end_date)
+    month_labels.append(f"{end_date.strftime('%b %Y')}")  # Ví dụ: Jan 2025
+
+# 2. Tạo bảng kiểm tra theo Banner cho từng tháng
+banner_names = [
+    "GO Mall", "Hyper", "Tops", "CBS", "Nguyen Kim", "KUBO", "mini go!"
+]
+table_data_banner_month = []
+for i, end in enumerate(month_ends):
+    row = {"Tháng": month_labels[i]}
+    for banner in banner_names:
+        # Điều kiện 1: custom_end_date == "not yet end"
+        mask1 = (
+            df['mall_display_name'].str.lower().str.startswith(banner.lower(), na=False) &
+            (df['create_date'] <= end) &
+            (df['custom_end_date'] == "not yet end")
+        )
+        # Điều kiện 2: custom_end_date != "not yet end" và custom_end_date > end
+        mask2 = (
+            df['mall_display_name'].str.lower().str.startswith(banner.lower(), na=False) &
+            (df['create_date'] <= end) &
+            (df['custom_end_date'] != "not yet end") &
+            (pd.to_datetime(df['custom_end_date'], errors='coerce') > end)
+        )
+        count = df[mask1].shape[0] + df[mask2].shape[0]
+        row[banner] = count
+    table_data_banner_month.append(row)
+df_table_banner_month = pd.DataFrame(table_data_banner_month)
+
+# 3. Vẽ stacked column chart theo Banner cho từng tháng
+import plotly.graph_objects as go
+
+fig_stack_banner_month = go.Figure()
+for banner in banner_names:
+    y_values = df_table_banner_month[banner].tolist()
+    text_labels = [str(v) if v != 0 else "" for v in y_values]
+    fig_stack_banner_month.add_trace(go.Bar(
+        name=banner,
+        x=df_table_banner_month["Tháng"],
+        y=y_values,
+        text=text_labels,
+        textposition="inside",
+        texttemplate="%{text}",
+        textangle=0,
+        textfont=dict(size=11),
+    ))
+
+# Thêm tổng trên đầu mỗi cột
+totals = df_table_banner_month[banner_names].sum(axis=1)
+totals_offset = totals + totals * 0.04
+for i, (x, y, t) in enumerate(zip(df_table_banner_month["Tháng"], totals_offset, totals)):
+    fig_stack_banner_month.add_annotation(
+        x=x,
+        y=y,
+        text=f"<span style='color:#e74c3c; font-weight:bold'>{t}</span>",
+        showarrow=False,
+        font=dict(size=18, color="#e74c3c"),
+        align="center",
+        xanchor="center",
+        yanchor="bottom",
+        borderpad=4,
+        bordercolor="#e74c3c",
+        borderwidth=0
+    )
+
+fig_stack_banner_month.update_layout(
+    barmode='stack',
+    title=dict(
+        text="OVERALL EVOLUTION OA TICKETS PER BANNER BY MONTH",
+        y=0.97,
+        x=0.5,
+        xanchor='center',
+        yanchor='top',
+        font=dict(size=26)
+    ),
+    width=1400,
+    height=800,
+    legend=dict(
+        orientation="h",
+        yanchor="top",
+        y=1.05,
+        xanchor="center",
+        x=0.5
+    ),
+    xaxis=dict(
+        tickfont=dict(color='black'),
+        title=dict(text="Months", font=dict(color='black'))
+    ),
+    yaxis=dict(
+        tickfont=dict(color='black'),
+        title=dict(text="Number of OA Tickets", font=dict(color='black'))
+    )
+)
+
+# --- Thêm box so sánh % giữa tháng hiện tại và tháng trước cho từng banner ---
+idx_m = len(df_table_banner_month["Tháng"]) - 1
+idx_m1 = idx_m - 1
+m_label = df_table_banner_month["Tháng"].iloc[idx_m]
+active_banners = []
+percent_changes = {}
+banner_positions = {}
+cumulative_height = 0
+for banner in banner_names:
+    count_m = float(df_table_banner_month[banner].iloc[idx_m])
+    if count_m <= 0:
+        continue
+    count_m1 = float(df_table_banner_month[banner].iloc[idx_m1])
+    if count_m1 == 0:
+        percent = 100 if count_m > 0 else 0
+    else:
+        percent = ((count_m - count_m1) / count_m1) * 100
+    active_banners.append(banner)
+    percent_changes[banner] = percent
+    banner_positions[banner] = cumulative_height + count_m / 2
+    cumulative_height += count_m
+if active_banners:
+    total_height = cumulative_height
+    x_vals = list(df_table_banner_month["Tháng"])
+    x_idx = x_vals.index(m_label)
+    x_offset = x_idx + 0.7
+    sorted_banners = sorted(active_banners, key=lambda x: banner_positions[x])
+    for i, banner in enumerate(sorted_banners):
+        percent = percent_changes[banner]
+        if percent > 0:
+            percent_text = f"M vs M-1: +{percent:.1f}%"
+            bgcolor = "#f2c795"
+        elif percent < 0:
+            percent_text = f"M vs M-1: -{abs(percent):.1f}%"
+            bgcolor = "#abf3ab"
+        else:
+            percent_text = "M vs M-1: 0.0%"
+            bgcolor = "#f2c795"
+        y_col = banner_positions[banner]
+        spacing_factor = 0.35
+        y_box = y_col + (total_height * spacing_factor * (i - len(sorted_banners)/2))
+        fig_stack_banner_month.add_annotation(
+            x=m_label, y=y_col,
+            ax=x_offset, ay=y_box,
+            xref="x", yref="y", axref="x", ayref="y",
+            text="", showarrow=True, arrowhead=0, arrowwidth=1, arrowcolor="black"
+        )
+        fig_stack_banner_month.add_annotation(
+            x=x_offset, y=y_box,
+            text=f"<b>{percent_text}</b>",
+            showarrow=False,
+            font=dict(size=11, color="black"),
+            align="left",
+            xanchor="left",
+            yanchor="middle",
+            bgcolor=bgcolor,
+            borderpad=3,
+            bordercolor="black",
+            borderwidth=1
+        )
+st.plotly_chart(fig_stack_banner_month)
+
+# --- Sinh câu mô tả tự động cho chart banner theo tháng ---
+neg_percents = {k: v for k, v in percent_changes.items() if v < 0}
+if neg_percents:
+    A = min(neg_percents, key=neg_percents.get)
+    X = neg_percents[A]
+else:
+    A = min(percent_changes, key=percent_changes.get)
+    X = percent_changes[A]
+
+pos_percents = {k: v for k, v in percent_changes.items() if v > 0}
+if pos_percents:
+    B = max(pos_percents, key=pos_percents.get)
+    Z = pos_percents[B]
+else:
+    B = max(percent_changes, key=percent_changes.get)
+    Z = percent_changes[B]
+
+sum_m = sum([df_table_banner_month[banner].iloc[idx_m] for banner in banner_names])
+sum_m1 = sum([df_table_banner_month[banner].iloc[idx_m1] for banner in banner_names])
+if sum_m1 == 0:
+    Y = 100 if sum_m > 0 else 0
+else:
+    Y = ((sum_m - sum_m1) / sum_m1) * 100
+
+C = 'increased' if Y > 0 else 'decreased'
+
+A_html = f"<span style='color:#d62728; font-weight:bold'>{A}</span>"
+B_html = f"<span style='color:#d62728; font-weight:bold'>{B}</span>"
+C_html = f"<span style='color:#111; font-weight:bold'>{C}</span>"
+decrease_html = "<span style='font-weight:bold; color:#111'>decrease</span>"
+increase_html = "<span style='font-weight:bold; color:#111'>increase</span>"
+total_html = "<span style='font-weight:bold; color:#d62728'>Total</span>"
+
+change_values = list(percent_changes.values())
+num_neg = sum(1 for v in change_values if v < 0)
+num_pos = sum(1 for v in change_values if v > 0)
+num_zero = sum(1 for v in change_values if abs(v) < 1e-6)
+
+if num_neg == 1 and num_zero == len(banner_names) - 1:
+    description = f"{A_html} recorded the largest {decrease_html} at {abs(X):.1f}%, while other banners remains unchanged, compared to the previous month. Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
+elif num_pos == 1 and num_zero == len(banner_names) - 1:
+    description = f"{B_html} show the highest {increase_html} with {abs(Z):.1f}%, while other banners remains unchanged, compared to the previous month. Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
+elif num_neg == len(banner_names):
+    description = f"{A_html} recorded the largest {decrease_html} at {abs(X):.1f}% compared to the previous month. Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
+elif num_pos == len(banner_names):
+    description = f"{B_html} show the highest {increase_html} with {abs(Z):.1f}% compared to the previous month. Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
+elif num_zero == len(banner_names):
+    description = f"All banners remain unchanged compared to the previous month. Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
+else:
+    if abs(X) < 1e-6:
+        decrease_text = f"{A_html} remains unchanged"
+    else:
+        decrease_text = f"{A_html} recorded the largest {decrease_html} at {abs(X):.1f}%"
+    if abs(Z) < 1e-6:
+        increase_text = f"{B_html} remains unchanged"
+    else:
+        increase_text = f"{B_html} show the highest {increase_html} with {abs(Z):.1f}%"
+    description = f"{decrease_text}, while {increase_text}, compared to the previous month. Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
+
+st.markdown(
+    f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>{description}</div>",
+    unsafe_allow_html=True
+)
+st.markdown("<div style='height: 20rem'></div>", unsafe_allow_html=True)
+
+#----------------------------- Waterfall Chart BY WEEKS--------------------------------------------
+
 created_counts = []
 solved_counts = []
 
@@ -1869,6 +2135,122 @@ fig.update_layout(
 st.plotly_chart(fig, use_container_width=True)
 st.markdown("<div style='height: 20rem'></div>", unsafe_allow_html=True)
 
+#----------------------------- Waterfall Chart theo MONTH -----------------------------
+
+import calendar
+from datetime import datetime
+
+# 1. Tạo danh sách ngày đầu và cuối từng tháng từ tháng 1 đến tháng hiện tại
+today = datetime.today()
+month_starts = []
+month_ends = []
+month_labels = []
+for m in range(1, today.month + 1):
+    start_date = datetime(today.year, m, 1)
+    last_day = calendar.monthrange(today.year, m)[1]
+    end_date = datetime(today.year, m, last_day, 23, 59, 59)
+    month_starts.append(start_date)
+    month_ends.append(end_date)
+    month_labels.append(f"{start_date.strftime('%b %Y')}")  # Ví dụ: Jan 2025
+
+# 2. Tính số lượng Created và Solved ticket cho từng tháng
+created_counts_month = []
+solved_counts_month = []
+for start, end in zip(month_starts, month_ends):
+    created = df[(df['create_date'] >= start) & (df['create_date'] <= end)].shape[0]
+    solved = df[
+        (pd.to_datetime(df['custom_end_date'], errors='coerce') >= start) &
+        (pd.to_datetime(df['custom_end_date'], errors='coerce') <= end)
+    ].shape[0]
+    created_counts_month.append(created)
+    solved_counts_month.append(solved)
+
+# 3. Tạo dữ liệu Waterfall step-by-step: mỗi tháng 2 bước Created/Solved
+x_waterfall_month = []
+y_waterfall_month = []
+measure_waterfall_month = []
+text_waterfall_month = []
+for i, month in enumerate(month_labels):
+    x_waterfall_month.append(f"{month} Created")
+    y_waterfall_month.append(created_counts_month[i])
+    measure_waterfall_month.append("relative")
+    text_waterfall_month.append(str(created_counts_month[i]))
+    x_waterfall_month.append(f"{month} Solved")
+    y_waterfall_month.append(-solved_counts_month[i])
+    measure_waterfall_month.append("relative")
+    text_waterfall_month.append(str(-solved_counts_month[i]))
+    # Thêm cột trắng (dummy) sau mỗi tháng, trừ tháng cuối
+    if i < len(month_labels) - 1:
+        x_waterfall_month.append(f"{month} Spacer")
+        y_waterfall_month.append(0)
+        measure_waterfall_month.append("relative")
+        text_waterfall_month.append("")
+
+# 4. Tạo tickvals và ticktext cho trục x (giữa 2 cột Created/Solved, bỏ qua Spacer)
+tickvals_month = []
+ticktext_month = []
+for i, month in enumerate(month_labels):
+    tickvals_month.append(i*3 + 0.5)
+    ticktext_month.append(month)
+
+# 5. Vẽ Waterfall chart theo tháng
+fig_waterfall_month = go.Figure(go.Waterfall(
+    x=x_waterfall_month,
+    y=y_waterfall_month,
+    measure=measure_waterfall_month,
+    text=[f'<span style="background-color:#fff9b1; color:#444; padding:2px 6px; border-radius:4px; font-weight:bold;">{v}</span>' if v not in [None, "", "0"] else "" for v in text_waterfall_month],
+    textposition="outside",
+    connector={"line": {"color": "rgba(0,0,0,0.3)"}},
+    increasing={"marker": {"color": "#e74c3c", "line": {"width": 0}}},
+    decreasing={"marker": {"color": "#27ae60", "line": {"width": 0}}},
+    showlegend=False
+))
+# Thêm legend thủ công cho Created (đỏ) và Solved (xanh)
+fig_waterfall_month.add_trace(go.Scatter(
+    x=[None], y=[None],
+    mode='markers',
+    marker=dict(size=14, color='#e74c3c'),
+    name='Created ticket',
+    showlegend=True
+))
+fig_waterfall_month.add_trace(go.Scatter(
+    x=[None], y=[None],
+    mode='markers',
+    marker=dict(size=14, color='#27ae60'),
+    name='Solved ticket',
+    showlegend=True
+))
+
+fig_waterfall_month.update_layout(
+    title=dict(
+        text="NATIONWIDE ON ASSESSMENT TICKET OVER MONTHS",
+        y=0.97,
+        x=0.5,
+        xanchor='center',
+        yanchor='top',
+        font=dict(size=28)
+    ),
+    width=1000,
+    height=700,
+    xaxis=dict(
+        tickangle=-35,
+        tickfont=dict(color='black'),
+        title=dict(text="Months", font=dict(color='black')),
+        tickvals=tickvals_month,
+        ticktext=ticktext_month,
+    ),
+    yaxis=dict(
+        showticklabels=False,
+        zeroline=False,
+        showgrid=True,
+        gridcolor='#ccc',
+        gridwidth=0.1
+    ),
+    plot_bgcolor='white'
+)
+st.plotly_chart(fig_waterfall_month, use_container_width=True)
+st.markdown("<div style='height: 20rem'></div>", unsafe_allow_html=True)
+
 # --- STACKED COLUMN CHART TỪ EXCEL: OVERALL COST SPENT PER CATEGORY BY WEEKS (MVND)-----------
 
 if 'Tuần' in df_excel.columns:
@@ -1907,11 +2289,11 @@ for i, (x, y, t) in enumerate(zip(df_excel[x_col], totals_offset, totals)):
         y=y,
         text=f"<span style='color:#e74c3c; font-weight:bold'>{int(t)}</span>",
         showarrow=False,
-        font=dict(size=10, color="#e74c3c"),
+        font=dict(size=20, color="#e74c3c"),
         align="center",
         xanchor="center",
         yanchor="bottom",
-        bgcolor="rgba(255,255,0,0.77)",
+        #bgcolor="rgba(255,255,0,0.77)",
         borderpad=4,
         bordercolor="#e74c3c",
         borderwidth=0
@@ -2232,11 +2614,11 @@ for i, (x, y, t) in enumerate(zip(df_excel2[x_col2], totals_offset2, totals2)):
         y=y,
         text=f"<span style='color:#e74c3c; font-weight:bold'>{int(t)}</span>",
         showarrow=False,
-        font=dict(size=10, color="#e74c3c"),
+        font=dict(size=20, color="#e74c3c"),
         align="center",
         xanchor="center",
         yanchor="bottom",
-        bgcolor="rgba(255,255,0,0.77)",
+        #bgcolor="rgba(255,255,0,0.77)",
         borderpad=4,
         bordercolor="#e74c3c",
         borderwidth=0
@@ -2499,11 +2881,11 @@ for i, (x, y, t) in enumerate(zip(df_excel3[x_col3], totals_offset3, totals3)):
         y=y,
         text=f"<span style='color:#e74c3c; font-weight:bold'>{int(t)}</span>",
         showarrow=False,
-        font=dict(size=10, color="#e74c3c"),
+        font=dict(size=20, color="#e74c3c"),
         align="center",
         xanchor="center",
         yanchor="bottom",
-        bgcolor="rgba(255,255,0,0.77)",
+        #bgcolor="rgba(255,255,0,0.77)",
         borderpad=4,
         bordercolor="#e74c3c",
         borderwidth=0
@@ -2845,7 +3227,7 @@ st.markdown(
     """
     <div style="text-align: center; margin-top: 0.5rem; margin-bottom: 1.5rem; font-size: 28px;">
         <span style="color: #e53935; font-weight: bold;">*Note:</span>
-         The budget for mini go! and CBS is still a dummy data, real budget will be added in in the future
+         The budget for CBS is still a dummy data, real budget will be added in in the future
     </div>
     """,
     unsafe_allow_html=True
@@ -2890,11 +3272,11 @@ for i, (x, y, t) in enumerate(zip(df_excel5[x_col_month], totals_offset, totals)
         y=y,
         text=f"<span style='color:#e74c3c; font-weight:bold'>{int(t)}</span>",
         showarrow=False,
-        font=dict(size=10, color="#e74c3c"),
+        font=dict(size=20, color="#e74c3c"),
         align="center",
         xanchor="center",
         yanchor="bottom",
-        bgcolor="rgba(255,255,0,0.77)",
+        #bgcolor="rgba(255,255,0,0.77)",
         borderpad=4,
         bordercolor="#e74c3c",
         borderwidth=0
@@ -3152,11 +3534,11 @@ for i, (x, y, t) in enumerate(zip(df_excel6[x_col_month_team], totals_offset_tea
         y=y,
         text=f"<span style='color:#e74c3c; font-weight:bold'>{int(t)}</span>",
         showarrow=False,
-        font=dict(size=10, color="#e74c3c"),
+        font=dict(size=20, color="#e74c3c"),
         align="center",
         xanchor="center",
         yanchor="bottom",
-        bgcolor="rgba(255,255,0,0.77)",
+        #bgcolor="rgba(255,255,0,0.77)",
         borderpad=4,
         bordercolor="#e74c3c",
         borderwidth=0
@@ -3409,11 +3791,11 @@ for i, (x, y, t) in enumerate(zip(df_excel7[x_col_month_banner], totals_offset_b
         y=y,
         text=f"<span style='color:#e74c3c; font-weight:bold'>{int(t)}</span>",
         showarrow=False,
-        font=dict(size=10, color="#e74c3c"),
+        font=dict(size=20, color="#e74c3c"),
         align="center",
         xanchor="center",
         yanchor="bottom",
-        bgcolor="rgba(255,255,0,0.77)",
+        #bgcolor="rgba(255,255,0,0.77)",
         borderpad=4,
         bordercolor="#e74c3c",
         borderwidth=0
@@ -3725,11 +4107,11 @@ for i, (x, y, t) in enumerate(zip(df_excel8_chart[cat_col], totals_offset, total
         y=y,
         text=f"<span style='color:#e74c3c; font-weight:bold'>{int(t)}</span>",
         showarrow=False,
-        font=dict(size=10, color="#e74c3c"),
+        font=dict(size=20, color="#e74c3c"),
         align="center",
         xanchor="center",
         yanchor="bottom",
-        bgcolor="rgba(255,255,0,0.77)",
+        #bgcolor="rgba(255,255,0,0.77)",
         borderpad=4,
         bordercolor="#e74c3c",
         borderwidth=0
@@ -3887,11 +4269,11 @@ if df_excel10.shape[1] > 1:
             y=y,
             text=f"<span style='color:#e74c3c; font-weight:bold'>{int(t)}</span>",
             showarrow=False,
-            font=dict(size=10, color="#e74c3c"),
+            font=dict(size=20, color="#e74c3c"),
             align="center",
             xanchor="center",
             yanchor="bottom",
-            bgcolor="rgba(255,255,0,0.77)",
+            #bgcolor="rgba(255,255,0,0.77)",
             borderpad=4,
             bordercolor="#e74c3c",
             borderwidth=0
@@ -5105,11 +5487,11 @@ for i, (x, y, t) in enumerate(zip(df_table_north1["Tuần"], totals_offset, tota
         y=y,
         text=f"<span style='color:#e74c3c; font-weight:bold'>{t}</span>",
         showarrow=False,
-        font=dict(size=10, color="#e74c3c"),
+        font=dict(size=20, color="#e74c3c"),
         align="center",
         xanchor="center",
         yanchor="bottom",
-        bgcolor="rgba(255,255,0,0.77)",
+        #bgcolor="rgba(255,255,0,0.77)",
         borderpad=4,
         bordercolor="#e74c3c",
         borderwidth=0
@@ -5371,11 +5753,11 @@ for i, (x, y, t) in enumerate(zip(df_table_priority_north1["Tuần"], totals_off
         y=y,
         text=f"<span style='color:#e74c3c; font-weight:bold'>{t}</span>",
         showarrow=False,
-        font=dict(size=10, color="#e74c3c"),
+        font=dict(size=20, color="#e74c3c"),
         align="center",
         xanchor="center",
         yanchor="bottom",
-        bgcolor="rgba(255,255,0,0.77)",
+        #bgcolor="rgba(255,255,0,0.77)",
         borderpad=4,
         bordercolor="#e74c3c",
         borderwidth=0
@@ -6056,11 +6438,11 @@ for i, (x, y, t) in enumerate(zip(df_table_north2["Tuần"], totals_offset2, tot
         y=y,
         text=f"<span style='color:#e74c3c; font-weight:bold'>{t}</span>",
         showarrow=False,
-        font=dict(size=10, color="#e74c3c"),
+        font=dict(size=20, color="#e74c3c"),
         align="center",
         xanchor="center",
         yanchor="bottom",
-        bgcolor="rgba(255,255,0,0.77)",
+        #bgcolor="rgba(255,255,0,0.77)",
         borderpad=4,
         bordercolor="#e74c3c",
         borderwidth=0
@@ -6305,11 +6687,11 @@ for i, (x, y, t) in enumerate(zip(df_table_priority_north2["Tuần"], totals_off
         y=y,
         text=f"<span style='color:#e74c3c; font-weight:bold'>{t}</span>",
         showarrow=False,
-        font=dict(size=10, color="#e74c3c"),
+        font=dict(size=20, color="#e74c3c"),
         align="center",
         xanchor="center",
         yanchor="bottom",
-        bgcolor="rgba(255,255,0,0.77)",
+        #bgcolor="rgba(255,255,0,0.77)",
         borderpad=4,
         bordercolor="#e74c3c",
         borderwidth=0
@@ -6958,11 +7340,11 @@ for i, (x, y, t) in enumerate(zip(df_table_north3["Tuần"], totals_offset3, tot
         y=y,
         text=f"<span style='color:#e74c3c; font-weight:bold'>{t}</span>",
         showarrow=False,
-        font=dict(size=10, color="#e74c3c"),
+        font=dict(size=20, color="#e74c3c"),
         align="center",
         xanchor="center",
         yanchor="bottom",
-        bgcolor="rgba(255,255,0,0.77)",
+        #bgcolor="rgba(255,255,0,0.77)",
         borderpad=4,
         bordercolor="#e74c3c",
         borderwidth=0
@@ -7205,11 +7587,11 @@ for i, (x, y, t) in enumerate(zip(df_table_priority_north3["Tuần"], totals_off
         y=y,
         text=f"<span style='color:#e74c3c; font-weight:bold'>{t}</span>",
         showarrow=False,
-        font=dict(size=10, color="#e74c3c"),
+        font=dict(size=20, color="#e74c3c"),
         align="center",
         xanchor="center",
         yanchor="bottom",
-        bgcolor="rgba(255,255,0,0.77)",
+        #bgcolor="rgba(255,255,0,0.77)",
         borderpad=4,
         bordercolor="#e74c3c",
         borderwidth=0
@@ -7867,11 +8249,11 @@ for i, (x, y, t) in enumerate(zip(df_table_center1["Tuần"], totals_offset, tot
         y=y,
         text=f"<span style='color:#e74c3c; font-weight:bold'>{t}</span>",
         showarrow=False,
-        font=dict(size=10, color="#e74c3c"),
+        font=dict(size=20, color="#e74c3c"),
         align="center",
         xanchor="center",
         yanchor="bottom",
-        bgcolor="rgba(255,255,0,0.77)",
+        #bgcolor="rgba(255,255,0,0.77)",
         borderpad=4,
         bordercolor="#e74c3c",
         borderwidth=0
@@ -8114,11 +8496,11 @@ for i, (x, y, t) in enumerate(zip(df_table_priority_center1["Tuần"], totals_of
         y=y,
         text=f"<span style='color:#e74c3c; font-weight:bold'>{t}</span>",
         showarrow=False,
-        font=dict(size=10, color="#e74c3c"),
+        font=dict(size=20, color="#e74c3c"),
         align="center",
         xanchor="center",
         yanchor="bottom",
-        bgcolor="rgba(255,255,0,0.77)",
+        #bgcolor="rgba(255,255,0,0.77)",
         borderpad=4,
         bordercolor="#e74c3c",
         borderwidth=0
@@ -8747,11 +9129,11 @@ for i, (x, y, t) in enumerate(zip(df_table_center2["Tuần"], totals_offset, tot
         y=y,
         text=f"<span style='color:#e74c3c; font-weight:bold'>{t}</span>",
         showarrow=False,
-        font=dict(size=10, color="#e74c3c"),
+        font=dict(size=20, color="#e74c3c"),
         align="center",
         xanchor="center",
         yanchor="bottom",
-        bgcolor="rgba(255,255,0,0.77)",
+        #bgcolor="rgba(255,255,0,0.77)",
         borderpad=4,
         bordercolor="#e74c3c",
         borderwidth=0
@@ -8994,11 +9376,11 @@ for i, (x, y, t) in enumerate(zip(df_table_priority_center2["Tuần"], totals_of
         y=y,
         text=f"<span style='color:#e74c3c; font-weight:bold'>{t}</span>",
         showarrow=False,
-        font=dict(size=10, color="#e74c3c"),
+        font=dict(size=20, color="#e74c3c"),
         align="center",
         xanchor="center",
         yanchor="bottom",
-        bgcolor="rgba(255,255,0,0.77)",
+        #bgcolor="rgba(255,255,0,0.77)",
         borderpad=4,
         bordercolor="#e74c3c",
         borderwidth=0
@@ -9633,11 +10015,11 @@ for i, (x, y, t) in enumerate(zip(df_table_center3["Tuần"], totals_offset, tot
         y=y,
         text=f"<span style='color:#e74c3c; font-weight:bold'>{t}</span>",
         showarrow=False,
-        font=dict(size=10, color="#e74c3c"),
+        font=dict(size=20, color="#e74c3c"),
         align="center",
         xanchor="center",
         yanchor="bottom",
-        bgcolor="rgba(255,255,0,0.77)",
+        #bgcolor="rgba(255,255,0,0.77)",
         borderpad=4,
         bordercolor="#e74c3c",
         borderwidth=0
@@ -9880,11 +10262,11 @@ for i, (x, y, t) in enumerate(zip(df_table_priority_center3["Tuần"], totals_of
         y=y,
         text=f"<span style='color:#e74c3c; font-weight:bold'>{t}</span>",
         showarrow=False,
-        font=dict(size=10, color="#e74c3c"),
+        font=dict(size=20, color="#e74c3c"),
         align="center",
         xanchor="center",
         yanchor="bottom",
-        bgcolor="rgba(255,255,0,0.77)",
+        #bgcolor="rgba(255,255,0,0.77)",
         borderpad=4,
         bordercolor="#e74c3c",
         borderwidth=0
@@ -10520,11 +10902,11 @@ for i, (x, y, t) in enumerate(zip(df_table_center4["Tuần"], totals_offset, tot
         y=y,
         text=f"<span style='color:#e74c3c; font-weight:bold'>{t}</span>",
         showarrow=False,
-        font=dict(size=10, color="#e74c3c"),
+        font=dict(size=20, color="#e74c3c"),
         align="center",
         xanchor="center",
         yanchor="bottom",
-        bgcolor="rgba(255,255,0,0.77)",
+        #bgcolor="rgba(255,255,0,0.77)",
         borderpad=4,
         bordercolor="#e74c3c",
         borderwidth=0
@@ -10767,11 +11149,11 @@ for i, (x, y, t) in enumerate(zip(df_table_priority_center4["Tuần"], totals_of
         y=y,
         text=f"<span style='color:#e74c3c; font-weight:bold'>{t}</span>",
         showarrow=False,
-        font=dict(size=10, color="#e74c3c"),
+        font=dict(size=20, color="#e74c3c"),
         align="center",
         xanchor="center",
         yanchor="bottom",
-        bgcolor="rgba(255,255,0,0.77)",
+        #bgcolor="rgba(255,255,0,0.77)",
         borderpad=4,
         bordercolor="#e74c3c",
         borderwidth=0
@@ -11403,11 +11785,11 @@ for i, (x, y, t) in enumerate(zip(df_table_south1["Tuần"], totals_offset, tota
         y=y,
         text=f"<span style='color:#e74c3c; font-weight:bold'>{t}</span>",
         showarrow=False,
-        font=dict(size=10, color="#e74c3c"),
+        font=dict(size=20, color="#e74c3c"),
         align="center",
         xanchor="center",
         yanchor="bottom",
-        bgcolor="rgba(255,255,0,0.77)",
+        #bgcolor="rgba(255,255,0,0.77)",
         borderpad=4,
         bordercolor="#e74c3c",
         borderwidth=0
@@ -11650,11 +12032,11 @@ for i, (x, y, t) in enumerate(zip(df_table_priority_south1["Tuần"], totals_off
         y=y,
         text=f"<span style='color:#e74c3c; font-weight:bold'>{t}</span>",
         showarrow=False,
-        font=dict(size=10, color="#e74c3c"),
+        font=dict(size=20, color="#e74c3c"),
         align="center",
         xanchor="center",
         yanchor="bottom",
-        bgcolor="rgba(255,255,0,0.77)",
+        #bgcolor="rgba(255,255,0,0.77)",
         borderpad=4,
         bordercolor="#e74c3c",
         borderwidth=0
@@ -12287,11 +12669,11 @@ for i, (x, y, t) in enumerate(zip(df_table_south2["Tuần"], totals_offset, tota
         y=y,
         text=f"<span style='color:#e74c3c; font-weight:bold'>{t}</span>",
         showarrow=False,
-        font=dict(size=10, color="#e74c3c"),
+        font=dict(size=20, color="#e74c3c"),
         align="center",
         xanchor="center",
         yanchor="bottom",
-        bgcolor="rgba(255,255,0,0.77)",
+        #bgcolor="rgba(255,255,0,0.77)",
         borderpad=4,
         bordercolor="#e74c3c",
         borderwidth=0
@@ -12534,11 +12916,11 @@ for i, (x, y, t) in enumerate(zip(df_table_priority_south2["Tuần"], totals_off
         y=y,
         text=f"<span style='color:#e74c3c; font-weight:bold'>{t}</span>",
         showarrow=False,
-        font=dict(size=10, color="#e74c3c"),
+        font=dict(size=20, color="#e74c3c"),
         align="center",
         xanchor="center",
         yanchor="bottom",
-        bgcolor="rgba(255,255,0,0.77)",
+        #bgcolor="rgba(255,255,0,0.77)",
         borderpad=4,
         bordercolor="#e74c3c",
         borderwidth=0
@@ -13178,11 +13560,11 @@ for i, (x, y, t) in enumerate(zip(df_table_south3["Tuần"], totals_offset, tota
         y=y,
         text=f"<span style='color:#e74c3c; font-weight:bold'>{t}</span>",
         showarrow=False,
-        font=dict(size=10, color="#e74c3c"),
+        font=dict(size=20, color="#e74c3c"),
         align="center",
         xanchor="center",
         yanchor="bottom",
-        bgcolor="rgba(255,255,0,0.77)",
+        #bgcolor="rgba(255,255,0,0.77)",
         borderpad=4,
         bordercolor="#e74c3c",
         borderwidth=0
@@ -13425,11 +13807,11 @@ for i, (x, y, t) in enumerate(zip(df_table_priority_south3["Tuần"], totals_off
         y=y,
         text=f"<span style='color:#e74c3c; font-weight:bold'>{t}</span>",
         showarrow=False,
-        font=dict(size=10, color="#e74c3c"),
+        font=dict(size=20, color="#e74c3c"),
         align="center",
         xanchor="center",
         yanchor="bottom",
-        bgcolor="rgba(255,255,0,0.77)",
+        #bgcolor="rgba(255,255,0,0.77)",
         borderpad=4,
         bordercolor="#e74c3c",
         borderwidth=0
@@ -14063,11 +14445,11 @@ for i, (x, y, t) in enumerate(zip(df_table_south4["Tuần"], totals_offset, tota
         y=y,
         text=f"<span style='color:#e74c3c; font-weight:bold'>{t}</span>",
         showarrow=False,
-        font=dict(size=10, color="#e74c3c"),
+        font=dict(size=20, color="#e74c3c"),
         align="center",
         xanchor="center",
         yanchor="bottom",
-        bgcolor="rgba(255,255,0,0.77)",
+        #bgcolor="rgba(255,255,0,0.77)",
         borderpad=4,
         bordercolor="#e74c3c",
         borderwidth=0
@@ -14310,11 +14692,11 @@ for i, (x, y, t) in enumerate(zip(df_table_priority_south4["Tuần"], totals_off
         y=y,
         text=f"<span style='color:#e74c3c; font-weight:bold'>{t}</span>",
         showarrow=False,
-        font=dict(size=10, color="#e74c3c"),
+        font=dict(size=20, color="#e74c3c"),
         align="center",
         xanchor="center",
         yanchor="bottom",
-        bgcolor="rgba(255,255,0,0.77)",
+        #bgcolor="rgba(255,255,0,0.77)",
         borderpad=4,
         bordercolor="#e74c3c",
         borderwidth=0
@@ -14955,11 +15337,11 @@ for i, (x, y, t) in enumerate(zip(df_table_south5["Tuần"], totals_offset, tota
         y=y,
         text=f"<span style='color:#e74c3c; font-weight:bold'>{t}</span>",
         showarrow=False,
-        font=dict(size=10, color="#e74c3c"),
+        font=dict(size=20, color="#e74c3c"),
         align="center",
         xanchor="center",
         yanchor="bottom",
-        bgcolor="rgba(255,255,0,0.77)",
+        #bgcolor="rgba(255,255,0,0.77)",
         borderpad=4,
         bordercolor="#e74c3c",
         borderwidth=0
@@ -15202,11 +15584,11 @@ for i, (x, y, t) in enumerate(zip(df_table_priority_south5["Tuần"], totals_off
         y=y,
         text=f"<span style='color:#e74c3c; font-weight:bold'>{t}</span>",
         showarrow=False,
-        font=dict(size=10, color="#e74c3c"),
+        font=dict(size=20, color="#e74c3c"),
         align="center",
         xanchor="center",
         yanchor="bottom",
-        bgcolor="rgba(255,255,0,0.77)",
+        #bgcolor="rgba(255,255,0,0.77)",
         borderpad=4,
         bordercolor="#e74c3c",
         borderwidth=0
@@ -15618,4 +16000,4 @@ num_rows = df_sites_south5.shape[0]
 row_height = 35
 header_height = 38
 st.dataframe(styled, use_container_width=True, height=num_rows * row_height + header_height)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+
