@@ -607,7 +607,7 @@ excel_url8 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9m
 sheet_name8 = "Actual cost per cat"
 usecols8 = "Y:AK"
 skiprows8 = 3
-nrows8 = 12
+nrows8 = 11
 try:
     df_excel8 = load_excel_online8(excel_url8, sheet_name8, usecols8, skiprows8, nrows8)
 except Exception as e:
