@@ -552,7 +552,7 @@ excel_url5 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9m
 sheet_name5 = "VISUALIZE (fin) by months"
 usecols5 = "BF:BQ"
 skiprows5 = 7
-nrows5 = 5
+nrows5 = 6
 try:
     df_excel5 = load_excel_online5(excel_url5, sheet_name5, usecols5, skiprows5, nrows5)
 except Exception as e:
@@ -571,7 +571,7 @@ excel_url6 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9m
 sheet_name6 = "VISUALIZE (fin) by months"
 usecols6 = "BY:CK"
 skiprows6 = 7
-nrows6 = 5
+nrows6 = 6
 try:
     df_excel6 = load_excel_online6(excel_url6, sheet_name6, usecols6, skiprows6, nrows6)
 except Exception as e:
@@ -589,7 +589,7 @@ excel_url7 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9m
 sheet_name7 = "VISUALIZE (fin) by months"
 usecols7 = "DF:DM"
 skiprows7 = 10
-nrows7 = 5
+nrows7 = 6
 try:
     df_excel7 = load_excel_online7(excel_url7, sheet_name7, usecols7, skiprows7, nrows7)
 except Exception as e:
@@ -690,6 +690,25 @@ except Exception as e:
     st.warning(f"Không thể đọc dữ liệu từ file Excel online thứ 12: {e}")
 
 
+# --- Đọc dữ liệu từ file Excel online thứ 13---
+@st.cache_data(show_spinner=True) 
+def load_excel_online13(excel_url13, sheet_name13, usecols13, skiprows13, nrows13):
+    response13 = requests.get(excel_url13)
+    excel_data13 = BytesIO(response13.content)
+    df_excel13 = pd.read_excel(excel_data13, sheet_name=sheet_name13, usecols=usecols13, skiprows=skiprows13, nrows=nrows13)
+    return df_excel13
+
+excel_url13 = "https://1drv.ms/x/c/982465afa38d44b6/EbHU7h-HDBlOrFY5xavC3JMBqdy9mzqsPhIMVyQWJ8AL3Q?e=8Vy150&download=1"
+sheet_name13 = "bud by month"
+usecols13 = "A:M"
+skiprows13 = 28
+nrows13 = 15
+try:
+    df_excel13 = load_excel_online13(excel_url13, sheet_name13, usecols13, skiprows13, nrows13)
+except Exception as e:
+    st.warning(f"Không thể đọc dữ liệu từ file Excel online thứ 13: {e}")
+
+    
 toc_html = """
 <style>
 #toc-float {
@@ -1308,7 +1327,7 @@ st.markdown(
     f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>{description}</div>",
     unsafe_allow_html=True
 )
-st.markdown("<div style='height: 5rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
 
 # -------------------------Stacked Column Chart theo Team--------------------------
 
@@ -3227,7 +3246,7 @@ st.markdown(
     """
     <div style="text-align: center; margin-top: 0.5rem; margin-bottom: 1.5rem; font-size: 28px;">
         <span style="color: #e53935; font-weight: bold;">*Note:</span>
-         The budget for CBS is still a dummy data, real budget will be added in in the future
+        The budget for CBS is still a dummy data, real budget will be added in in the future
     </div>
     """,
     unsafe_allow_html=True
@@ -3338,7 +3357,7 @@ if active_categories:
     total_height = cumulative_height
     x_vals = list(df_excel5[x_col_month])
     x_idx = x_vals.index(w_label)
-    x_offset = x_idx + 2
+    x_offset = x_idx + 0.8
     sorted_categories = sorted(active_categories, key=lambda x: category_positions[x])
     for i, cat in enumerate(sorted_categories):
         percent = percent_changes[cat]
@@ -3352,7 +3371,7 @@ if active_categories:
             percent_text = "M vs M-1: 0.0%"
             bgcolor = "#f2c795"
         y_col = category_positions[cat]
-        spacing_factor = 0.35
+        spacing_factor = 2
         y_box = y_col + (total_height * spacing_factor * (i - len(sorted_categories)/2))
         fig_stack_excel_month.add_annotation(
             x=w_label, y=y_col,
@@ -3490,7 +3509,7 @@ else:
         desc = ", while ".join(desc_parts) + f", respectively, compared to the previous month. Overall, the {total_html} change is {'decreased' if total_percent < 0 else 'increased'} by {total_percent_html(total_percent)}"
 
 st.markdown(f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>{desc}</div>", unsafe_allow_html=True)
-st.markdown("<div style='height: 12rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 19rem'></div>", unsafe_allow_html=True)
 
 # --- STACKED COLUMN CHART TỪ EXCEL: OVERALL COST SPENT PER TEAM BY MONTH (MVND)-----------
 
@@ -3595,7 +3614,7 @@ if active_teams:
     total_height_team = cumulative_height_team
     x_vals_team = list(df_excel6[x_col_month_team])
     x_idx_team = x_vals_team.index(w_label_team)
-    x_offset_team = x_idx_team + 2
+    x_offset_team = x_idx_team + 0.8
     sorted_teams = sorted(active_teams, key=lambda x: team_positions[x])
     for i, team in enumerate(sorted_teams):
         percent = percent_changes_team[team]
@@ -3609,7 +3628,7 @@ if active_teams:
             percent_text = "M vs M-1: 0.0%"
             bgcolor = "#f2c795"
         y_col = team_positions[team]
-        spacing_factor = 0.35
+        spacing_factor = 2
         y_box = y_col + (total_height_team * spacing_factor * (i - len(sorted_teams)/2))
         fig_stack_excel_month_team.add_annotation(
             x=w_label_team, y=y_col,
@@ -3852,7 +3871,7 @@ if active_banners:
     total_height_banner = cumulative_height_banner
     x_vals_banner = list(df_excel7[x_col_month_banner])
     x_idx_banner = x_vals_banner.index(w_label_banner)
-    x_offset_banner = x_idx_banner + 2
+    x_offset_banner = x_idx_banner + 0.8
     sorted_banners = sorted(active_banners, key=lambda x: banner_positions[x])
     for i, banner in enumerate(sorted_banners):
         percent = percent_changes_banner[banner]
@@ -3866,7 +3885,7 @@ if active_banners:
             percent_text = "M vs M-1: 0.0%"
             bgcolor = "#f2c795"
         y_col = banner_positions[banner]
-        spacing_factor = 0.35
+        spacing_factor = 2
         y_box = y_col + (total_height_banner * spacing_factor * (i - len(sorted_banners)/2))
         fig_stack_excel_month_banner.add_annotation(
             x=w_label_banner, y=y_col,
@@ -5229,14 +5248,456 @@ df_latest_ticket = pd.DataFrame({
 
 st.markdown("<h3 style='text-align: center; margin-top: 2rem;'>TOP EQUIPMENT BY MONTHLY INCIDENT RATE</h3>", unsafe_allow_html=True)
 st.dataframe(df_latest_ticket, use_container_width=True)
+st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
 
-#-------------------------------------------------------------------
+#------------------------ GO MALL - CHART ACTUAL COST VS BUDGET -------------------------------------------
+
+import plotly.graph_objects as go
+
+row1 = df_excel13.iloc[0, 1:]
+row2 = df_excel13.iloc[1, 1:]
+x_labels = df_excel13.columns[1:].tolist()
+y_line = [round(v) if pd.notnull(v) else 0 for v in row1.values.tolist()]
+y_bar = [round(v) if pd.notnull(v) else 0 for v in row2.values.tolist()]
+
+fig_combo = go.Figure()
+
+# Line chart cho dòng 1
+fig_combo.add_trace(go.Scatter(
+    x=x_labels,
+    y=y_line,
+    mode='lines+markers',
+    name='Go Mall - Budget',
+    line=dict(color='#e74c3c', width=3),
+    marker=dict(size=10, color='#e74c3c'),
+    text=[str(v) if v != 0 else "" for v in y_line],  # Ẩn label nếu = 0
+    textposition='top center'
+))
+
+# Bar chart cho dòng 2
+fig_combo.add_trace(go.Bar(
+    x=x_labels,
+    y=y_bar,
+    name='GO Mall - Actual Cost',
+    marker_color='#3498db',
+    text=[str(v) if v != 0 else "" for v in y_bar],  # Ẩn label nếu = 0
+    textposition='outside',
+    textfont=dict(size=16, color='black', family='Arial', weight='bold')
+))
+
+fig_combo.update_layout(
+    title={
+        'text': 'Go Mall - Actual Cost vs Budget (2025) (MVND)',
+        'y': 1.0,
+        'x': 0.5,
+        'xanchor': 'center',
+        'yanchor': 'top',
+        'font': dict(size=28)
+    },
+    width=1300,
+    height=650,
+    legend=dict(
+        orientation="h",
+        yanchor="top",
+        y=1.08,
+        xanchor="center",
+        x=0.5
+    ),
+    xaxis=dict(
+        tickfont=dict(color='black', size=14),
+    ),
+    yaxis=dict(
+        tickfont=dict(color='black', size=14),
+    )
+)
+st.plotly_chart(fig_combo, use_container_width=True)
+st.markdown("<div style='height: 6rem'></div>", unsafe_allow_html=True)
+
+#------------------------ HYPER - CHART ACTUAL COST VS BUDGET -------------------------------------------
+
+import plotly.graph_objects as go
+
+row1_hyper = df_excel13.iloc[2, 1:]  # Dòng 3 (index 2)
+row2_hyper = df_excel13.iloc[3, 1:]  # Dòng 4 (index 3)
+x_labels_hyper = df_excel13.columns[1:].tolist()
+y_line_hyper = [round(v) if pd.notnull(v) else 0 for v in row1_hyper.values.tolist()]
+y_bar_hyper = [round(v) if pd.notnull(v) else 0 for v in row2_hyper.values.tolist()]
+
+fig_combo_hyper = go.Figure()
+
+# Line chart cho dòng 3
+fig_combo_hyper.add_trace(go.Scatter(
+    x=x_labels_hyper,
+    y=y_line_hyper,
+    mode='lines+markers',
+    name='Hyper - Budget',
+    line=dict(color='#e74c3c', width=3),
+    marker=dict(size=10, color='#e74c3c'),
+    text=[str(v) if v != 0 else "" for v in y_line_hyper],
+    textposition='top center'
+))
+
+# Bar chart cho dòng 4
+fig_combo_hyper.add_trace(go.Bar(
+    x=x_labels_hyper,
+    y=y_bar_hyper,
+    name='Hyper - Actual Cost',
+    marker_color='#2980b9',
+    text=[str(v) if v != 0 else "" for v in y_bar_hyper],
+    textposition='outside',
+    textfont=dict(size=16, color='black', family='Arial', weight='bold')
+))
+
+fig_combo_hyper.update_layout(
+    title={
+        'text': 'Hyper - Actual Cost vs Budget (2025) (MVND)',
+        'y': 1.0,
+        'x': 0.5,
+        'xanchor': 'center',
+        'yanchor': 'top',
+        'font': dict(size=28)
+    },
+    width=1300,
+    height=650,
+    legend=dict(
+        orientation="h",
+        yanchor="top",
+        y=1.08,
+        xanchor="center",
+        x=0.5
+    ),
+    xaxis=dict(
+        tickfont=dict(color='black', size=14),
+    ),
+    yaxis=dict(
+        tickfont=dict(color='black', size=14),
+    )
+)
+st.plotly_chart(fig_combo_hyper, use_container_width=True)
+st.markdown("<div style='height: 6rem'></div>", unsafe_allow_html=True)
+
+#------------------------ TOP - CHART ACTUAL COST VS BUDGET -------------------------------------------
+
+import plotly.graph_objects as go
+
+row1_top = df_excel13.iloc[4, 1:]  # Dòng 5 (index 4) - Budget
+row2_top = df_excel13.iloc[5, 1:]  # Dòng 6 (index 5) - Actual Cost
+x_labels_top = df_excel13.columns[1:].tolist()
+y_line_top = [round(v) if pd.notnull(v) else 0 for v in row1_top.values.tolist()]
+y_bar_top = [round(v) if pd.notnull(v) else 0 for v in row2_top.values.tolist()]
+
+fig_combo_top = go.Figure()
+
+# Line chart cho dòng 5
+fig_combo_top.add_trace(go.Scatter(
+    x=x_labels_top,
+    y=y_line_top,
+    mode='lines+markers',
+    name='Top - Budget',
+    line=dict(color='#e67e22', width=3),
+    marker=dict(size=10, color='#e67e22'),
+    text=[str(v) if v != 0 else "" for v in y_line_top],
+    textposition='top center'
+))
+
+# Bar chart cho dòng 6
+fig_combo_top.add_trace(go.Bar(
+    x=x_labels_top,
+    y=y_bar_top,
+    name='Top - Actual Cost',
+    marker_color='#16a085',
+    text=[str(v) if v != 0 else "" for v in y_bar_top],
+    textposition='outside',
+    textfont=dict(size=16, color='black', family='Arial', weight='bold')
+))
+
+fig_combo_top.update_layout(
+    title={
+        'text': 'Top - Actual Cost vs Budget (2025) (MVND)',
+        'y': 1.0,
+        'x': 0.5,
+        'xanchor': 'center',
+        'yanchor': 'top',
+        'font': dict(size=28)
+    },
+    width=1300,
+    height=650,
+    legend=dict(
+        orientation="h",
+        yanchor="top",
+        y=1.08,
+        xanchor="center",
+        x=0.5
+    ),
+    xaxis=dict(
+        tickfont=dict(color='black', size=14),
+    ),
+    yaxis=dict(
+        tickfont=dict(color='black', size=14),
+    )
+)
+st.plotly_chart(fig_combo_top, use_container_width=True)
+st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+
+#------------------------ MINIGO - CHART ACTUAL COST VS BUDGET -------------------------------------------
+
+import plotly.graph_objects as go
+
+row1_minigo = df_excel13.iloc[6, 1:]  # Dòng 7 (index 6) - Budget
+row2_minigo = df_excel13.iloc[7, 1:]  # Dòng 8 (index 7) - Actual Cost
+x_labels_minigo = df_excel13.columns[1:].tolist()
+y_line_minigo = [round(v) if pd.notnull(v) else 0 for v in row1_minigo.values.tolist()]
+y_bar_minigo = [round(v) if pd.notnull(v) else 0 for v in row2_minigo.values.tolist()]
+
+fig_combo_minigo = go.Figure()
+
+# Line chart cho dòng 7
+fig_combo_minigo.add_trace(go.Scatter(
+    x=x_labels_minigo,
+    y=y_line_minigo,
+    mode='lines+markers',
+    name='Minigo - Budget',
+    line=dict(color='#f39c12', width=3),
+    marker=dict(size=10, color='#f39c12'),
+    text=[str(v) if v != 0 else "" for v in y_line_minigo],
+    textposition='top center'
+))
+
+# Bar chart cho dòng 8
+fig_combo_minigo.add_trace(go.Bar(
+    x=x_labels_minigo,
+    y=y_bar_minigo,
+    name='Minigo - Actual Cost',
+    marker_color='#8e44ad',
+    text=[str(v) if v != 0 else "" for v in y_bar_minigo],
+    textposition='outside',
+    textfont=dict(size=16, color='black', family='Arial', weight='bold')
+))
+
+fig_combo_minigo.update_layout(
+    title={
+        'text': 'Minigo - Actual Cost vs Budget (2025) (MVND)',
+        'y': 1.0,
+        'x': 0.5,
+        'xanchor': 'center',
+        'yanchor': 'top',
+        'font': dict(size=28)
+    },
+    width=1300,
+    height=650,
+    legend=dict(
+        orientation="h",
+        yanchor="top",
+        y=1.08,
+        xanchor="center",
+        x=0.5
+    ),
+    xaxis=dict(
+        tickfont=dict(color='black', size=14),
+    ),
+    yaxis=dict(
+        tickfont=dict(color='black', size=14),
+    )
+)
+st.plotly_chart(fig_combo_minigo, use_container_width=True)
+st.markdown("<div style='height: 6rem'></div>", unsafe_allow_html=True)
+
+#------------------------ NK - CHART ACTUAL COST VS BUDGET -------------------------------------------
+
+import plotly.graph_objects as go
+
+row1_nk = df_excel13.iloc[8, 1:]  # Dòng 9 (index 8) - Budget
+row2_nk = df_excel13.iloc[9, 1:]  # Dòng 10 (index 9) - Actual Cost
+x_labels_nk = df_excel13.columns[1:].tolist()
+y_line_nk = [round(v) if pd.notnull(v) else 0 for v in row1_nk.values.tolist()]
+y_bar_nk = [round(v) if pd.notnull(v) else 0 for v in row2_nk.values.tolist()]
+
+fig_combo_nk = go.Figure()
+
+# Line chart cho dòng 9
+fig_combo_nk.add_trace(go.Scatter(
+    x=x_labels_nk,
+    y=y_line_nk,
+    mode='lines+markers',
+    name='NK - Budget',
+    line=dict(color='#34495e', width=3),
+    marker=dict(size=10, color='#34495e'),
+    text=[str(v) if v != 0 else "" for v in y_line_nk],
+    textposition='top center'
+))
+
+# Bar chart cho dòng 10
+fig_combo_nk.add_trace(go.Bar(
+    x=x_labels_nk,
+    y=y_bar_nk,
+    name='NK - Actual Cost',
+    marker_color='#e74c3c',
+    text=[str(v) if v != 0 else "" for v in y_bar_nk],
+    textposition='outside',
+    textfont=dict(size=16, color='black', family='Arial', weight='bold')
+))
+
+fig_combo_nk.update_layout(
+    title={
+        'text': 'NGUYEN KIM - Actual Cost vs Budget (2025) (MVND)',
+        'y': 1.0,
+        'x': 0.5,
+        'xanchor': 'center',
+        'yanchor': 'top',
+        'font': dict(size=28)
+    },
+    width=1300,
+    height=650,
+    legend=dict(
+        orientation="h",
+        yanchor="top",
+        y=1.08,
+        xanchor="center",
+        x=0.5
+    ),
+    xaxis=dict(
+        tickfont=dict(color='black', size=14),
+    ),
+    yaxis=dict(
+        tickfont=dict(color='black', size=14),
+    )
+)
+st.plotly_chart(fig_combo_nk, use_container_width=True)
+st.markdown("<div style='height: 6rem'></div>", unsafe_allow_html=True)
+
+#------------------------ CBS - CHART ACTUAL COST VS BUDGET -------------------------------------------
+
+import plotly.graph_objects as go
+
+row1_cbs = df_excel13.iloc[10, 1:]  # Dòng 11 (index 10) - Budget
+row2_cbs = df_excel13.iloc[11, 1:]  # Dòng 12 (index 11) - Actual Cost
+x_labels_cbs = df_excel13.columns[1:].tolist()
+y_line_cbs = [round(v) if pd.notnull(v) else 0 for v in row1_cbs.values.tolist()]
+y_bar_cbs = [round(v) if pd.notnull(v) else 0 for v in row2_cbs.values.tolist()]
+
+fig_combo_cbs = go.Figure()
+
+# Line chart cho dòng 11
+fig_combo_cbs.add_trace(go.Scatter(
+    x=x_labels_cbs,
+    y=y_line_cbs,
+    mode='lines+markers',
+    name='CBS - Budget',
+    line=dict(color='#e74c3c', width=3),
+    marker=dict(size=10, color='#e74c3c'),
+    text=[str(v) if v != 0 else "" for v in y_line_cbs],
+    textposition='top center'
+))
+
+# Bar chart cho dòng 12
+fig_combo_cbs.add_trace(go.Bar(
+    x=x_labels_cbs,
+    y=y_bar_cbs,
+    name='CBS - Actual Cost',
+    marker_color='#00bfff',
+    text=[str(v) if v != 0 else "" for v in y_bar_cbs],
+    textposition='outside',
+    textfont=dict(size=16, color='black', family='Arial', weight='bold')
+))
+
+fig_combo_cbs.update_layout(
+    title={
+        'text': 'CBS - Actual Cost vs Budget (2025) (MVND)',
+        'y': 1.0,
+        'x': 0.5,
+        'xanchor': 'center',
+        'yanchor': 'top',
+        'font': dict(size=28)
+    },
+    width=1300,
+    height=650,
+    legend=dict(
+        orientation="h",
+        yanchor="top",
+        y=1.08,
+        xanchor="center",
+        x=0.5
+    ),
+    xaxis=dict(
+        tickfont=dict(color='black', size=14),
+    ),
+    yaxis=dict(
+        tickfont=dict(color='black', size=14),
+    )
+)
+st.plotly_chart(fig_combo_cbs, use_container_width=True)
+st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+
+#------------------------ KUBO - CHART ACTUAL COST VS BUDGET -------------------------------------------
+
+import plotly.graph_objects as go
+
+row1_kubo = df_excel13.iloc[12, 1:]  # Dòng 13 (index 12) - Budget
+row2_kubo = df_excel13.iloc[13, 1:]  # Dòng 14 (index 13) - Actual Cost
+x_labels_kubo = df_excel13.columns[1:].tolist()
+y_line_kubo = [round(v) if pd.notnull(v) else 0 for v in row1_kubo.values.tolist()]
+y_bar_kubo = [round(v) if pd.notnull(v) else 0 for v in row2_kubo.values.tolist()]
+
+fig_combo_kubo = go.Figure()
+
+# Line chart cho dòng 13
+fig_combo_kubo.add_trace(go.Scatter(
+    x=x_labels_kubo,
+    y=y_line_kubo,
+    mode='lines+markers',
+    name='KUBO - Budget',
+    line=dict(color='#229954', width=3),
+    marker=dict(size=10, color='#229954'),
+    text=[str(v) if v != 0 else "" for v in y_line_kubo],
+    textposition='top center'
+))
+
+# Bar chart cho dòng 14
+fig_combo_kubo.add_trace(go.Bar(
+    x=x_labels_kubo,
+    y=y_bar_kubo,
+    name='KUBO - Actual Cost',
+    marker_color='#1f77b4',
+    text=[str(v) if v != 0 else "" for v in y_bar_kubo],
+    textposition='outside',
+    textfont=dict(size=16, color='black', family='Arial', weight='bold')
+))
+
+fig_combo_kubo.update_layout(
+    title={
+        'text': 'KUBO - Actual Cost vs Budget (2025) (MVND)',
+        'y': 1.0,
+        'x': 0.5,
+        'xanchor': 'center',
+        'yanchor': 'top',
+        'font': dict(size=28)
+    },
+    width=1300,
+    height=800,
+    legend=dict(
+        orientation="h",
+        yanchor="top",
+        y=1.08,
+        xanchor="center",
+        x=0.5
+    ),
+    xaxis=dict(
+        tickfont=dict(color='black', size=14),
+    ),
+    yaxis=dict(
+        tickfont=dict(color='black', size=14),
+    )
+)
+st.plotly_chart(fig_combo_kubo, use_container_width=True)
+st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+
+#------------------------------------------------------------------------------------------------------------
 
 st.markdown(
 "<hr style='border: 1.5px solid #222; margin: 30px 0;'>",
 unsafe_allow_html=True
 )
-st.markdown("<div style='height: 1rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 70rem'></div>", unsafe_allow_html=True)
 
 # -------------------------------NORTH 1------------------------------------------------------
 
@@ -16000,4 +16461,3 @@ num_rows = df_sites_south5.shape[0]
 row_height = 35
 header_height = 38
 st.dataframe(styled, use_container_width=True, height=num_rows * row_height + header_height)
-
