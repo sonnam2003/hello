@@ -4023,7 +4023,7 @@ import numpy as np
 # Làm tròn số cho toàn bộ các cột số, không lấy số thập phân
 df_excel8_rounded = df_excel8.copy()
 num_cols = df_excel8_rounded.select_dtypes(include='number').columns
-df_excel8_rounded[num_cols] = df_excel8_rounded[num_cols].round(0).astype(int)
+df_excel8_rounded[num_cols] = df_excel8_rounded[num_cols].round(0).astype('Int64')
 
 # Tạo colormap từ đỏ nhạt đến đỏ đậm
 red_cmap = mcolors.LinearSegmentedColormap.from_list("red_grad", ["#fff0f0", "#e57373"])
