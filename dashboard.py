@@ -708,7 +708,7 @@ try:
 except Exception as e:
     st.warning(f"Không thể đọc dữ liệu từ file Excel online thứ 13: {e}")
 
-    
+
 toc_html = """
 <style>
 #toc-float {
@@ -838,7 +838,7 @@ document.querySelectorAll('#toc-float a').forEach(function(link) {
 </script>
 """
 st.markdown(toc_html, unsafe_allow_html=True)
-
+st.markdown('<a id="overview"></a>', unsafe_allow_html=True)
     # Căn giữa title ở top center
 st.markdown(
     """
@@ -848,7 +848,7 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-st.markdown('<a id="overview"></a>', unsafe_allow_html=True)
+
 # Stacked Column Chart theo Priority
 fig_stack_priority = go.Figure()
 priority_cols = ['Low priority', 'Medium priority', 'High priority', 'Emergency']
@@ -3136,16 +3136,18 @@ color_palette = [
     '#229954', '#0bf4a3', '#e74c3c', '#f7dc6f', '#a569bd',
     '#45b39d', '#f1948a', '#34495e', '#f39c12'
 ]
-for i, row_label in enumerate(row_labels):
-    y_values = percent_data.iloc[i].tolist()
-    text_labels = [row_label if v > 0 else "" for v in y_values]  # <-- chỉ hiện tên tháng
-    label_lower = row_label.strip().lower()
-    if label_lower == "remaining year budget":
-        color = "#27ae60"  # Xanh lá
-    elif label_lower in ["jul'", "jun'"]:
-        color = "#e53935"  # Đỏ tươi cho cả Jul' và Jun'
+for i, row_label in enumerate(row_labels):  # Đúng! Lặp qua từng dòng (tháng)
+    y_values = percent_data.iloc[i].tolist()  # Phần trăm của từng banner tại dòng i
+    text_labels = [row_label if v > 0 else "" for v in y_values]
+    color = "#1976d2"
+    # Nếu là "remaining year budget" thì xanh lá
+    if row_label.strip().lower() == "remaining year budget":
+        color = "#27ae60"
     else:
-        color = "#1976d2"
+        # Nếu bất kỳ giá trị từ dòng 14 trở xuống của dòng này > 0 thì tô đỏ
+        vals = data.iloc[i, :]
+        if (vals > 0).any() and i >= 13:
+            color = "#e53935"
     fig_100stack.add_trace(go.Bar(
         name=row_label,
         x=x_cols,
@@ -3154,12 +3156,13 @@ for i, row_label in enumerate(row_labels):
         textposition="inside",
         texttemplate="%{text}",
         marker_color=color,
-        marker_line_color="black",      # Thêm dòng này
-        marker_line_width=1,            # Và dòng này (có thể tăng lên 2 nếu muốn đậm hơn)
+        marker_line_color="black",
+        marker_line_width=1,
         textfont=dict(size=10),
         textangle=0,
         hovertemplate=f"<b>{row_label}</b><br>%{{x}}: %{{y:.1f}}%<extra></extra>"
     ))
+
 fig_100stack.update_layout(
 barmode='stack',
 title=dict(
