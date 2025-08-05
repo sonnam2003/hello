@@ -5268,8 +5268,8 @@ fig_combo.add_trace(go.Scatter(
     y=y_line,
     mode='lines+markers',
     name='Go Mall - Budget',
-    line=dict(color='#e74c3c', width=3),
-    marker=dict(size=10, color='#e74c3c'),
+    line=dict(color='#EE0000', width=4),
+    marker=dict(size=11, color='#e74c3c'),
     text=[str(v) if v != 0 else "" for v in y_line],  # Ẩn label nếu = 0
     textposition='top center'
 ))
@@ -5279,7 +5279,7 @@ fig_combo.add_trace(go.Bar(
     x=x_labels,
     y=y_bar,
     name='GO Mall - Actual Cost',
-    marker_color='#3498db',
+    marker_color='#87CEFA',
     text=[str(v) if v != 0 else "" for v in y_bar],  # Ẩn label nếu = 0
     textposition='outside',
     textfont=dict(size=16, color='black', family='Arial', weight='bold')
@@ -5331,8 +5331,8 @@ fig_combo_hyper.add_trace(go.Scatter(
     y=y_line_hyper,
     mode='lines+markers',
     name='Hyper - Budget',
-    line=dict(color='#e74c3c', width=3),
-    marker=dict(size=10, color='#e74c3c'),
+    line=dict(color='#EE0000', width=4),
+    marker=dict(size=11, color='#e74c3c'),
     text=[str(v) if v != 0 else "" for v in y_line_hyper],
     textposition='top center'
 ))
@@ -5342,7 +5342,7 @@ fig_combo_hyper.add_trace(go.Bar(
     x=x_labels_hyper,
     y=y_bar_hyper,
     name='Hyper - Actual Cost',
-    marker_color='#2980b9',
+    marker_color='#87CEFA',
     text=[str(v) if v != 0 else "" for v in y_bar_hyper],
     textposition='outside',
     textfont=dict(size=16, color='black', family='Arial', weight='bold')
@@ -5394,8 +5394,8 @@ fig_combo_top.add_trace(go.Scatter(
     y=y_line_top,
     mode='lines+markers',
     name='Top - Budget',
-    line=dict(color='#e67e22', width=3),
-    marker=dict(size=10, color='#e67e22'),
+    line=dict(color='#EE0000', width=4),
+    marker=dict(size=11, color='#e74c3c'),
     text=[str(v) if v != 0 else "" for v in y_line_top],
     textposition='top center'
 ))
@@ -5405,7 +5405,7 @@ fig_combo_top.add_trace(go.Bar(
     x=x_labels_top,
     y=y_bar_top,
     name='Top - Actual Cost',
-    marker_color='#16a085',
+    marker_color='#87CEFA',
     text=[str(v) if v != 0 else "" for v in y_bar_top],
     textposition='outside',
     textfont=dict(size=16, color='black', family='Arial', weight='bold')
@@ -5457,8 +5457,8 @@ fig_combo_minigo.add_trace(go.Scatter(
     y=y_line_minigo,
     mode='lines+markers',
     name='Minigo - Budget',
-    line=dict(color='#f39c12', width=3),
-    marker=dict(size=10, color='#f39c12'),
+    line=dict(color='#EE0000', width=4),
+    marker=dict(size=11, color='#e74c3c'),
     text=[str(v) if v != 0 else "" for v in y_line_minigo],
     textposition='top center'
 ))
@@ -5468,7 +5468,7 @@ fig_combo_minigo.add_trace(go.Bar(
     x=x_labels_minigo,
     y=y_bar_minigo,
     name='Minigo - Actual Cost',
-    marker_color='#8e44ad',
+    marker_color='#87CEFA',
     text=[str(v) if v != 0 else "" for v in y_bar_minigo],
     textposition='outside',
     textfont=dict(size=16, color='black', family='Arial', weight='bold')
@@ -5520,8 +5520,8 @@ fig_combo_nk.add_trace(go.Scatter(
     y=y_line_nk,
     mode='lines+markers',
     name='NK - Budget',
-    line=dict(color='#34495e', width=3),
-    marker=dict(size=10, color='#34495e'),
+    line=dict(color='#EE0000', width=4),
+    marker=dict(size=11, color='#e74c3c'),
     text=[str(v) if v != 0 else "" for v in y_line_nk],
     textposition='top center'
 ))
@@ -5531,7 +5531,7 @@ fig_combo_nk.add_trace(go.Bar(
     x=x_labels_nk,
     y=y_bar_nk,
     name='NK - Actual Cost',
-    marker_color='#e74c3c',
+    marker_color='#87CEFA',
     text=[str(v) if v != 0 else "" for v in y_bar_nk],
     textposition='outside',
     textfont=dict(size=16, color='black', family='Arial', weight='bold')
@@ -5583,8 +5583,8 @@ fig_combo_cbs.add_trace(go.Scatter(
     y=y_line_cbs,
     mode='lines+markers',
     name='CBS - Budget',
-    line=dict(color='#e74c3c', width=3),
-    marker=dict(size=10, color='#e74c3c'),
+    line=dict(color='#EE0000', width=4),
+    marker=dict(size=11, color='#e74c3c'),
     text=[str(v) if v != 0 else "" for v in y_line_cbs],
     textposition='top center'
 ))
@@ -5594,7 +5594,7 @@ fig_combo_cbs.add_trace(go.Bar(
     x=x_labels_cbs,
     y=y_bar_cbs,
     name='CBS - Actual Cost',
-    marker_color='#00bfff',
+    marker_color='#87CEFA',
     text=[str(v) if v != 0 else "" for v in y_bar_cbs],
     textposition='outside',
     textfont=dict(size=16, color='black', family='Arial', weight='bold')
@@ -5646,8 +5646,8 @@ fig_combo_kubo.add_trace(go.Scatter(
     y=y_line_kubo,
     mode='lines+markers',
     name='KUBO - Budget',
-    line=dict(color='#229954', width=3),
-    marker=dict(size=10, color='#229954'),
+    line=dict(color='#EE0000', width=4),
+    marker=dict(size=11, color='#e74c3c'),
     text=[str(v) if v != 0 else "" for v in y_line_kubo],
     textposition='top center'
 ))
@@ -5657,7 +5657,7 @@ fig_combo_kubo.add_trace(go.Bar(
     x=x_labels_kubo,
     y=y_bar_kubo,
     name='KUBO - Actual Cost',
-    marker_color='#1f77b4',
+    marker_color='#87CEFA',
     text=[str(v) if v != 0 else "" for v in y_bar_kubo],
     textposition='outside',
     textfont=dict(size=16, color='black', family='Arial', weight='bold')
