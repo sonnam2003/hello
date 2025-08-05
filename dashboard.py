@@ -1225,7 +1225,6 @@ fig_stack.update_layout(
 st.plotly_chart(fig_stack)
 st.markdown("<div style='height: 1rem'></div>", unsafe_allow_html=True)
 
-# Sau khi st.plotly_chart(fig_stack)
 # --- Tính top 2 giảm/tăng mạnh nhất và sinh câu mô tả tự động cho Category ---
 idx_w = len(df_table["Tuần"]) - 1
 idx_w1 = idx_w - 1
@@ -1273,37 +1272,28 @@ total_html = "<span style='font-weight:bold; color:#d62728'>Total</span>"
 
 # Logic sinh câu
 if num_neg == 1 and num_zero == n_cat - 1:
-    # Chỉ có 1 giảm, còn lại không đổi
     description = f"{A_html} recorded the largest {decrease_html} at {abs(X):.1f}%, while the other categories remain unchanged, compared to the previous week. Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
 elif num_pos == 1 and num_zero == n_cat - 1:
-    # Chỉ có 1 tăng, còn lại không đổi
     description = f"{B_html} recorded the largest {increase_html} at {abs(Z):.1f}%, while the other categories remain unchanged, compared to the previous week. Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
 elif num_neg == n_cat:
-    # Tất cả đều giảm
     if num_neg >= 2:
         description = f"{A_html} and {O_html} recorded the largest {decrease_html} at {abs(X):.1f}% and {abs(K):.1f}%, respectively, compared to the previous week. Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
     else:
         description = f"{A_html} recorded the largest {decrease_html} at {abs(X):.1f}% compared to the previous week. Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
 elif num_pos == n_cat:
-    # Tất cả đều tăng
     if num_pos >= 2:
         description = f"{B_html} and {P_html} recorded the largest {increase_html} at {abs(Z):.1f}% and {abs(H):.1f}%, respectively, compared to the previous week. Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
     else:
         description = f"{B_html} recorded the largest {increase_html} at {abs(Z):.1f}% compared to the previous week. Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
 elif num_zero == n_cat:
-    # Tất cả không đổi
     description = f"All categories remain unchanged compared to the previous week. Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
 elif num_neg == 1 and num_pos == 1 and num_zero == n_cat - 2:
-    # Chỉ có 1 giảm và 1 tăng, còn lại không đổi
     description = f"{A_html} recorded the largest {decrease_html} at {abs(X):.1f}%, while {B_html} recorded the largest {increase_html} at {abs(Z):.1f}%, respectively, compared to the previous week. Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
 elif num_neg == 1 and num_pos == 0:
-    # Chỉ có 1 giảm
     description = f"{A_html} recorded the largest {decrease_html} at {abs(X):.1f}% compared to the previous week. Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
 elif num_pos == 1 and num_neg == 0:
-    # Chỉ có 1 tăng
     description = f"{B_html} recorded the largest {increase_html} at {abs(Z):.1f}% compared to the previous week. Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
 else:
-    # Trường hợp mặc định: lấy top2 mỗi bên nếu có
     decrease_text = ""
     increase_text = ""
     if num_neg >= 2:
@@ -1322,6 +1312,7 @@ else:
         description = f"{increase_text} compared to the previous week. Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
     else:
         description = f"Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
+
 
 st.markdown(
     f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>{description}</div>",
@@ -1479,6 +1470,7 @@ fig_stack_team.update_layout(
 st.plotly_chart(fig_stack_team)
 st.markdown("<div style='height: 1rem'></div>", unsafe_allow_html=True)
 
+
 # --- Tính top 2 giảm/tăng mạnh nhất và sinh câu mô tả tự động cho Region (Team) ---
 team_cols = [col for col in df_table_team.columns if col != "Tuần"]
 idx_w = len(df_table_team["Tuần"]) - 1
@@ -1495,9 +1487,10 @@ for team in team_cols:
         percent = ((count_w - count_w1) / count_w1) * 100
     percent_changes_team[team] = percent
 
-neg_percents = sorted([(k, v) for k, v in percent_changes_team.items() if v < 0], key=lambda x: x[1])
-pos_percents = sorted([(k, v) for k, v in percent_changes_team.items() if v > 0], key=lambda x: x[1], reverse=True)
-zero_percents = [(k, v) for k, v in percent_changes_team.items() if abs(v) < 1e-6]
+# Phân loại các nhóm
+neg_percents = sorted([(k, v) for k, v in percent_changes_team.items() if v < -1e-6], key=lambda x: x[1])
+pos_percents = sorted([(k, v) for k, v in percent_changes_team.items() if v > 1e-6], key=lambda x: x[1], reverse=True)
+zero_percents = [(k, v) for k, v in percent_changes_team.items() if abs(v) <= 1e-6]
 
 def short_team_name(name):
     return str(name).split('-')[0].strip() if '-' in str(name) else str(name).strip()
@@ -1506,97 +1499,66 @@ decrease_html = "<span style='font-weight:bold; color:#111'>decrease</span>"
 increase_html = "<span style='font-weight:bold; color:#111'>increase</span>"
 total_html = "<span style='font-weight:bold; color:#d62728'>Total</span>"
 
+decrease_text = ""
+increase_text = ""
+
 # Xử lý các trường hợp đặc biệt
-if len(neg_percents) == 1 and len(pos_percents) == 0 and len(zero_percents) == len(percent_changes_team) - 1:
-    # Chỉ có 1 giảm, còn lại không đổi
-    A, X = neg_percents[0]
-    A_html = f"<span style='color:#d62728; font-weight:bold'>{short_team_name(A)}</span>"
-    decrease_text = f"{A_html} recorded the largest {decrease_html} at {abs(X):.1f}%, while the other categories remain unchanged"
-    increase_text = ""
-elif len(pos_percents) == 1 and len(neg_percents) == 0 and len(zero_percents) == len(percent_changes_team) - 1:
-    # Chỉ có 1 tăng, còn lại không đổi
-    B, Z = pos_percents[0]
-    B_html = f"<span style='color:#d62728; font-weight:bold'>{short_team_name(B)}</span>"
-    increase_text = f"{B_html} recorded the largest {increase_html} at {abs(Z):.1f}%, while the other categories remain unchanged"
-    decrease_text = ""
-elif len(neg_percents) == 1 and len(pos_percents) == 0:
-    # Chỉ có 1 giảm
-    A, X = neg_percents[0]
-    A_html = f"<span style='color:#d62728; font-weight:bold'>{short_team_name(A)}</span>"
-    decrease_text = f"{A_html} recorded the largest {decrease_html} at {abs(X):.1f}%"
-    increase_text = ""
-elif len(pos_percents) == 1 and len(neg_percents) == 0:
-    # Chỉ có 1 tăng
-    B, Z = pos_percents[0]
-    B_html = f"<span style='color:#d62728; font-weight:bold'>{short_team_name(B)}</span>"
-    increase_text = f"{B_html} recorded the largest {increase_html} at {abs(Z):.1f}%"
-    decrease_text = ""
-elif len(neg_percents) == 1 and len(pos_percents) == 1:
-    # Chỉ có 1 giảm và 1 tăng
-    A, X = neg_percents[0]
-    B, Z = pos_percents[0]
-    A_html = f"<span style='color:#d62728; font-weight:bold'>{short_team_name(A)}</span>"
-    B_html = f"<span style='color:#d62728; font-weight:bold'>{short_team_name(B)}</span>"
-    decrease_text = f"{A_html} recorded the largest {decrease_html} at {abs(X):.1f}%"
-    increase_text = f"{B_html} showed the largest {increase_html} at {abs(Z):.1f}%"
-elif len(neg_percents) >= 2 and len(pos_percents) == 0:
-    # Tất cả đều giảm, lấy top 2
-    (A, X), (O, K) = neg_percents[0], neg_percents[1]
-    A_html = f"<span style='color:#d62728; font-weight:bold'>{short_team_name(A)}</span>"
-    O_html = f"<span style='color:#d62728; font-weight:bold'>{short_team_name(O)}</span>"
-    decrease_text = f"{A_html} and {O_html} recorded the largest {decrease_html} at {abs(X):.1f}% and {abs(K):.1f}%, respectively"
-    increase_text = ""
-elif len(pos_percents) >= 2 and len(neg_percents) == 0:
-    # Tất cả đều tăng, lấy top 2
-    (B, Z), (P, H) = pos_percents[0], pos_percents[1]
-    B_html = f"<span style='color:#d62728; font-weight:bold'>{short_team_name(B)}</span>"
-    P_html = f"<span style='color:#d62728; font-weight:bold'>{short_team_name(P)}</span>"
-    increase_text = f"{B_html} and {P_html} recorded the largest {increase_html} at {abs(Z):.1f}% and {abs(H):.1f}%, respectively"
-    decrease_text = ""
+if len(neg_percents) == 0 and len(pos_percents) == 0:
+    # Tất cả không đổi
+    description = f"All categories remain unchanged compared to the previous week. Overall, the {total_html} change is <span style='color:#111; font-weight:bold'>unchanged</span>."
 else:
-    # Trường hợp mỗi bên có >=2 giá trị, giữ nguyên logic cũ
-    # Top 2 giảm mạnh nhất (min)
-    if len(neg_percents) >= 2:
+    # Xử lý giảm
+    if len(neg_percents) == 1:
+        A, X = neg_percents[0]
+        A_html = f"<span style='color:#d62728; font-weight:bold'>{short_team_name(A)}</span>"
+        decrease_text = f"{A_html} recorded the largest {decrease_html} at {abs(X):.1f}%"
+    elif len(neg_percents) >= 2:
         (A, X), (O, K) = neg_percents[0], neg_percents[1]
-    elif len(neg_percents) == 1:
-        (A, X), (O, K) = neg_percents[0], (neg_percents[0][0], neg_percents[0][1])
-    else:
-        min2 = sorted(percent_changes_team.items(), key=lambda x: x[1])[:2]
-        (A, X), (O, K) = min2[0], min2[1]
-    # Top 2 tăng mạnh nhất (max)
-    if len(pos_percents) >= 2:
+        A_html = f"<span style='color:#d62728; font-weight:bold'>{short_team_name(A)}</span>"
+        O_html = f"<span style='color:#d62728; font-weight:bold'>{short_team_name(O)}</span>"
+        decrease_text = f"{A_html} and {O_html} recorded the largest {decrease_html} at {abs(X):.1f}% and {abs(K):.1f}%, respectively"
+    # Xử lý tăng
+    if len(pos_percents) == 1:
+        B, Z = pos_percents[0]
+        B_html = f"<span style='color:#d62728; font-weight:bold'>{short_team_name(B)}</span>"
+        increase_text = f"{B_html} recorded the largest {increase_html} at {abs(Z):.1f}%"
+    elif len(pos_percents) >= 2:
         (B, Z), (P, H) = pos_percents[0], pos_percents[1]
-    elif len(pos_percents) == 1:
-        (B, Z), (P, H) = pos_percents[0], (pos_percents[0][0], pos_percents[0][1])
+        B_html = f"<span style='color:#d62728; font-weight:bold'>{short_team_name(B)}</span>"
+        P_html = f"<span style='color:#d62728; font-weight:bold'>{short_team_name(P)}</span>"
+        increase_text = f"{B_html} and {P_html} recorded the largest {increase_html} at {abs(Z):.1f}% and {abs(H):.1f}%, respectively"
+
+    # Nếu có cả tăng và giảm
+    if decrease_text and increase_text:
+        description_main = f"{decrease_text}, while {increase_text}, compared to the previous week."
+    elif decrease_text:
+        description_main = f"{decrease_text} compared to the previous week."
+    elif increase_text:
+        description_main = f"{increase_text} compared to the previous week."
     else:
-        max2 = sorted(percent_changes_team.items(), key=lambda x: x[1], reverse=True)[:2]
-        (B, Z), (P, H) = max2[0], max2[1]
-    A_html = f"<span style='color:#d62728; font-weight:bold'>{short_team_name(A)}</span>"
-    O_html = f"<span style='color:#d62728; font-weight:bold'>{short_team_name(O)}</span>"
-    B_html = f"<span style='color:#d62728; font-weight:bold'>{short_team_name(B)}</span>"
-    P_html = f"<span style='color:#d62728; font-weight:bold'>{short_team_name(P)}</span>"
-    decrease_text = f"{A_html} and {O_html} recorded the largest {decrease_html} at {abs(X):.1f}% and {abs(K):.1f}%, respectively"
-    increase_text = f"{B_html} and {P_html} showed highest {increase_html} with {abs(Z):.1f}% and {abs(H):.1f}%, respectively"
+        # Trường hợp chỉ có không đổi và 1 tăng/giảm
+        unchanged_names = [short_team_name(k) for k, v in zero_percents]
+        if unchanged_names:
+            unchanged_html = ", ".join([f"<span style='color:#d62728; font-weight:bold'>{name}</span>" for name in unchanged_names])
+            description_main = f"{unchanged_html} remain unchanged compared to the previous week."
+        else:
+            description_main = ""
 
-# Tính tổng phần trăm thay đổi
-sum_w = sum([df_table_team[team].iloc[idx_w] for team in team_cols])
-sum_w1 = sum([df_table_team[team].iloc[idx_w1] for team in team_cols])
-if sum_w1 == 0:
-    Y = 100 if sum_w > 0 else 0
-else:
-    Y = ((sum_w - sum_w1) / sum_w1) * 100
-C = 'increased' if Y > 0 else 'decreased'
-C_html = f"<span style='color:#111; font-weight:bold'>{C}</span>"
+    # Tính tổng phần trăm thay đổi
+    sum_w = sum([df_table_team[team].iloc[idx_w] for team in team_cols])
+    sum_w1 = sum([df_table_team[team].iloc[idx_w1] for team in team_cols])
+    if sum_w1 == 0:
+        Y = 100 if sum_w > 0 else 0
+    else:
+        Y = ((sum_w - sum_w1) / sum_w1) * 100
+    if abs(Y) <= 1e-6:
+        C = 'unchanged'
+    else:
+        C = 'increased' if Y > 0 else 'decreased'
+    C_html = f"<span style='color:#111; font-weight:bold'>{C}</span>"
 
-# Hiển thị câu mô tả tự động
-if decrease_text and increase_text:
-    description = f"{decrease_text}, while {increase_text}, compared to the previous week. Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
-elif decrease_text:
-    description = f"{decrease_text} compared to the previous week. Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
-elif increase_text:
-    description = f"{increase_text} compared to the previous week. Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
-else:
-    description = f"All categories remain unchanged compared to the previous week. Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
+    description = f"{description_main} Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
+
 
 st.markdown(
     f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>{description}</div>",
