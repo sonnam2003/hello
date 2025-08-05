@@ -927,7 +927,7 @@ if active_priorities:
     total_height = cumulative_height
     x_vals = list(df_table_priority["Tuần"])
     x_idx = x_vals.index(w_label)
-    x_offset = x_idx + 2
+    x_offset = x_idx + 1
     sorted_priorities = sorted(active_priorities, key=lambda x: priority_positions[x])
     for i, pri in enumerate(sorted_priorities):
         percent = percent_changes[pri]
@@ -941,7 +941,7 @@ if active_priorities:
             percent_text = "W vs W-1: 0.0%"
             bgcolor = "#f2c795"
         y_col = priority_positions[pri]
-        spacing_factor = 0.35
+        spacing_factor = 0.1
         y_box = y_col + (total_height * spacing_factor * (i - len(sorted_priorities)/2))
         fig_stack_priority.add_annotation(
             x=w_label, y=y_col,
@@ -1143,7 +1143,7 @@ if active_categories:
     total_height = cumulative_height
     x_vals = list(df_table["Tuần"])
     x_idx = x_vals.index(w_label)
-    x_offset = x_idx + 2
+    x_offset = x_idx + 0.8
     sorted_categories = sorted(active_categories, key=lambda x: category_positions[x])
     for i, cat in enumerate(sorted_categories):
         percent = percent_changes[cat]
@@ -1397,7 +1397,7 @@ if active_teams:
     total_height = cumulative_height
     x_vals = list(df_table_team["Tuần"])
     x_idx = x_vals.index(w_label)
-    x_offset = x_idx + 2
+    x_offset = x_idx + 0.8
     sorted_teams = sorted(active_teams, key=lambda x: team_positions[x])
     for i, team in enumerate(sorted_teams):
         percent = percent_changes[team]
@@ -1645,7 +1645,7 @@ if active_banners:
     total_height = cumulative_height
     x_vals = list(df_table_banner["Tuần"])
     x_idx = x_vals.index(w_label)
-    x_offset = x_idx + 2
+    x_offset = x_idx + 1
     sorted_banners = sorted(active_banners, key=lambda x: banner_positions[x])
     for i, banner in enumerate(sorted_banners):
         percent = percent_changes[banner]
@@ -1659,7 +1659,7 @@ if active_banners:
             percent_text = "W vs W-1: 0.0%"
             bgcolor = "#f2c795"
         y_col = banner_positions[banner]
-        spacing_factor = 0.35
+        spacing_factor = 0.2
         y_box = y_col + (total_height * spacing_factor * (i - len(sorted_banners)/2))
         fig_stack_banner.add_annotation(
             x=w_label, y=y_col,
@@ -2376,7 +2376,7 @@ if active_categories:
     total_height = cumulative_height
     x_vals = list(df_excel[x_col])
     x_idx = x_vals.index(w_label)
-    x_offset = x_idx + 2
+    x_offset = x_idx + 0.9
     sorted_categories = sorted(active_categories, key=lambda x: category_positions[x])
     for i, cat in enumerate(sorted_categories):
         percent = percent_changes[cat]
@@ -2390,7 +2390,7 @@ if active_categories:
             percent_text = "W vs W-1: 0.0%"
             bgcolor = "#f2c795"
         y_col = category_positions[cat]
-        spacing_factor = 0.35
+        spacing_factor = 0.9
         y_box = y_col + (total_height * spacing_factor * (i - len(sorted_categories)/2))
         fig_stack_excel.add_annotation(
             x=w_label, y=y_col,
@@ -2694,7 +2694,7 @@ if active_teams:
     total_height2 = cumulative_height2
     x_vals2 = list(df_excel2[x_col2])
     x_idx2 = x_vals2.index(w_label2)
-    x_offset2 = x_idx2 + 2
+    x_offset2 = x_idx2 + 0.9
     sorted_teams = sorted(active_teams, key=lambda x: team_positions[x])
     for i, team in enumerate(sorted_teams):
         percent = percent_changes2[team]
@@ -2708,7 +2708,7 @@ if active_teams:
             percent_text = "W vs W-1: 0.0%"
             bgcolor = "#f2c795"
         y_col = team_positions[team]
-        spacing_factor = 0.35
+        spacing_factor = 0.9
         y_box = y_col + (total_height2 * spacing_factor * (i - len(sorted_teams)/2))
         fig_stack_excel2.add_annotation(
             x=w_label2, y=y_col,
@@ -2960,7 +2960,7 @@ if active_banners3:
     total_height3 = cumulative_height3
     x_vals3 = list(df_excel3[x_col3])
     x_idx3 = x_vals3.index(w_label3)
-    x_offset3 = x_idx3 + 2
+    x_offset3 = x_idx3 + 0.9
     sorted_banners3 = sorted(active_banners3, key=lambda x: banner_positions3[x])
     for i, banner in enumerate(sorted_banners3):
         percent = percent_changes3[banner]
@@ -2974,7 +2974,7 @@ if active_banners3:
             percent_text = "W vs W-1: 0.0%"
             bgcolor = "#f2c795"
         y_col = banner_positions3[banner]
-        spacing_factor = 0.35
+        spacing_factor = 0.9
         y_box = y_col + (total_height3 * spacing_factor * (i - len(sorted_banners3)/2))
         fig_stack_excel3.add_annotation(
             x=w_label3, y=y_col,
