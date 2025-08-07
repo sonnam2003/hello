@@ -838,6 +838,27 @@ document.querySelectorAll('#toc-float a').forEach(function(link) {
 </script>
 """
 st.markdown(toc_html, unsafe_allow_html=True)
+
+
+def read_priority_auto_desc():
+    try:
+        with open("priority_auto_desc.txt", "r", encoding="utf-8") as f:
+            return f.read()
+    except Exception:
+        return None
+
+priority_desc = read_priority_auto_desc()
+if priority_desc:
+    st.markdown(
+        f"""<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>
+        <b>OVERALL EVOLUTION OA TICKETS PER PRIORITY:</b><br>
+        {priority_desc}
+        </div>""",
+        unsafe_allow_html=True
+    )
+
+
+
 st.markdown('<a id="overview"></a>', unsafe_allow_html=True)
     # Căn giữa title ở top center
 st.markdown(
@@ -1101,6 +1122,10 @@ st.markdown(
     f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>{description}</div>",
     unsafe_allow_html=True
 )
+
+with open("priority_auto_desc.txt", "w", encoding="utf-8") as f:
+    f.write(description)
+
 st.markdown("<div style='height: 3rem'></div>", unsafe_allow_html=True)
 
 # Stacked Column Chart theo Category
@@ -1313,11 +1338,11 @@ else:
     else:
         description = f"Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
 
-
 st.markdown(
     f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>{description}</div>",
     unsafe_allow_html=True
 )
+st.session_state['category_auto_desc'] = description  # Lưu vào session_state
 st.markdown("<div style='height: 14rem'></div>", unsafe_allow_html=True)
 
 # -------------------------Stacked Column Chart theo Team--------------------------
@@ -1564,6 +1589,7 @@ st.markdown(
     f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>{description}</div>",
     unsafe_allow_html=True
 )
+st.session_state['region_auto_desc'] = description  # Lưu vào session_state
 st.markdown("<div style='height: 10rem'></div>", unsafe_allow_html=True)
 
 # Stacked Column Chart theo Banner
@@ -1781,6 +1807,7 @@ st.markdown(
     f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>{description}</div>",
     unsafe_allow_html=True
 )
+st.session_state['banner_week_auto_desc'] = description  # Lưu vào session_state
 st.markdown("<div style='height: 24rem'></div>", unsafe_allow_html=True)
 
 # -------------------------Stacked Column Chart theo Banner theo tháng--------------------------
@@ -2017,6 +2044,7 @@ st.markdown(
     f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>{description}</div>",
     unsafe_allow_html=True
 )
+st.session_state['banner_month_auto_desc'] = description  # Lưu vào session_state
 st.markdown("<div style='height: 20rem'></div>", unsafe_allow_html=True)
 
 #----------------------------- Waterfall Chart BY WEEKS--------------------------------------------
