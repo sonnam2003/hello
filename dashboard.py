@@ -990,7 +990,7 @@ fig_stack_priority.update_layout(
         font=dict(size=28)
     ),
     width=1400,
-    height=800,
+    height=650,
     legend=dict(
         orientation="h",
         yanchor="top",
@@ -1101,7 +1101,7 @@ st.markdown(
     f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>{description}</div>",
     unsafe_allow_html=True
 )
-st.markdown("<div style='height: 5rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 3rem'></div>", unsafe_allow_html=True)
 
 # Stacked Column Chart theo Category
 fig_stack = go.Figure()
@@ -1205,7 +1205,7 @@ fig_stack.update_layout(
         font=dict(size=28)
     ),
     width=1400,
-    height=800,
+    height=900,
     legend=dict(
         orientation="h",
         yanchor="bottom",
@@ -1318,7 +1318,7 @@ st.markdown(
     f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>{description}</div>",
     unsafe_allow_html=True
 )
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 14rem'></div>", unsafe_allow_html=True)
 
 # -------------------------Stacked Column Chart theo Team--------------------------
 
@@ -3731,7 +3731,7 @@ else:
         desc = ", while ".join(desc_parts) + f", respectively, compared to the previous month. Overall, the {total_html} change is {'decreased' if total_percent < 0 else 'increased'} by {total_percent_html(total_percent)}"
 
 st.markdown(f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>{desc}</div>", unsafe_allow_html=True)
-st.markdown("<div style='height: 14rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 10rem'></div>", unsafe_allow_html=True)
 
 # --- STACKED COLUMN CHART TỪ EXCEL: OVERALL COST SPENT PER BANNER BY MONTH (MVND)-----------
 
@@ -4101,7 +4101,7 @@ for i, (x, y, t) in enumerate(zip(df_excel8_chart[cat_col], totals_offset, total
         borderwidth=0
     )
 st.plotly_chart(fig_excel8, use_container_width=True)
-st.markdown("<div style='height: 5rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 3rem'></div>", unsafe_allow_html=True)
 
 # --------------------------- BẢNG Actual cost per cat 2 ---------------------------
 
@@ -4151,7 +4151,7 @@ st.markdown("""
 <h3 style='text-align: center; margin-top: 2rem; margin-bottom: 1rem;'>AVERAGE ACTUAL COST PER CONFIRMED TICKET BY CATEGORY (MVND)</h3>
 """, unsafe_allow_html=True)
 st.dataframe(styled_df9, use_container_width=True, height=total_height9)
-st.markdown("<div style='height: 15rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 12rem'></div>", unsafe_allow_html=True)
 
 # --------------------------- BẢNG Actual cost per sub region 1 ---------------------------
 
@@ -4188,7 +4188,7 @@ st.markdown("""
 <h3 style='text-align: center; margin-top: 2rem; margin-bottom: 1rem;'>TOTAL ACTUAL COST CONFIRMED BY SUB-REGION (MVND)</h3>
 """, unsafe_allow_html=True)
 st.dataframe(styled_df10, use_container_width=True, height=total_height10)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 5rem'></div>", unsafe_allow_html=True)
 
 # --------------------------- STACKED BAR CHART CHO BẢNG Actual cost per sub region 1 ---------------------------
 
@@ -4961,7 +4961,7 @@ fig_oa.update_layout(
     shapes=shapes_oa
 )
 st.plotly_chart(fig_oa, use_container_width=True)
-st.markdown("<div style='height: 20rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 22rem'></div>", unsafe_allow_html=True)
 
 
 # --- LINE CHART DAILY OA TICKETS BY CATEGORY ---
@@ -5654,7 +5654,7 @@ fig_combo_kubo.update_layout(
     )
 )
 st.plotly_chart(fig_combo_kubo, use_container_width=True)
-st.markdown("<div style='height: 9rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 15rem'></div>", unsafe_allow_html=True)
 
 #------------------------------------------------------------------------------------------------------------
 
@@ -5662,7 +5662,7 @@ st.markdown(
 "<hr style='border: 1.5px solid #222; margin: 30px 0;'>",
 unsafe_allow_html=True
 )
-st.markdown("<div style='height: 70rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 67rem'></div>", unsafe_allow_html=True)
 
 # -------------------------------NORTH 1------------------------------------------------------
 
@@ -9319,7 +9319,7 @@ num_rows = df_sites_center1.shape[0]
 row_height = 35
 header_height = 38
 st.dataframe(styled, use_container_width=True, height=num_rows * row_height + header_height)
-st.markdown("<div style='height: 32rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 25rem'></div>", unsafe_allow_html=True)
 
 
 st.markdown(
@@ -9327,7 +9327,7 @@ st.markdown(
 unsafe_allow_html=True
 )
 
-st.markdown("<div style='height: 3rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 10rem'></div>", unsafe_allow_html=True)
 
 st.markdown('<a id="center2"></a>', unsafe_allow_html=True)
 st.markdown("<h2 style='text-align: center;color: #ab3f3f;'>CENTER 2 - Luu Duc Thach</h2>", unsafe_allow_html=True)
@@ -10207,14 +10207,14 @@ num_rows = df_sites_center2.shape[0]
 row_height = 35  # hoặc 32, tuỳ font
 header_height = 38
 st.dataframe(styled, use_container_width=True, height=num_rows * row_height + header_height)
-st.markdown("<div style='height: 20rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 10rem'></div>", unsafe_allow_html=True)
 
 st.markdown(
 "<hr style='border: 1.5px solid #222; margin: 30px 0;'>",
 unsafe_allow_html=True
 )
 
-st.markdown("<div style='height: 3rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 13rem'></div>", unsafe_allow_html=True)
 
 st.markdown('<a id="center3"></a>', unsafe_allow_html=True)
 st.markdown("<h2 style='text-align: center;color: #ab3f3f;'>CENTER 3 - Le Duc Thanh</h2>", unsafe_allow_html=True)
@@ -11094,14 +11094,14 @@ num_rows = df_sites_center3.shape[0]
 row_height = 35
 header_height = 38
 st.dataframe(styled, use_container_width=True, height=num_rows * row_height + header_height)
-st.markdown("<div style='height: 13rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 8rem'></div>", unsafe_allow_html=True)
 
 st.markdown(
 "<hr style='border: 1.5px solid #222; margin: 30px 0;'>",
 unsafe_allow_html=True
 )
 
-st.markdown("<div style='height: 3rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 8rem'></div>", unsafe_allow_html=True)
 
 st.markdown('<a id="center4"></a>', unsafe_allow_html=True)
 st.markdown("<h2 style='text-align: center;color: #ab3f3f;'>CENTER 4 & NINH BINH - Le Anh Sinh</h2>", unsafe_allow_html=True)
@@ -13550,7 +13550,7 @@ fig.update_layout(
     )
 )
 st.plotly_chart(fig, use_container_width=True)
-st.markdown("<div style='height: 3rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 2rem'></div>", unsafe_allow_html=True)
 
 # Bảng Sites cho South 2
 st.markdown("<h3 style='text-align: center;'>SOUTH 2 - DETAIL VIEW PER SITE</h3>", unsafe_allow_html=True)
@@ -13751,14 +13751,14 @@ num_rows = df_sites_south2.shape[0]
 row_height = 35
 header_height = 38
 st.dataframe(styled, use_container_width=True, height=num_rows * row_height + header_height)
-st.markdown("<div style='height: 2rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 0.5rem'></div>", unsafe_allow_html=True)
 
 st.markdown(
 "<hr style='border: 1.5px solid #222; margin: 30px 0;'>",
 unsafe_allow_html=True
 )
 
-st.markdown("<div style='height: 3rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 5.5rem'></div>", unsafe_allow_html=True)
 
 st.markdown('<a id="south3"></a>', unsafe_allow_html=True)
 
@@ -14636,14 +14636,14 @@ num_rows = df_sites_south3.shape[0]
 row_height = 35
 header_height = 38
 st.dataframe(styled, use_container_width=True, height=num_rows * row_height + header_height)
-st.markdown("<div style='height: 18rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 8rem'></div>", unsafe_allow_html=True)
 
 st.markdown(
 "<hr style='border: 1.5px solid #222; margin: 30px 0;'>",
 unsafe_allow_html=True
 )
 
-st.markdown("<div style='height: 3rem'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 11rem'></div>", unsafe_allow_html=True)
 
 st.markdown('<a id="south4"></a>', unsafe_allow_html=True)
 
