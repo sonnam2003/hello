@@ -840,22 +840,23 @@ document.querySelectorAll('#toc-float a').forEach(function(link) {
 st.markdown(toc_html, unsafe_allow_html=True)
 
 
-def read_priority_auto_desc():
-    try:
-        with open("priority_auto_desc.txt", "r", encoding="utf-8") as f:
-            return f.read()
-    except Exception:
-        return None
-
-priority_desc = read_priority_auto_desc()
-if priority_desc:
+for key, title in [
+    ('priority_auto_desc', 'OVERALL EVOLUTION OA TICKETS PER PRIORITY'),
+    ('category_auto_desc', 'OVERALL EVOLUTION OA TICKETS PER CATEGORY'),
+    ('region_auto_desc', 'OVERALL EVOLUTION OA TICKETS PER REGION'),
+    ('banner_week_auto_desc', 'OVERALL EVOLUTION OA TICKETS PER BANNER (BY WEEK)'),
+    ('banner_month_auto_desc', 'OVERALL EVOLUTION OA TICKETS PER BANNER (BY MONTH)')
+]:
+    desc = st.session_state.get(key, "No description available.")
     st.markdown(
-        f"""<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>
-        <b>OVERALL EVOLUTION OA TICKETS PER PRIORITY:</b><br>
-        {priority_desc}
-        </div>""",
+        f"<h4 style='text-align:center; color:#e74c3c;'>{title}</h4>",
         unsafe_allow_html=True
     )
+    st.markdown(
+        f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>{desc}</div>",
+        unsafe_allow_html=True
+    )
+    st.markdown("<div style='height: 5rem'></div>", unsafe_allow_html=True)
 
 
 
@@ -1122,10 +1123,7 @@ st.markdown(
     f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>{description}</div>",
     unsafe_allow_html=True
 )
-
-with open("priority_auto_desc.txt", "w", encoding="utf-8") as f:
-    f.write(description)
-
+st.session_state['priority_auto_desc'] = description  # Lưu vào session_state
 st.markdown("<div style='height: 3rem'></div>", unsafe_allow_html=True)
 
 # Stacked Column Chart theo Category
