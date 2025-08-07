@@ -12112,7 +12112,7 @@ with col2:
         unsafe_allow_html=True
     )
     st.markdown("<div style='margin-left: 40px;'>", unsafe_allow_html=True)
-    st.plotly_chart(fig_gauge)
+    st.plotly_chart(fig_gauge, key="gauge_chart_s1")
     st.markdown("</div>", unsafe_allow_html=True)
 
 st.markdown("<div style='height: 7rem'></div>", unsafe_allow_html=True)
@@ -12996,7 +12996,7 @@ with col2:
         unsafe_allow_html=True
     )
     st.markdown("<div style='margin-left: 40px;'>", unsafe_allow_html=True)
-    st.plotly_chart(fig_gauge)
+    st.plotly_chart(fig_gauge, key="gauge_chart_s2")
     st.markdown("</div>", unsafe_allow_html=True)
 
 st.markdown("<div style='height: 7rem'></div>", unsafe_allow_html=True)
@@ -13887,7 +13887,7 @@ with col2:
         unsafe_allow_html=True
     )
     st.markdown("<div style='margin-left: 40px;'>", unsafe_allow_html=True)
-    st.plotly_chart(fig_gauge)
+    st.plotly_chart(fig_gauge, key="gauge_chart_s3")
     st.markdown("</div>", unsafe_allow_html=True)
 
 st.markdown("<div style='height: 7rem'></div>", unsafe_allow_html=True)
@@ -14772,7 +14772,7 @@ with col2:
         unsafe_allow_html=True
     )
     st.markdown("<div style='margin-left: 40px;'>", unsafe_allow_html=True)
-    st.plotly_chart(fig_gauge)
+    st.plotly_chart(fig_gauge, key="gauge_chart_s4")
     st.markdown("</div>", unsafe_allow_html=True)
 
 st.markdown("<div style='height: 7rem'></div>", unsafe_allow_html=True)
@@ -15664,7 +15664,7 @@ with col2:
         unsafe_allow_html=True
     )
     st.markdown("<div style='margin-left: 40px;'>", unsafe_allow_html=True)
-    st.plotly_chart(fig_gauge)
+    st.plotly_chart(fig_gauge, key="gauge_chart_s5")
     st.markdown("</div>", unsafe_allow_html=True)
 
 st.markdown("<div style='height: 7rem'></div>", unsafe_allow_html=True)
