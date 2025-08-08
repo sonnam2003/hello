@@ -2419,15 +2419,15 @@ num_pos = sum(1 for v in change_values if v > 0)
 num_zero = sum(1 for v in change_values if abs(v) < 1e-6)
 
 if num_neg == 1 and num_zero == len(banner_names) - 1:
-    desc_banner_month_html = f"{A_html} recorded the largest {decrease_html} at {abs(X):.1f}%, while other banners remains unchanged, compared to the previous month. Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
+    desc_ticket_banner_month_html = f"{A_html} recorded the largest {decrease_html} at {abs(X):.1f}%, while other banners remains unchanged, compared to the previous month. Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
 elif num_pos == 1 and num_zero == len(banner_names) - 1:
-    desc_banner_month_html = f"{B_html} show the highest {increase_html} with {abs(Z):.1f}%, while other banners remains unchanged, compared to the previous month. Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
+    desc_ticket_banner_month_html = f"{B_html} show the highest {increase_html} with {abs(Z):.1f}%, while other banners remains unchanged, compared to the previous month. Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
 elif num_neg == len(banner_names):
-    desc_banner_month_html = f"{A_html} recorded the largest {decrease_html} at {abs(X):.1f}% compared to the previous month. Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
+    desc_ticket_banner_month_html = f"{A_html} recorded the largest {decrease_html} at {abs(X):.1f}% compared to the previous month. Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
 elif num_pos == len(banner_names):
-    desc_banner_month_html = f"{B_html} show the highest {increase_html} with {abs(Z):.1f}% compared to the previous month. Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
+    desc_ticket_banner_month_html = f"{B_html} show the highest {increase_html} with {abs(Z):.1f}% compared to the previous month. Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
 elif num_zero == len(banner_names):
-    desc_banner_month_html = f"All banners remain unchanged compared to the previous month. Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
+    desc_ticket_banner_month_html = f"All banners remain unchanged compared to the previous month. Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
 else:
     if abs(X) < 1e-6:
         decrease_text = f"{A_html} remains unchanged"
@@ -2437,32 +2437,32 @@ else:
         increase_text = f"{B_html} remains unchanged"
     else:
         increase_text = f"{B_html} show the highest {increase_html} with {abs(Z):.1f}%"
-    desc_banner_month_html = f"{decrease_text}, while {increase_text}, compared to the previous month. Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
+    desc_ticket_banner_month_html = f"{decrease_text}, while {increase_text}, compared to the previous month. Overall, the {total_html} change is {C_html} by {abs(Y):.1f}%"
 
 
 # desc_html là biến gốc bạn lấy từ đâu đó
-desc_banner_month_html1 = desc_banner_month_html.replace("text-align:center", "text-align:left")
+desc_ticket_banner_month_html1 = desc_ticket_banner_month_html.replace("text-align:center", "text-align:left")
 
 # Nếu desc_html bắt đầu bằng <div>, loại bỏ thẻ div ngoài cùng
-if desc_banner_month_html.startswith("<div"):
-    desc_banner_month_html_content = desc_banner_month_html[desc_banner_month_html.find('>')+1:desc_banner_month_html.rfind('</div>')]
+if desc_ticket_banner_month_html.startswith("<div"):
+    desc_ticket_banner_month_html_content = desc_ticket_banner_month_html_html[desc_ticket_banner_month_html_html.find('>')+1:desc_ticket_banner_month_html.rfind('</div>')]
 else:
-    desc_banner_month_html_content = desc_banner_month_html
+    desc_ticket_banner_month_html_content = desc_ticket_banner_month_html
 
 # Tạo biến căn trái
-desc_banner_month_html_left = f"""
+desc_ticket_banner_month_html_left = f"""
 <div style='font-size:18px; color:#444; text-align:left; margin-bottom:3rem'>
     <b style='color:#000'>
         <a href="#ticket_banner_month" style="color:#000; text-decoration:underline;">- OVERALL EVOLUTION OA TICKETS PER BANNER: </a>
-    </b> {desc_banner_month_html_content}
+    </b> {desc_ticket_banner_month_html_content}
 </div>
 """
 
 # Tạo biến giữ nguyên căn giữa
-desc_banner_month_html_center = f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>{desc_banner_month_html_content}</div>"
+desc_ticket_banner_month_html_center = f"<div style='font-size:18px; color:#444; text-align:center; margin-bottom:2rem'>{desc_ticket_banner_month_html_content}</div>"
 
 # Hiển thị
-st.markdown(desc_banner_month_html_left, unsafe_allow_html=True)
+st.markdown(desc_ticket_banner_month_html_left, unsafe_allow_html=True)
 
 
 # ------------------------------- STACKED COLUMN CHART TỪ EXCEL: OVERALL COST SPENT PER CATEGORY BY MONTH (MVND)---------------------------------------
@@ -3898,7 +3898,7 @@ st.markdown('<div id="ticket_banner_month"></div>', unsafe_allow_html=True)
 st.plotly_chart(fig_stack_banner_month)
 st.markdown("<div style='height: 0.2rem'></div>", unsafe_allow_html=True)
 
-st.markdown(desc_banner_month_html_center, unsafe_allow_html=True)
+st.markdown(desc_ticket_banner_month_html_center, unsafe_allow_html=True)
 st.markdown("<div style='height: 20rem'></div>", unsafe_allow_html=True)
 
 #----------------------------- Waterfall Chart BY WEEKS--------------------------------------------
