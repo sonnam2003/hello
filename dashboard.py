@@ -729,12 +729,13 @@ toc_html = """
     border: none;
 }
 #toc-float:hover {
-    width: 340px;
-    height: 780px;
-    min-height: 780px;
+    width: 280px;
+    height: 800px;
+    min-height: 800px;
     opacity: 1;
     overflow: visible;
     box-shadow: 0 8px 32px rgba(231,76,60,0.18), 0 2px 12px rgba(44,62,80,0.10);
+    padding-top: 0.1px;
 }
 #toc-float .toc-icon {
     font-size: 38px;
@@ -754,9 +755,9 @@ toc_html = """
     font-weight: 700;
     font-size: 22px;
     color: #e74c3c;
-    margin: 18px 0 12px 18px;
+    margin: 0.1px 0 18px 18px;
     display: none;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
     font-family: 'Segoe UI', Arial, sans-serif;
 }
 #toc-float:hover .toc-title {
