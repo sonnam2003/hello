@@ -4286,7 +4286,7 @@ st.markdown(
     """
     <div style="text-align: center; margin-top: 0.5rem; margin-bottom: 1.5rem; font-size: 28px;">
         <span style="color: #e53935; font-weight: bold;">*Note:</span>
-        The budget for CBS is still a dummy data. Additionally, cost includes both capex and opex, but the budget just includes opex (Capex and CBS's real budget will be added in in the future)
+        Cost includes both capex and opex, but the budget just includes opex (Capex will be added in in the future)
     </div>
     """,
     unsafe_allow_html=True
